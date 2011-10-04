@@ -1,0 +1,50 @@
+name: Coupon Codes
+main: com.lala.CouponCodes.CouponCodes
+version: 1.5.3
+author: 'LaLa'
+commands:
+    coupon:
+        description: Coupon
+        usage: |
+               /<command> - See forum post for more details on syntax
+    c:
+        description: Coupon
+        usage: |
+               /<command> - See forum post for more details on syntax
+permissions:
+    coupon.*:
+        description: Gives access to all coupon commands
+        children:
+            coupon.add: true
+            coupon.redeem: true
+            coupon.remove: true
+            coupon.remove.all: true
+            coupon.renew: true
+            coupon.reload: true
+            coupon.help: true
+    coupon.remove.*:
+        description: Gives you permission to remove and remove all coupons
+        children:
+            coupon.remove: true
+            coupon.remove.all: true
+    coupon.add:
+        description: Allows you to add a coupon
+        default: false
+    coupon.redeem:
+        description: Allows you to redeem a coupon
+        default: false
+    coupon.help:
+        description: Allows you to redeem a coupon
+        default: true
+    coupon.remove:
+        description: Allows you to remove a coupon
+        default: false
+    coupon.remove.all:
+        description: Allows you to remove all coupons
+        default: false
+    coupon.reload:
+        description: Allows you to reload CouponCode's configuration files
+        default: false
+    coupon.renew:
+        description: Allows you to renew a coupon
+        default: false
