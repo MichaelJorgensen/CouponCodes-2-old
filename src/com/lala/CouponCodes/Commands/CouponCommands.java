@@ -23,6 +23,14 @@ public class CouponCommands implements CommandExecutor{
 				return true;
 			}
 		}
+		
+		if (args[0].equalsIgnoreCase("remove")){
+			if (sender.hasPermission("coupon.remove")){
+				
+			}else{
+				sender.sendMessage("You do not have permission to remove a coupon!");
+			}
+		}
 		return false;
 	}	
 }
