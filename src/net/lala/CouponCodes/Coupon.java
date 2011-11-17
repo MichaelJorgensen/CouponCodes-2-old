@@ -6,15 +6,15 @@ public class Coupon {
 
 	private String name;
 	private int usetimesleft;
-	private ArrayList<Integer> itemids = new ArrayList<Integer>();
+	private ArrayList<Integer> itemids;
 	private int amount;
-	private ArrayList<String> usedplayers = new ArrayList<String>();
+	private ArrayList<String> usedplayers;
 	
-	public Coupon(String name, int usetimesleft, ArrayList<Integer> itemids, ArrayList<String> usedplayers, int prizeamount) {
+	public Coupon(String name, int usetimesleft, ArrayList<Integer> ids, ArrayList<String> names, int prizeamount) {
 		this.name = name;
 		this.usetimesleft = usetimesleft;
-		this.itemids = itemids;
-		this.usedplayers = usedplayers;
+		this.itemids = ids;
+		this.usedplayers = names;
 		this.amount = prizeamount;
 	}
 	
@@ -83,5 +83,23 @@ public class Coupon {
 	public void setItemIDs(ArrayList<Integer> ids){
 		this.itemids = ids;
 		//TODO: update database with new value
+	}
+	
+	/**
+	 * Turns the Arraylist of Item IDs into a String separated by commans
+	 * Example: 76,46,50
+	 * @return String
+	 */
+	public String FormatIDsToDbString(){
+		StringBuilder sb = new StringBuilder();
+		for (int i = itemids.size(); i > 0; i--){
+			sb.append(itemids.get(i-1));
+			sb.append(",");
+		}
+		return sb.toString();
+	}
+	
+	public String toString(){
+		return this.getName()+"::"+this.getAmount();
 	}
 }

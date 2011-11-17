@@ -8,6 +8,7 @@ import net.lala.CouponCodes.CouponCodes;
 
 public class CouponCommands implements CommandExecutor{
 
+	@SuppressWarnings("unused")
 	private CouponCodes plugin;
 	public CouponCommands(CouponCodes cc){
 		this.plugin = cc;

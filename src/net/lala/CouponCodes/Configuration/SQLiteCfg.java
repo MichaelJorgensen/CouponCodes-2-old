@@ -1,25 +1,24 @@
 package net.lala.CouponCodes.Configuration;
 
 
-import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import lib.PatPeter.SQLibrary.SQLite;
-
-import org.bukkit.ChatColor;
-
 import net.lala.CouponCodes.Coupon;
 import net.lala.CouponCodes.CouponCodes;
+
+import org.bukkit.ChatColor;
 
 public class SQLiteCfg {
 
 	private CouponCodes plugin;
-	private SQLite sql = plugin.sql;
-	public SQLiteCfg(CouponCodes plugin){
+	private SQLite sql;
+	public SQLiteCfg(CouponCodes plugin, SQLite sql){
 		this.plugin = plugin;
+		this.sql = sql;
 	}
 	// 1: name 2: use times 3:ArrayList of itemids 4:Array of used players
 	
@@ -39,24 +38,25 @@ public class SQLiteCfg {
 		return null;
 	}
 	
-	public String addCoupon(Coupon coupon){		
+	public String addCoupon(Coupon coupon){
 		if (getCouponsFromDatabase().contains(coupon.getName())){
 			return String.valueOf(ChatColor.RED + "Coupon already exists!");
 		}
 		
 		try {
-			PreparedStatement ps = sql.getConnection().prepareStatement("INSERT INTO couponcodes VALUES (?, ?, ?, ?)");
+			PreparedStatement ps = sql.getConnection().prepareStatement("INSERT INTO couponcodes VALUES (?, ?, ?, ?)");			
 			ps.setString(1, coupon.getName());
 			ps.setInt(2, coupon.getUseTimesLeft());
-			ps.setArray(3, (Array) coupon.getItemIDs());
-			ps.setArray(4, (Array) coupon.getUsedPlayers());
+			ps.setString(3, coupon.FormatIDsToDbString());
+			ps.setString(4, "mike_101_102,gaylord");
 			ps.addBatch();
 			sql.getConnection().setAutoCommit(false);
 			ps.executeBatch();
 			sql.getConnection().setAutoCommit(true);
 		} catch (SQLException e){
 			plugin.send("Error while using SQLite database to add coupon");
-			return String.valueOf(ChatColor.RED + "Error while using SQLite database to add coupon, coupon creation failed");
+			e.printStackTrace();
+			return ChatColor.RED + "Error while using SQLite database to add coupon, coupon creation failed (SQLException)";
 		}
 		
 		try{
@@ -64,17 +64,17 @@ public class SQLiteCfg {
 			sql.close();
 		} catch (SQLException e){
 			plugin.send("Error while closing SQLite connections");
-			return String.valueOf(ChatColor.RED + "Error while closing SQLite connections, coupon creation failed");
+			return ChatColor.RED + "Error while closing SQLite connections, coupon creation failed";
 		}
-		return String.valueOf(ChatColor.GREEN + "Coupon "+ChatColor.LIGHT_PURPLE+coupon.getName()+ChatColor.GREEN+" has been created!");
+		return ChatColor.GREEN + "Coupon "+ChatColor.LIGHT_PURPLE+coupon.getName()+ChatColor.GREEN+" has been created!";
 	}
 	
 	public String removeCoupon(Coupon coupon){
 		if (!this.getCouponsFromDatabase().contains(coupon.getName())){
-			return String.valueOf(ChatColor.RED + "Coupon does not exist!");
+			return ChatColor.RED + "Coupon does not exist!";
 		}else{
 			sql.query("DELETE FROM couponcodes WHERE name = '"+coupon.getName()+"'");
-			return String.valueOf(ChatColor.GREEN + "Coupon " + ChatColor.GOLD + coupon.getName() + ChatColor.GREEN + " has been removed!");
+			return ChatColor.GREEN + "Coupon " + ChatColor.GOLD + coupon.getName() + ChatColor.GREEN + " has been removed!";
 		}
 	}
 }

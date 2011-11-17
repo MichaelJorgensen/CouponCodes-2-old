@@ -6,15 +6,13 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import lib.PatPeter.SQLibrary.SQLite;
+import net.lala.CouponCodes.Configuration.SQLiteCfg;
 
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.config.Configuration;
-
-import net.lala.CouponCodes.Configuration.SQLiteCfg;
 
 public class CouponCodes extends JavaPlugin{
 
@@ -51,22 +49,11 @@ public class CouponCodes extends JavaPlugin{
 	public void setupMySQLDatabase() throws SQLException{
 		this.sql = new SQLite(this.log, "[CouponCodes]", "coupondata", this.getDataFolder().getAbsolutePath());
 		if (!sql.checkTable("couponcodes")){
-			sql.query("create table couponcodes (name, usetimes, itemsids, usedplayers)");
+			send("Table 'couponcodes' does not exist, creating");
+			sql.createTable("CREATE TABLE couponcodes (name String, usetimes Integer, itemsids ArrayList, usedplayers ArrayList)");
+			return;
 		}
-	}
-	
-	public Configuration getBukkitConfiguration(){
-		try {
-			Configuration cfg = new Configuration(new File("bukkit.yml"));
-			cfg.load();
-			return cfg;
-		}catch (Exception e){
-			return null;
-		}
-	}
-	
-	public Configuration getConfig(){
-		return this.getConfiguration();
+		send("Table 'couponcodes' detected");
 	}
 	
 	public void send(String message){
@@ -79,17 +66,23 @@ public class CouponCodes extends JavaPlugin{
 		}
 	}
 	
-	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args){
-		if (command.getName().equalsIgnoreCase("coupon")){
-			SQLiteCfg cfg = new SQLiteCfg(this);
-			ArrayList<Integer> ints = new ArrayList<Integer>();
-			ints.add(46);
-			ints.add(50);
-			ArrayList<String> up = new ArrayList<String>();
-			up.add("hi");
-			
-			cfg.addCoupon(new Coupon("test", 1, ints, up, 765));
-		}
+	public boolean onCommand(CommandSender sender, Command command, String cl, String[] args){
+		
+		//TODO: proper coding..
+		
+		SQLiteCfg db = new SQLiteCfg(this, sql);
+		
+		
+		
+		
+		/**ArrayList<Integer> ids = new ArrayList<Integer>();
+		ArrayList<String> names = new ArrayList<String>();
+		ids.add(46);
+		ids.add(57);
+		names.add("Notch");
+		names.add("DumbFuck");
+		names.add("fucker");
+		sender.sendMessage(db.addCoupon(new Coupon("testcoupon", 1, ids, names, 10)));*/
 		return true;
 	}
 }
