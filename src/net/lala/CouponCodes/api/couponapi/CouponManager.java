@@ -13,15 +13,15 @@ import net.lala.CouponCodes.api.SQLAPI;
  * CouponManager.java - Allows other plugins to interact with coupons
  * @author LaLa
  */
-public class CouponManager implements CouponAPI{
+public class CouponManager implements CouponAPI {
 	
 	private SQLAPI sql;
 	
-	public CouponManager(CouponCodes plugin){
+	public CouponManager(CouponCodes plugin) {
 		this.sql = plugin.getSQLAPI();
 	}
 	
-	public CouponManager(SQLAPI sql){
+	public CouponManager(SQLAPI sql) {
 		this.sql = sql;
 	}
 	
@@ -60,12 +60,12 @@ public class CouponManager implements CouponAPI{
 	}
 	
 	@Override
-	public Coupon createNewItemCoupon(String name, int usetimes, Array ids, Array usedplayers){
+	public Coupon createNewItemCoupon(String name, int usetimes, Array ids, Array usedplayers) {
 		return new Coupon(name, usetimes, ids, usedplayers);
 	}
 	
 	@Override
-	public Coupon createNewEconomyCoupon(String name, int usetimes, Array usedplayers, int money){
+	public Coupon createNewEconomyCoupon(String name, int usetimes, Array usedplayers, int money) {
 		return new Coupon(name, usetimes, usedplayers, money);
 	}
 }

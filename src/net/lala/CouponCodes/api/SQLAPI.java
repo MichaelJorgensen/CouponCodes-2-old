@@ -15,15 +15,15 @@ public abstract class SQLAPI {
 
 	private CouponCodes plugin;
 	
-	public SQLAPI(CouponCodes plugin){
+	public SQLAPI(CouponCodes plugin) {
 		this.plugin = plugin;
 	}
 	
-	public void send(String message){
+	public void send(String message) {
 		plugin.send(message);
 	}
 	
-	public void sendErr(String message){
+	public void sendErr(String message) {
 		plugin.sendErr(message);
 	}
 	

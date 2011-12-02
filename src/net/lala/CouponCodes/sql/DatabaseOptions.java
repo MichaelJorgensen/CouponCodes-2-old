@@ -31,7 +31,7 @@ public class DatabaseOptions {
 	 * @param username
 	 * @param password
 	 */
-	public DatabaseOptions(String hostname, String portnumber, String database, String username, String password){
+	public DatabaseOptions(String hostname, String portnumber, String database, String username, String password) {
 		this.sqltype = SQLType.MySQL;
 		this.hostname = hostname;
 		this.pn = portnumber;
@@ -44,36 +44,36 @@ public class DatabaseOptions {
 	 * For setting up SQLite
 	 * @param sqlFile
 	 */
-	public DatabaseOptions(File sqlFile){
+	public DatabaseOptions(File sqlFile) {
 		this.sqltype = SQLType.SQLite;
 		this.sqlFile = sqlFile;
 	}
 	
-	public SQLType getSQLType(){
+	public SQLType getSQLType() {
 		return sqltype;
 	}
 	
-	public File getSQLFile(){
+	public File getSQLFile() {
 		return sqlFile;
 	}
 	
-	public String getHostname(){
+	public String getHostname() {
 		return hostname;
 	}
 	
-	public String getPort(){
+	public String getPort() {
 		return pn;
 	}
 	
-	public String getDatabase(){
+	public String getDatabase() {
 		return database;
 	}
 	
-	public String getUsername(){
+	public String getUsername() {
 		return username;
 	}
 	
-	public String getPassword(){
+	public String getPassword() {
 		return password;
 	}
 }

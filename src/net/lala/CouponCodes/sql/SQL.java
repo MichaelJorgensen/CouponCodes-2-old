@@ -21,64 +21,64 @@ public class SQL extends SQLAPI {
 	private SQLType sqltype = SQLType.Unknown;
 	private Connection con = null;
 	
-	public SQL(CouponCodes plugin, DatabaseOptions dop){
+	public SQL(CouponCodes plugin, DatabaseOptions dop) {
 		super(plugin);
 		this.dop = dop;
 		this.sqltype = plugin.getSQLType();
 	}
 	
 	@Override
-	public DatabaseOptions getDatabaseOptions(){
+	public DatabaseOptions getDatabaseOptions() {
 		return dop;
 	}
 	
 	@Override
-	public Connection getConnection(){
+	public Connection getConnection() {
 		return con;
 	}
 	
 	@Override
-	public boolean open() throws SQLException{
+	public boolean open() throws SQLException {
 		if (sqltype.equals(SQLType.MySQL)){
 			con = DriverManager.getConnection("jdbc:mysql://"+dop.getHostname()+":"+dop.getPort()+"/"+dop.getDatabase(), dop.getUsername(), dop.getPassword());
 			return true;
 		}
-		else if (sqltype.equals(SQLType.SQLite)){
+		else if (sqltype.equals(SQLType.SQLite)) {
 			con = DriverManager.getConnection("jdbc:sqlite:"+dop.getSQLFile().getAbsolutePath());
 			return true;
-		}else{
+		} else {
 			return false;
 		}
 	}
 	
 	@Override
-	public void close() throws SQLException{
+	public void close() throws SQLException {
 		con.close();
 	}
 	
 	@Override
-	public boolean reload() throws SQLException{
+	public boolean reload() throws SQLException {
 		con.close();
 		return open();
 	}
 	
 	@Override
-	public ResultSet query(String query) throws SQLException{
+	public ResultSet query(String query) throws SQLException {
 		Statement st = null;
 		ResultSet rs = null;
 		
 		st = con.createStatement();
-		if (query.toLowerCase().contains("delete")){
+		if (query.toLowerCase().contains("delete")) {
 			st.executeUpdate(query);
 			return rs;
-		}else{
+		} else {
 			rs = st.executeQuery(query);
 			return rs;
 		}
 	}
 	
 	@Override
-	public boolean createTable(String table) throws SQLException{
+	public boolean createTable(String table) throws SQLException {
 		Statement st = con.createStatement();
 		return st.execute(table);
 	}

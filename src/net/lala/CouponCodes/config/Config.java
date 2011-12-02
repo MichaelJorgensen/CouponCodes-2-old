@@ -13,49 +13,49 @@ public class Config {
 	
 	private FileConfiguration config;
 	
-	public Config(Plugin plugin){
+	public Config(Plugin plugin) {
 		this.config = plugin.getConfig();
 		copyDefaults(true);
 	}
 	
-	public void copyDefaults(boolean copy){
+	public void copyDefaults(boolean copy) {
 		config.options().copyDefaults(copy);
 	}
 	
-	public SQLType getSQLType(){
+	public SQLType getSQLType() {
 		String type = getSQLValue();
 		
-		if (type.equalsIgnoreCase("MySQL")){
+		if (type.equalsIgnoreCase("MySQL")) {
 			return SQLType.MySQL;
 		}
-		else if (type.equalsIgnoreCase("SQLite")){
+		else if (type.equalsIgnoreCase("SQLite")) {
 			return SQLType.SQLite;
-		}else{
+		} else {
 			return SQLType.Unknown;
 		}
 	}
 	
-	public String getSQLValue(){
+	public String getSQLValue() {
 		return config.getString("sql-type");
 	}
 	
-	public String getHostname(){
+	public String getHostname() {
 		return config.getString("MySQL-options.hostname");
 	}
 	
-	public String getPort(){
+	public String getPort() {
 		return config.getString("MySQL-options.port");
 	}
 	
-	public String getDatabase(){
+	public String getDatabase() {
 		return config.getString("MySQL-options.database");
 	}
 	
-	public String getUsername(){
+	public String getUsername() {
 		return config.getString("MySQL-options.username");
 	}
 	
-	public String getPassword(){
+	public String getPassword() {
 		return config.getString("MySQL-options.password");
 	}
 }

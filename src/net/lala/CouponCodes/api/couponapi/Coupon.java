@@ -31,7 +31,7 @@ public class Coupon {
 	 * @param ids
 	 * @param usedplayers
 	 */
-	public Coupon(String name, int usetimes, Array ids, Array usedplayers){
+	public Coupon(String name, int usetimes, Array ids, Array usedplayers) {
 		this.ct = CouponType.Item;
 		this.name = name;
 		this.usetimes = usetimes;
@@ -46,17 +46,17 @@ public class Coupon {
 	 * @param usedplayers
 	 * @param money
 	 */
-	public Coupon(String name, int usetimes, Array usedplayers, int money){
+	public Coupon(String name, int usetimes, Array usedplayers, int money) {
 		this.ct = CouponType.Economy;
 		this.name = name;
 		this.usetimes = usetimes;
 	}
 	
-	public boolean addToDatabase() throws SQLException{
+	public boolean addToDatabase() throws SQLException {
 		return CouponCodes.getCouponAPI().addCouponToDatabase(this);
 	}
 	
-	public boolean removeFromDatabase() throws SQLException{
+	public boolean removeFromDatabase() throws SQLException {
 		return CouponCodes.getCouponAPI().removeCouponFromDatabase(this);
 	}
 	
@@ -64,51 +64,51 @@ public class Coupon {
 		return CouponCodes.getCouponAPI().couponExists(this);
 	}
 	
-	public CouponType getCouponType(){
+	public CouponType getCouponType() {
 		return ct;
 	}
 	
-	public void setCouponType(CouponType coupontype){
+	public void setCouponType(CouponType coupontype) {
 		this.ct = coupontype;
 	}
 	
-	public String getName(){
+	public String getName() {
 		return name;
 	}
 	
-	public void setName(String name){
+	public void setName(String name) {
 		this.name = name;
 	}
 	
-	public Integer getUseTimes(){
+	public Integer getUseTimes() {
 		return usetimes;
 	}
 	
-	public void setUseTimes(int usetimes){
+	public void setUseTimes(int usetimes) {
 		this.usetimes = usetimes;
 	}
 	
-	public Array getIDs(){
+	public Array getIDs() {
 		return ids;
 	}
 	
-	public void setIDs(Array ids){
+	public void setIDs(Array ids) {
 		this.ids = ids;
 	}
 	
-	public Array getUsedPlayers(){
+	public Array getUsedPlayers() {
 		return usedplayers;
 	}
 	
-	public void setUsedPlayers(Array usedplayers){
+	public void setUsedPlayers(Array usedplayers) {
 		this.usedplayers = usedplayers;
 	}
 	
-	public Integer getMoney(){
+	public Integer getMoney() {
 		return money;
 	}
 	
-	public void setMoney(int money){
+	public void setMoney(int money) {
 		this.money = money;
 	}
 }

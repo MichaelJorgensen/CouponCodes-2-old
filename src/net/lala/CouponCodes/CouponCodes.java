@@ -98,7 +98,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		} catch (SQLException e){
 			sendErr("Could not close SQL connection");
 		} catch (NullPointerException e){
-			sendErr("SQL is null. Connection doesn't exist.");
+			sendErr("SQL is null. Connection doesn't exist");
 		}
 		send("is now disabled.");
 	}
@@ -111,7 +111,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 			else
 				econ = ep.getProvider();
 				return true;
-		} catch (NoClassDefFoundError e){
+		} catch (NoClassDefFoundError e) {
 			return false;
 		}
 	}
@@ -126,11 +126,13 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
 		boolean pl = false;
 		if (sender instanceof Player) pl = true;
-		if (args.length == 0 || args[0].equalsIgnoreCase("help")){
+		if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
 			help(sender);
 			return true;
 		}
 		CouponAPI api = CouponCodes.getCouponAPI();
+		
+		// Add command
 		if (args[0].equalsIgnoreCase("add")) {
 			if (sender.hasPermission("cc.add")) {
 				if (args[0].equalsIgnoreCase("item")) {
@@ -186,6 +188,38 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 					}
 				} else {
 					help(sender);
+					return true;
+				}
+			} else {
+				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
+				return true;
+			}
+		}
+		
+		// List command
+		else if (args[0].equalsIgnoreCase("list")) {
+			if (sender.hasPermission("cc.list")) {
+				StringBuilder sb = new StringBuilder();
+				try {
+					ArrayList<String> c = api.getCoupons();
+					if (c.isEmpty() || c.size() <= 0 || c.equals(null)) {
+						sender.sendMessage(ChatColor.RED+"No coupons found.");
+						return true;
+					} else {
+						sb.append(ChatColor.DARK_PURPLE+"Coupon list:"+ChatColor.GOLD);
+						for (int i = 0; i < c.size(); i++) {
+							sb.append(c.get(i));
+							if (!(Integer.valueOf(i+1).equals(c.size()))){
+								sb.append(", ");
+							}
+						}
+						sender.sendMessage(sb.toString());
+						return true;
+					}
+				} catch (SQLException e) {
+					sender.sendMessage(ChatColor.DARK_RED+"Error while getting the coupon list from the database. Please check the console for more info.");
+					sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+					e.printStackTrace();
 					return true;
 				}
 			} else {

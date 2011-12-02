@@ -7,7 +7,7 @@ package net.lala.CouponCodes.misc;
 public enum CouponType {
 	Item, Economy, Unknown;
 	
-	public String value(){
+	public String value() {
 		switch (this){
 		case Item: return "Item";
 		case Economy: return "Economy";
