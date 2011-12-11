@@ -4,9 +4,9 @@ version: 2.0
 author: 'LaLa'
 commands:
     coupon:
-        description: Coupon
+        description: CouponCode's main command
         usage: |
-               /<command> - See forum post for more details on syntax
+               /<command> help
 permissions:
     coupon.*:
         description: Gives access to all coupon commands
