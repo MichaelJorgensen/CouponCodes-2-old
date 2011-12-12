@@ -1,0 +1,14 @@
+# This is the configuration for CouponCodes
+# If you have SQLite selected, IGNORE MySQL-options
+# In order for use-economy to be true, you must have the plugin Vault installed.
+# Vault is an API that allows this plugin to interact with economy plugins easily.
+# If you do not have vault, select false for use-economy.
+sql-type: SQLite
+sql-options: [SQLite, MySQL]
+MySQL-options:
+ hostname: localhost
+ port: '3306'
+ database: CouponCodes
+ username: minecraft
+ password: password
+use-economy: false

@@ -14,5 +14,4 @@ public class CouponManager implements CouponAPI{
 	public boolean addCouponToDatabase(Coupon coupon) {
 		return false;
 	}
-
 }
