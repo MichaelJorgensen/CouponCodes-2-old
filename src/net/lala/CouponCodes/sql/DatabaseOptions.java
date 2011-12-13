@@ -4,10 +4,14 @@ import java.io.File;
 
 import net.lala.CouponCodes.misc.SQLType;
 
+/**
+ * DatabaseOptions.java - Provides an easy way of sharing a database's options among classes
+ * @author LaLa
+ */
 public class DatabaseOptions {
 
 	//General Variables
-	private SQLType sqltype;
+	private SQLType sqltype = SQLType.Unknown;
 	
 	//MySQL variables
 	private String hostname = null;
@@ -47,6 +51,10 @@ public class DatabaseOptions {
 	
 	public SQLType getSQLType(){
 		return sqltype;
+	}
+	
+	public File getSQLFile(){
+		return sqlFile;
 	}
 	
 	public String getHostname(){

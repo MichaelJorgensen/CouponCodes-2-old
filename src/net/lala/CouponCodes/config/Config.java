@@ -5,18 +5,20 @@ import net.lala.CouponCodes.misc.SQLType;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
+/**
+ * Config.java - Custom config handling
+ * @author LaLa
+ */
 public class Config {
-
-	private Plugin plugin;
+	
 	private FileConfiguration config;
 	
 	public Config(Plugin plugin){
-		this.plugin = plugin;
 		this.config = plugin.getConfig();
 	}
 	
 	public SQLType getSQLType(){
-		String type = config.getString("sql-type");
+		String type = getSQLValue();
 		
 		if (type.equalsIgnoreCase("MySQL"))
 			return SQLType.MySQL;
@@ -24,6 +26,10 @@ public class Config {
 			return SQLType.SQLite;
 		else
 			return SQLType.Unknown;
+	}
+	
+	public String getSQLValue(){
+		return config.getString("sql-type");
 	}
 	
 	public String getHostname(){

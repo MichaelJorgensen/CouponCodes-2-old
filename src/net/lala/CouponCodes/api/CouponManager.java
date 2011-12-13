@@ -2,6 +2,10 @@ package net.lala.CouponCodes.api;
 
 import net.lala.CouponCodes.CouponCodes;
 
+/**
+ * CouponManager.java - Allows other plugins to interact with coupons
+ * @author LaLa
+ */
 public class CouponManager implements CouponAPI{
 
 	private CouponCodes plugin;

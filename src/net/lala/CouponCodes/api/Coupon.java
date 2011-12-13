@@ -4,16 +4,20 @@ import java.sql.Array;
 
 import net.lala.CouponCodes.misc.CouponType;
 
+/**
+ * Coupon.java - Stores all of the coupon's information
+ * @author LaLa
+ */
 public class Coupon {
 	
 	// General variables
 	private CouponType ct = CouponType.Unknown;
 	private String name;
 	private int usetimes;
+	private Array usedplayers = null;
 	
 	// Item specific variables
 	private Array ids = null;
-	private Array usedplayers = null;
 	
 	// Economy specific variables
 	private int money = 0;
@@ -26,6 +30,7 @@ public class Coupon {
 	 * @param usedplayers
 	 */
 	public Coupon(String name, int usetimes, Array ids, Array usedplayers){
+		this.ct = CouponType.Item;
 		this.name = name;
 		this.usetimes = usetimes;
 		this.ids = ids;
@@ -40,6 +45,7 @@ public class Coupon {
 	 * @param money
 	 */
 	public Coupon(String name, int usetimes, Array usedplayers, int money){
+		this.ct = CouponType.Economy;
 		this.name = name;
 		this.usetimes = usetimes;
 	}
