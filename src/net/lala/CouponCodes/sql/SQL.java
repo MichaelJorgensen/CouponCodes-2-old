@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import net.lala.CouponCodes.CouponCodes;
-import net.lala.CouponCodes.api.Coupon;
 import net.lala.CouponCodes.api.SQLAPI;
 import net.lala.CouponCodes.misc.SQLType;
 
@@ -28,10 +27,17 @@ public class SQL extends SQLAPI{
 		this.sqltype = plugin.getSQLType();
 	}
 	
+	@Override
 	public DatabaseOptions getDatabaseOptions(){
 		return dop;
 	}
 	
+	@Override
+	public Connection getConnection(){
+		return con;
+	}
+	
+	@Override
 	public boolean open() throws SQLException{
 		if (sqltype.equals(SQLType.MySQL)){
 			con = DriverManager.getConnection("jdbc:mysql://"+dop.getHostname()+":"+dop.getPort()+"/"+dop.getDatabase(), dop.getUsername(), dop.getPassword());
@@ -45,15 +51,18 @@ public class SQL extends SQLAPI{
 		}
 	}
 	
+	@Override
 	public void close() throws SQLException{
 		con.close();
 	}
 	
+	@Override
 	public boolean reload() throws SQLException{
 		con.close();
 		return open();
 	}
 	
+	@Override
 	public ResultSet query(String query) throws SQLException{
 		Statement st = null;
 		ResultSet rs = null;
@@ -68,12 +77,9 @@ public class SQL extends SQLAPI{
 		}
 	}
 	
+	@Override
 	public boolean createTable(String table) throws SQLException{
 		Statement st = con.createStatement();
 		return st.execute(table);
-	}
-	
-	public boolean addCouponToDatabase(Coupon coupon){
-		return false;
 	}
 }

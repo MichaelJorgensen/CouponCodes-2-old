@@ -4,14 +4,19 @@ import java.io.File;
 import java.sql.SQLException;
 
 import net.lala.CouponCodes.api.CouponCodesInterface;
-import net.lala.CouponCodes.api.CouponManager;
+import net.lala.CouponCodes.api.SQLAPI;
+import net.lala.CouponCodes.api.couponapi.CouponAPI;
+import net.lala.CouponCodes.api.couponapi.CouponManager;
 import net.lala.CouponCodes.config.Config;
 import net.lala.CouponCodes.misc.SQLType;
 import net.lala.CouponCodes.sql.DatabaseOptions;
 import net.lala.CouponCodes.sql.SQL;
 import net.milkbowl.vault.economy.Economy;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -33,6 +38,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 	public Server server = null;
 	public Economy econ = null;
 	
+	@Override
 	public void onEnable(){
 		if (cm == null)
 			cm = new CouponManager(this);
@@ -66,7 +72,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		sql = new SQL(this, dataop);
 		
 		try {
-			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ENUM('Item', 'Economy'), usetimes INT(5), usedplayers Array, ids Array, money INT(5))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ENUM('Item', 'Economy'), usetimes INT(10), usedplayers Array, ids Array, money INT(10))");
 		} catch (SQLException e) {
 			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
 			e.printStackTrace();
@@ -77,6 +83,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		send("is now enabled! Version: "+this.getDescription().getVersion());
 	}
 	
+	@Override
 	public void onDisable(){
 		send("is now disabled.");
 	}
@@ -90,6 +97,23 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 			return true;
 	}
 	
+	@Override
+	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args){
+		if (args.length == 0 || args[0].equalsIgnoreCase("help")){
+			help(sender);
+			return true;
+		}
+		CouponAPI api = CouponCodes.getCouponAPI();
+		return false;
+	}
+	
+	private void help(CommandSender sender){
+		sender.sendMessage(ChatColor.GOLD+"|---------------------|");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.DARK_RED+"CouponCodes Help"+ChatColor.GOLD+"--|");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c help"+ChatColor.GOLD+"--|");
+		sender.sendMessage(ChatColor.GOLD+"|---------------------|");
+	}
+	
 	public void send(String message){
 		System.out.println("[CouponCodes] "+message);
 	}
@@ -98,8 +122,12 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		System.err.println("[CouponCodes] [Error] "+message);
 	}
 	
-	public static CouponManager getCouponManager(){
-		return cm;
+	public static CouponAPI getCouponAPI(){
+		return (CouponAPI) cm;
+	}
+	
+	public SQLAPI getSQLAPI(){
+		return (SQLAPI) sql;
 	}
 	
 	public DatabaseOptions getDatabaseOptions(){

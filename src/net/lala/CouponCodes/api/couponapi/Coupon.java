@@ -1,4 +1,4 @@
-package net.lala.CouponCodes.api;
+package net.lala.CouponCodes.api.couponapi;
 
 import java.sql.Array;
 

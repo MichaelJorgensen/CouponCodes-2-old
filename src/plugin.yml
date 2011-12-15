@@ -6,8 +6,7 @@ softdepend: [Vault]
 commands:
     coupon:
         description: CouponCode's main command
-        usage: |
-               /<command> help
+        usage: /<command>
 permissions:
     coupon.*:
         description: Gives access to all coupon commands
