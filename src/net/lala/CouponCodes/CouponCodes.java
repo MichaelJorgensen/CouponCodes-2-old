@@ -1,10 +1,14 @@
 package net.lala.CouponCodes;
 
 import java.io.File;
+import java.sql.Array;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import net.lala.CouponCodes.api.CouponCodesInterface;
 import net.lala.CouponCodes.api.SQLAPI;
+import net.lala.CouponCodes.api.couponapi.Coupon;
 import net.lala.CouponCodes.api.couponapi.CouponAPI;
 import net.lala.CouponCodes.api.couponapi.CouponManager;
 import net.lala.CouponCodes.config.Config;
@@ -17,6 +21,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -72,6 +77,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		sql = new SQL(this, dataop);
 		
 		try {
+			sql.open();
 			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ENUM('Item', 'Economy'), usetimes INT(10), usedplayers Array, ids Array, money INT(10))");
 		} catch (SQLException e) {
 			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
@@ -97,13 +103,83 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 			return true;
 	}
 	
+	/*
+	 * Notes
+	 * /c add item [name] [item1,item2] [usetimes]
+	 * /c add econ [name] [money] [usetimes]
+	 */
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args){
+		boolean pl = false;
+		if (sender instanceof Player) pl = true;
 		if (args.length == 0 || args[0].equalsIgnoreCase("help")){
 			help(sender);
 			return true;
 		}
 		CouponAPI api = CouponCodes.getCouponAPI();
+		if (args[0].equalsIgnoreCase("add")){
+			if (sender.hasPermission("cc.add")){
+				if (args[0].equalsIgnoreCase("item")){
+					if (args.length == 5){
+						try {
+							Coupon coupon = api.createNewItemCoupon(args[2], Integer.parseInt(args[4]), (Array) new ArrayList<String>(Arrays.asList(args[3].split(","))), null);
+							if (api.couponExists(coupon)){
+								sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
+								return true;
+							}else{
+								api.addCouponToDatabase(coupon);
+								return true;
+							}
+						} catch (NumberFormatException e){
+							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got "+ChatColor.YELLOW+args[4]);
+							return true;
+						} catch (SQLException e){
+							sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
+							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+							e.printStackTrace();
+							return true;
+						}
+					}else{
+						sender.sendMessage(ChatColor.DARK_RED+"Invalid syntax length");
+						help(sender);
+						return true;
+					}
+				}
+				else if (args[0].equalsIgnoreCase("econ")){
+					if (args.length == 5){
+						try{
+							Coupon coupon = api.createNewEconomyCoupon(args[2], Integer.parseInt(args[4]), (Array) new ArrayList<String>(Arrays.asList(args[3].split(","))), Integer.parseInt(args[3]));
+							if (api.couponExists(coupon)){
+								sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
+								return true;
+							}else{
+								api.addCouponToDatabase(coupon);
+								return true;
+							}
+						} catch (NumberFormatException e){
+							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got "+ChatColor.YELLOW+args[3]);
+							return true;
+						} catch (SQLException e){
+							sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
+							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+							e.printStackTrace();
+							return true;
+						}
+					}else{
+						sender.sendMessage(ChatColor.DARK_RED+"Invalid syntax length");
+						help(sender);
+						return true;
+					}
+				}else{
+					help(sender);
+					return true;
+				}
+			}else{
+				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
+				return true;
+			}
+		}
 		return false;
 	}
 	

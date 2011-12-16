@@ -34,8 +34,7 @@ public class CouponManager implements CouponAPI{
 	
 	@Override
 	public boolean removeCouponFromDatabase(Coupon coupon) throws SQLException {
-		if (!couponExists(coupon)) return false;
-		
+		if (!couponExists(coupon)) return false;		
 		sql.query("DELETE FROM couponcodes WHERE name='"+coupon.getName()+"'");
 		return true;
 	}
@@ -48,6 +47,7 @@ public class CouponManager implements CouponAPI{
 	@Override
 	public ArrayList<String> getCoupons() throws SQLException {
 		ResultSet rs = sql.query("SELECT name FROM couponcodes");
+		if (rs.equals(null)) return null;
 		ArrayList<String> c = new ArrayList<String>();
 		while (rs.next())
 			c.add(rs.getString(1));
