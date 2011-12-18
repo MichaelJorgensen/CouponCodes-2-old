@@ -1,7 +1,9 @@
 package net.lala.CouponCodes.api.couponapi;
 
 import java.sql.Array;
+import java.sql.SQLException;
 
+import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.misc.CouponType;
 
 /**
@@ -48,6 +50,14 @@ public class Coupon {
 		this.ct = CouponType.Economy;
 		this.name = name;
 		this.usetimes = usetimes;
+	}
+	
+	public boolean addToDatabase() throws SQLException{
+		return CouponCodes.getCouponAPI().addCouponToDatabase(this);
+	}
+	
+	public boolean removeFromDatabase() throws SQLException{
+		return CouponCodes.getCouponAPI().removeCouponFromDatabase(this);
 	}
 	
 	public CouponType getCouponType(){
