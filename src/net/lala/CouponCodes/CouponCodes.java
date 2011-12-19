@@ -120,6 +120,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 	 * Notes
 	 * /c add item [name] [item1,item2] [usetimes]
 	 * /c add econ [name] [money] [usetimes]
+	 * /c remove [name]
 	 */
 	
 	@Override
@@ -140,7 +141,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 						try {
 							Coupon coupon = api.createNewItemCoupon(args[2], Integer.parseInt(args[4]), (Array) new ArrayList<String>(Arrays.asList(args[3].split(","))), null);
 							if (api.couponExists(coupon)) {
-								sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
+								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
 								return true;
 							} else {
 								coupon.addToDatabase();
@@ -156,7 +157,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 							return true;
 						}
 					} else {
-						sender.sendMessage(ChatColor.DARK_RED+"Invalid syntax length");
+						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
 						help(sender);
 						return true;
 					}
@@ -182,11 +183,36 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 							return true;
 						}
 					} else {
-						sender.sendMessage(ChatColor.DARK_RED+"Invalid syntax length");
+						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
 						help(sender);
 						return true;
 					}
 				} else {
+					help(sender);
+					return true;
+				}
+			} else {
+				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
+				return true;
+			}
+		}
+		
+		// Remove command
+		else if (args[0].equalsIgnoreCase("remove")) {
+			if (sender.hasPermission("cc.remove")) {
+				if (args.length == 2) {
+					try {
+						api.removeCouponFromDatabase(api.createNewItemCoupon(args[1], 0, null, null));
+						sender.sendMessage(ChatColor.GREEN+"The coupon "+ChatColor.GOLD+args[1]+ChatColor.GREEN+" has been removed.");
+						return true;
+					} catch (SQLException e) {
+						sender.sendMessage(ChatColor.DARK_RED+"Error while removing coupon from the database. Please check the console for more info.");
+						sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+						e.printStackTrace();
+						return true;
+					}
+				} else {
+					sender.sendMessage(ChatColor.RED+"Invalid syntax length");
 					help(sender);
 					return true;
 				}
