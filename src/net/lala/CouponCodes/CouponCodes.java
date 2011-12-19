@@ -44,7 +44,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 	public Economy econ = null;
 	
 	@Override
-	public void onEnable(){
+	public void onEnable() {
 		if (cm == null)
 			cm = new CouponManager(this);
 		
@@ -54,14 +54,14 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		if (!setupEcon()){
 			send("Economy support is disabled.");
 			ec = false;
-		}else{
+		} else {
 			ec = true;
 		}
 		
 		config = new Config(this);
 		sqltype = config.getSQLType();
 		
-		switch (sqltype){
+		switch (sqltype) {
 		case MySQL: dataop = new DatabaseOptions(config.getHostname(),
 				config.getPort(),
 				config.getDatabase(),
@@ -86,21 +86,34 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 			return;
 		}
 		
+		this.saveConfig();
 		send("is now enabled! Version: "+this.getDescription().getVersion());
 	}
 	
 	@Override
-	public void onDisable(){
+	public void onDisable() {
+		this.saveConfig();
+		try {
+			sql.close();
+		} catch (SQLException e){
+			sendErr("Could not close SQL connection");
+		} catch (NullPointerException e){
+			sendErr("SQL is null. Connection doesn't exist.");
+		}
 		send("is now disabled.");
 	}
 	
-	private boolean setupEcon(){
-		RegisteredServiceProvider<Economy> ep = server.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-		if (ep == null)
+	private boolean setupEcon() {
+		try {
+			RegisteredServiceProvider<Economy> ep = server.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+			if (ep == null)
+				return false;
+			else
+				econ = ep.getProvider();
+				return true;
+		} catch (NoClassDefFoundError e){
 			return false;
-		else
-			econ = ep.getProvider();
-			return true;
+		}
 	}
 	
 	/*
@@ -110,7 +123,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 	 */
 	
 	@Override
-	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args){
+	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
 		boolean pl = false;
 		if (sender instanceof Player) pl = true;
 		if (args.length == 0 || args[0].equalsIgnoreCase("help")){
@@ -118,64 +131,64 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 			return true;
 		}
 		CouponAPI api = CouponCodes.getCouponAPI();
-		if (args[0].equalsIgnoreCase("add")){
-			if (sender.hasPermission("cc.add")){
-				if (args[0].equalsIgnoreCase("item")){
-					if (args.length == 5){
+		if (args[0].equalsIgnoreCase("add")) {
+			if (sender.hasPermission("cc.add")) {
+				if (args[0].equalsIgnoreCase("item")) {
+					if (args.length == 5) {
 						try {
 							Coupon coupon = api.createNewItemCoupon(args[2], Integer.parseInt(args[4]), (Array) new ArrayList<String>(Arrays.asList(args[3].split(","))), null);
-							if (api.couponExists(coupon)){
+							if (api.couponExists(coupon)) {
 								sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
 								return true;
-							}else{
-								api.addCouponToDatabase(coupon);
+							} else {
+								coupon.addToDatabase();
 								return true;
 							}
-						} catch (NumberFormatException e){
+						} catch (NumberFormatException e) {
 							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got "+ChatColor.YELLOW+args[4]);
 							return true;
-						} catch (SQLException e){
+						} catch (SQLException e) {
 							sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
 							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 							e.printStackTrace();
 							return true;
 						}
-					}else{
+					} else {
 						sender.sendMessage(ChatColor.DARK_RED+"Invalid syntax length");
 						help(sender);
 						return true;
 					}
 				}
-				else if (args[0].equalsIgnoreCase("econ")){
-					if (args.length == 5){
+				else if (args[0].equalsIgnoreCase("econ")) {
+					if (args.length == 5) {
 						try{
 							Coupon coupon = api.createNewEconomyCoupon(args[2], Integer.parseInt(args[4]), (Array) new ArrayList<String>(Arrays.asList(args[3].split(","))), Integer.parseInt(args[3]));
-							if (api.couponExists(coupon)){
+							if (api.couponExists(coupon)) {
 								sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
 								return true;
-							}else{
-								api.addCouponToDatabase(coupon);
+							} else {
+								coupon.addToDatabase();
 								return true;
 							}
-						} catch (NumberFormatException e){
+						} catch (NumberFormatException e) {
 							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got "+ChatColor.YELLOW+args[3]);
 							return true;
-						} catch (SQLException e){
+						} catch (SQLException e) {
 							sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
 							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 							e.printStackTrace();
 							return true;
 						}
-					}else{
+					} else {
 						sender.sendMessage(ChatColor.DARK_RED+"Invalid syntax length");
 						help(sender);
 						return true;
 					}
-				}else{
+				} else {
 					help(sender);
 					return true;
 				}
-			}else{
+			} else {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
 				return true;
 			}
@@ -183,38 +196,38 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		return false;
 	}
 	
-	private void help(CommandSender sender){
+	private void help(CommandSender sender) {
 		sender.sendMessage(ChatColor.GOLD+"|---------------------|");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.DARK_RED+"CouponCodes Help"+ChatColor.GOLD+"--|");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c help"+ChatColor.GOLD+"--|");
 		sender.sendMessage(ChatColor.GOLD+"|---------------------|");
 	}
 	
-	public void send(String message){
+	public void send(String message) {
 		System.out.println("[CouponCodes] "+message);
 	}
 	
-	public void sendErr(String message){
+	public void sendErr(String message) {
 		System.err.println("[CouponCodes] [Error] "+message);
 	}
 	
-	public static CouponAPI getCouponAPI(){
+	public static CouponAPI getCouponAPI() {
 		return (CouponAPI) cm;
 	}
 	
-	public SQLAPI getSQLAPI(){
+	public SQLAPI getSQLAPI() {
 		return (SQLAPI) sql;
 	}
 	
-	public DatabaseOptions getDatabaseOptions(){
+	public DatabaseOptions getDatabaseOptions() {
 		return dataop;
 	}
 	
-	public boolean isEconomyEnabled(){
+	public boolean isEconomyEnabled() {
 		return ec;
 	}
 	
-	public SQLType getSQLType(){
+	public SQLType getSQLType() {
 		return sqltype;
 	}
 }

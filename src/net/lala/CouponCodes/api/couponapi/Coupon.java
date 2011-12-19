@@ -60,6 +60,10 @@ public class Coupon {
 		return CouponCodes.getCouponAPI().removeCouponFromDatabase(this);
 	}
 	
+	public boolean existsInDatabase() throws SQLException {
+		return CouponCodes.getCouponAPI().couponExists(this);
+	}
+	
 	public CouponType getCouponType(){
 		return ct;
 	}

@@ -11,6 +11,7 @@ public interface CouponAPI {
 	 * Add the coupon to the database, returning its success
 	 * @param coupon
 	 * @return true if coupon has been added
+	 * @throws SQLException
 	 */
 	public boolean addCouponToDatabase(Coupon coupon) throws SQLException;
 	
@@ -18,6 +19,7 @@ public interface CouponAPI {
 	 * Removes the give coupon from the database, returning its success
 	 * @param coupon
 	 * @return true if coupon has been deleted
+	 * @throws SQLException
 	 */
 	public boolean removeCouponFromDatabase(Coupon coupon) throws SQLException;
 	
@@ -45,12 +47,21 @@ public interface CouponAPI {
 	 * Checks if the coupon exists in the database
 	 * @param coupon
 	 * @return true if the coupon exists
+	 * @throws SQLException
 	 */
 	public boolean couponExists(Coupon coupon) throws SQLException;
 	
 	/**
+	 * Checks if the coupon name exists in the database
+	 * @param name
+	 * @return true if coupon exists
+	 * @throws SQLException
+	 */
+	public boolean couponExists(String name) throws SQLException;
+	/**
 	 * Returns all the coupon names in the database
 	 * @return ArrayList<String>
+	 * @throws SQLException
 	 */
 	public ArrayList<String> getCoupons() throws SQLException;
 }

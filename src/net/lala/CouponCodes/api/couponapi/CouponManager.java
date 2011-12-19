@@ -45,6 +45,11 @@ public class CouponManager implements CouponAPI{
 	}
 	
 	@Override
+	public boolean couponExists(String name) throws SQLException {
+		return getCoupons().contains(name);
+	}
+	
+	@Override
 	public ArrayList<String> getCoupons() throws SQLException {
 		ResultSet rs = sql.query("SELECT name FROM couponcodes");
 		if (rs.equals(null)) return null;

@@ -15,17 +15,24 @@ public class Config {
 	
 	public Config(Plugin plugin){
 		this.config = plugin.getConfig();
+		copyDefaults(true);
+	}
+	
+	public void copyDefaults(boolean copy){
+		config.options().copyDefaults(copy);
 	}
 	
 	public SQLType getSQLType(){
 		String type = getSQLValue();
 		
-		if (type.equalsIgnoreCase("MySQL"))
+		if (type.equalsIgnoreCase("MySQL")){
 			return SQLType.MySQL;
-		else if (type.equalsIgnoreCase("SQLite"))
+		}
+		else if (type.equalsIgnoreCase("SQLite")){
 			return SQLType.SQLite;
-		else
+		}else{
 			return SQLType.Unknown;
+		}
 	}
 	
 	public String getSQLValue(){

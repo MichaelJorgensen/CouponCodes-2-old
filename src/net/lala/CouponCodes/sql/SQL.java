@@ -14,7 +14,7 @@ import net.lala.CouponCodes.misc.SQLType;
  * SQL.java - MySQL, SQLite handling
  * @author LaLa
  */
-public class SQL extends SQLAPI{
+public class SQL extends SQLAPI {
 	
 	private DatabaseOptions dop;
 	
