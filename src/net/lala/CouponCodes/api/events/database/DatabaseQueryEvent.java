@@ -33,7 +33,10 @@ public class DatabaseQueryEvent extends Event {
 		return rs;
 	}
 	
-	protected void call() {
+	/**
+	 * Calls the event
+	 */
+	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}
 }

@@ -6,10 +6,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.lala.CouponCodes.api.Coupon;
 import net.lala.CouponCodes.api.CouponAPI;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.api.SQLAPI;
+import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.events.example.CouponMaster;
 import net.lala.CouponCodes.api.events.example.DatabaseMaster;
 import net.lala.CouponCodes.config.Config;
@@ -168,7 +168,7 @@ public class CouponCodes extends JavaPlugin {
 						}
 					} else {
 						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
-						help(sender);
+						sender.sendMessage(ChatColor.YELLOW+"/c add item [name] [item1,item2...] [usetimes]");
 						return true;
 					}
 				}
@@ -194,12 +194,9 @@ public class CouponCodes extends JavaPlugin {
 						}
 					} else {
 						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
-						help(sender);
+						sender.sendMessage(ChatColor.YELLOW+"/c add econ [name] [money] [usetimes]");
 						return true;
 					}
-				} else {
-					help(sender);
-					return true;
 				}
 			} else {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
@@ -223,7 +220,7 @@ public class CouponCodes extends JavaPlugin {
 					}
 				} else {
 					sender.sendMessage(ChatColor.RED+"Invalid syntax length");
-					help(sender);
+					sender.sendMessage(ChatColor.YELLOW+"/c remove [name]");
 					return true;
 				}
 			} else {
@@ -262,6 +259,9 @@ public class CouponCodes extends JavaPlugin {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
 				return true;
 			}
+		} else{
+			help(sender);
+			return true;
 		}
 		return false;
 	}

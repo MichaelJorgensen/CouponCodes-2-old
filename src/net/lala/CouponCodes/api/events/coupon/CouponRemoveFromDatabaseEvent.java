@@ -1,6 +1,6 @@
 package net.lala.CouponCodes.api.events.coupon;
 
-import net.lala.CouponCodes.api.Coupon;
+import net.lala.CouponCodes.api.coupon.Coupon;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -19,7 +19,10 @@ public class CouponRemoveFromDatabaseEvent extends Event {
 		return coupon;
 	}
 	
-	protected void call() {
+	/**
+	 * Calls the event
+	 */
+	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}
 }

@@ -16,16 +16,16 @@ public class CouponMaster extends CouponListener {
 	
 	@Override
 	public void onCouponCreate(CouponCreateEvent event) {
-		plugin.debug("Coupon created: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType().value());
+		plugin.debug("Coupon created: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType());
 	}
 	
 	@Override
 	public void onCouponAddToDatabase(CouponAddToDatabaseEvent event) {
-		plugin.debug("Coupon added to database: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType().value());
+		plugin.debug("Coupon added to database: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType());
 	}
 	
 	@Override
 	public void onCouponRemoveFromDatabase(CouponRemoveFromDatabaseEvent event) {
-		plugin.debug("Coupon removed from database: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType().value());
+		plugin.debug("Coupon removed from database: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType());
 	}
 }

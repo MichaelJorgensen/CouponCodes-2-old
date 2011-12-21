@@ -33,7 +33,10 @@ public class DatabaseOpenConnectionEvent extends Event {
 		return success;
 	}
 	
-	protected void call() {
+	/**
+	 * Calls the event
+	 */
+	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}
 }

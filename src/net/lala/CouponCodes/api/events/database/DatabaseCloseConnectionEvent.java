@@ -27,7 +27,10 @@ public class DatabaseCloseConnectionEvent extends Event {
 		return dop;
 	}
 	
-	protected void call() {
+	/**
+	 * Calls the event
+	 */
+	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}
 }

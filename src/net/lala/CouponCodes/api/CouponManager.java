@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.lala.CouponCodes.CouponCodes;
+import net.lala.CouponCodes.api.coupon.Coupon;
+import net.lala.CouponCodes.api.coupon.EconomyCoupon;
+import net.lala.CouponCodes.api.coupon.ItemCoupon;
 import net.lala.CouponCodes.api.events.coupon.CouponAddToDatabaseEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
 
@@ -31,7 +34,14 @@ public class CouponManager implements CouponAPI {
 	@Override
 	public boolean addCouponToDatabase(Coupon coupon) throws SQLException {		
 		Connection con = sql.getConnection();
-		con.createStatement().executeUpdate("INSERT INTO couponcodes VALUES('"+coupon.getName()+"', '"+coupon.getType().value()+"', "+coupon.getUseTimes()+", "+coupon.getUsedPlayers()+", "+coupon.getMoney());
+		if (coupon instanceof ItemCoupon) {
+			ItemCoupon c = (ItemCoupon) coupon;
+			con.createStatement().executeUpdate("INSERT INTO couponcodes VALUES('"+c.getName()+"', '"+c.getType()+"', "+c.getUseTimes()+", "+c.getUsedPlayers()+", "+0);
+		}
+		else if (coupon instanceof EconomyCoupon) {
+			EconomyCoupon c = (EconomyCoupon) coupon;
+			con.createStatement().executeUpdate("INSERT INTO couponcodes VALUES('"+c.getName()+"', '"+c.getType()+"', "+c.getUseTimes()+", "+c.getUsedPlayers()+", "+c.getMoney());
+		}
 		CouponAddToDatabaseEvent ev = new CouponAddToDatabaseEvent(coupon);
 		Bukkit.getServer().getPluginManager().callEvent(ev);
 		return true;
@@ -68,11 +78,11 @@ public class CouponManager implements CouponAPI {
 	
 	@Override
 	public Coupon createNewItemCoupon(String name, int usetimes, Array ids, Array usedplayers) {
-		return new Coupon(name, usetimes, ids, usedplayers);
+		return new ItemCoupon(name, usetimes, ids, usedplayers);
 	}
 	
 	@Override
 	public Coupon createNewEconomyCoupon(String name, int usetimes, Array usedplayers, int money) {
-		return new Coupon(name, usetimes, usedplayers, money);
+		return new EconomyCoupon(name, usetimes, usedplayers, money);
 	}
 }

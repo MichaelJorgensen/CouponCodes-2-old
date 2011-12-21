@@ -4,7 +4,7 @@ import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-
+import net.lala.CouponCodes.api.coupon.Coupon;
 
 public interface CouponAPI {
 
@@ -17,9 +17,9 @@ public interface CouponAPI {
 	public boolean addCouponToDatabase(Coupon coupon) throws SQLException;
 	
 	/**
-	 * Removes the give coupon from the database, returning its success
+	 * Removes the given coupon from the database, returning its success
 	 * @param coupon
-	 * @return true if coupon has been deleted
+	 * @return true if coupon has been removed
 	 * @throws SQLException
 	 */
 	public boolean removeCouponFromDatabase(Coupon coupon) throws SQLException;
@@ -59,6 +59,7 @@ public interface CouponAPI {
 	 * @throws SQLException
 	 */
 	public boolean couponExists(String name) throws SQLException;
+	
 	/**
 	 * Returns all the coupon names in the database
 	 * @return ArrayList<String>

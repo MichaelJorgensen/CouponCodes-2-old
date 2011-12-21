@@ -3,7 +3,7 @@ package net.lala.CouponCodes.api.events.coupon;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
-import net.lala.CouponCodes.api.Coupon;
+import net.lala.CouponCodes.api.coupon.Coupon;
 
 @SuppressWarnings("serial")
 public class CouponCreateEvent extends Event {
@@ -19,7 +19,10 @@ public class CouponCreateEvent extends Event {
 		return coupon;
 	}
 	
-	protected void call() {
+	/**
+	 * Calls the event
+	 */
+	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}
 }
