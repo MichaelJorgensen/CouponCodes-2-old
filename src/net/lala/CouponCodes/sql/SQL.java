@@ -8,12 +8,8 @@ import java.sql.Statement;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.SQLAPI;
-import net.lala.CouponCodes.api.events.database.DatabaseCloseConnectionEvent;
-import net.lala.CouponCodes.api.events.database.DatabaseOpenConnectionEvent;
-import net.lala.CouponCodes.api.events.database.DatabaseQueryEvent;
+import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.misc.SQLType;
-
-import org.bukkit.Bukkit;
 
 /**
  * SQL.java - MySQL, SQLite handling
@@ -46,16 +42,15 @@ public class SQL extends SQLAPI {
 	public boolean open() throws SQLException {
 		if (sqltype.equals(SQLType.MySQL)){
 			con = DriverManager.getConnection("jdbc:mysql://"+dop.getHostname()+":"+dop.getPort()+"/"+dop.getDatabase(), dop.getUsername(), dop.getPassword());
-			DatabaseOpenConnectionEvent ev = new DatabaseOpenConnectionEvent(con, dop, true);
-			Bukkit.getServer().getPluginManager().callEvent(ev);
+			EventHandle.callDatabaseOpenConnectionEvent(con, dop, true);
 			return true;
 		}
 		else if (sqltype.equals(SQLType.SQLite)) {
 			con = DriverManager.getConnection("jdbc:sqlite:"+dop.getSQLFile().getAbsolutePath());
-			DatabaseOpenConnectionEvent ev = new DatabaseOpenConnectionEvent(con, dop, true);
-			Bukkit.getServer().getPluginManager().callEvent(ev);
+			EventHandle.callDatabaseOpenConnectionEvent(con, dop, true);
 			return true;
 		} else {
+			EventHandle.callDatabaseOpenConnectionEvent(con, dop, false);
 			return false;
 		}
 	}
@@ -63,8 +58,7 @@ public class SQL extends SQLAPI {
 	@Override
 	public void close() throws SQLException {
 		con.close();
-		DatabaseCloseConnectionEvent ev = new DatabaseCloseConnectionEvent(con, dop);
-		Bukkit.getServer().getPluginManager().callEvent(ev);
+		EventHandle.callDatabaseCloseConnectionEvent(con, dop);
 	}
 	
 	@Override
@@ -81,13 +75,11 @@ public class SQL extends SQLAPI {
 		st = con.createStatement();
 		if (query.toLowerCase().contains("delete")) {
 			st.executeUpdate(query);
-			DatabaseQueryEvent ev = new DatabaseQueryEvent(dop, query, rs);
-			Bukkit.getServer().getPluginManager().callEvent(ev);
+			EventHandle.callDatabaseQueryEvent(dop, query, rs);
 			return rs;
 		} else {
 			rs = st.executeQuery(query);
-			DatabaseQueryEvent ev = new DatabaseQueryEvent(dop, query, rs);
-			Bukkit.getServer().getPluginManager().callEvent(ev);
+			EventHandle.callDatabaseQueryEvent(dop, query, rs);
 			return rs;
 		}
 	}
