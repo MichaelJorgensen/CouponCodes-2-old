@@ -1,4 +1,4 @@
-package net.lala.CouponCodes.api.couponapi;
+package net.lala.CouponCodes.api;
 
 import java.sql.Array;
 import java.sql.Connection;
@@ -7,7 +7,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.lala.CouponCodes.CouponCodes;
-import net.lala.CouponCodes.api.SQLAPI;
+import net.lala.CouponCodes.api.events.coupon.CouponAddToDatabaseEvent;
+import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
+
+import org.bukkit.Bukkit;
 
 /**
  * CouponManager.java - Allows other plugins to interact with coupons
@@ -28,7 +31,9 @@ public class CouponManager implements CouponAPI {
 	@Override
 	public boolean addCouponToDatabase(Coupon coupon) throws SQLException {		
 		Connection con = sql.getConnection();
-		con.createStatement().executeUpdate("INSERT INTO couponcodes VALUES('"+coupon.getName()+"', '"+coupon.getCouponType().value()+"', "+coupon.getUseTimes()+", "+coupon.getUsedPlayers()+", "+coupon.getMoney());
+		con.createStatement().executeUpdate("INSERT INTO couponcodes VALUES('"+coupon.getName()+"', '"+coupon.getType().value()+"', "+coupon.getUseTimes()+", "+coupon.getUsedPlayers()+", "+coupon.getMoney());
+		CouponAddToDatabaseEvent ev = new CouponAddToDatabaseEvent(coupon);
+		Bukkit.getServer().getPluginManager().callEvent(ev);
 		return true;
 	}
 	
@@ -36,6 +41,8 @@ public class CouponManager implements CouponAPI {
 	public boolean removeCouponFromDatabase(Coupon coupon) throws SQLException {
 		if (!couponExists(coupon)) return false;		
 		sql.query("DELETE FROM couponcodes WHERE name='"+coupon.getName()+"'");
+		CouponRemoveFromDatabaseEvent ev = new CouponRemoveFromDatabaseEvent(coupon);
+		Bukkit.getServer().getPluginManager().callEvent(ev);
 		return true;
 	}
 	

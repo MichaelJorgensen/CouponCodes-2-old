@@ -1,9 +1,12 @@
-package net.lala.CouponCodes.api.couponapi;
+package net.lala.CouponCodes.api;
 
 import java.sql.Array;
 import java.sql.SQLException;
 
+import org.bukkit.Bukkit;
+
 import net.lala.CouponCodes.CouponCodes;
+import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
 import net.lala.CouponCodes.misc.CouponType;
 
 /**
@@ -37,6 +40,8 @@ public class Coupon {
 		this.usetimes = usetimes;
 		this.ids = ids;
 		this.usedplayers = usedplayers;
+		CouponCreateEvent ev = new CouponCreateEvent(this);
+		Bukkit.getServer().getPluginManager().callEvent(ev);
 	}
 	
 	/**
@@ -50,6 +55,8 @@ public class Coupon {
 		this.ct = CouponType.Economy;
 		this.name = name;
 		this.usetimes = usetimes;
+		CouponCreateEvent ev = new CouponCreateEvent(this);
+		Bukkit.getServer().getPluginManager().callEvent(ev);
 	}
 	
 	public boolean addToDatabase() throws SQLException {
@@ -60,11 +67,11 @@ public class Coupon {
 		return CouponCodes.getCouponAPI().removeCouponFromDatabase(this);
 	}
 	
-	public boolean existsInDatabase() throws SQLException {
+	public boolean isInDatabase() throws SQLException {
 		return CouponCodes.getCouponAPI().couponExists(this);
 	}
 	
-	public CouponType getCouponType() {
+	public CouponType getType() {
 		return ct;
 	}
 	

@@ -1,8 +1,9 @@
-package net.lala.CouponCodes.api.couponapi;
+package net.lala.CouponCodes.api;
 
 import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 
 
 public interface CouponAPI {

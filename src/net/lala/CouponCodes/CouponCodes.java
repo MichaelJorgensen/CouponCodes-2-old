@@ -6,11 +6,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import net.lala.CouponCodes.api.CouponCodesInterface;
+import net.lala.CouponCodes.api.Coupon;
+import net.lala.CouponCodes.api.CouponAPI;
+import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.api.SQLAPI;
-import net.lala.CouponCodes.api.couponapi.Coupon;
-import net.lala.CouponCodes.api.couponapi.CouponAPI;
-import net.lala.CouponCodes.api.couponapi.CouponManager;
+import net.lala.CouponCodes.api.events.example.CouponMaster;
+import net.lala.CouponCodes.api.events.example.DatabaseMaster;
 import net.lala.CouponCodes.config.Config;
 import net.lala.CouponCodes.misc.SQLType;
 import net.lala.CouponCodes.sql.DatabaseOptions;
@@ -22,6 +23,8 @@ import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Priority;
+import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,13 +32,15 @@ import org.bukkit.plugin.java.JavaPlugin;
  * CouponCodes.java - Main class
  * @author LaLa
  */
-public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
+public class CouponCodes extends JavaPlugin {
 	
 	private static CouponManager cm = null;
 	
 	private DatabaseOptions dataop = null;
 	private Config config = null;
+	
 	private boolean ec = false;
+	private boolean debug = false;
 	
 	private SQLType sqltype;
 	private SQL sql;
@@ -51,15 +56,20 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		if (server == null)
 			server = getServer();
 		
-		if (!setupEcon()){
+		if (!setupEcon()) {
 			send("Economy support is disabled.");
 			ec = false;
 		} else {
 			ec = true;
 		}
 		
+		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponMaster(this), Priority.Normal, this);
+		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new DatabaseMaster(this), Priority.Normal, this);
+		
 		config = new Config(this);
 		sqltype = config.getSQLType();
+		
+		debug = config.getDebug();
 		
 		switch (sqltype) {
 		case MySQL: dataop = new DatabaseOptions(config.getHostname(),
@@ -95,9 +105,9 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		this.saveConfig();
 		try {
 			sql.close();
-		} catch (SQLException e){
+		} catch (SQLException e) {
 			sendErr("Could not close SQL connection");
-		} catch (NullPointerException e){
+		} catch (NullPointerException e) {
 			sendErr("SQL is null. Connection doesn't exist");
 		}
 		send("is now disabled.");
@@ -140,7 +150,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 					if (args.length == 5) {
 						try {
 							Coupon coupon = api.createNewItemCoupon(args[2], Integer.parseInt(args[4]), (Array) new ArrayList<String>(Arrays.asList(args[3].split(","))), null);
-							if (api.couponExists(coupon)) {
+							if (coupon.isInDatabase()) {
 								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
 								return true;
 							} else {
@@ -166,7 +176,7 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 					if (args.length == 5) {
 						try{
 							Coupon coupon = api.createNewEconomyCoupon(args[2], Integer.parseInt(args[4]), (Array) new ArrayList<String>(Arrays.asList(args[3].split(","))), Integer.parseInt(args[3]));
-							if (api.couponExists(coupon)) {
+							if (coupon.isInDatabase()) {
 								sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
 								return true;
 							} else {
@@ -271,6 +281,11 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 		System.err.println("[CouponCodes] [Error] "+message);
 	}
 	
+	public void debug(String message) {
+		if (!isDebug()) return;
+		System.out.println("[CouponCodes] [Debug] "+message);
+	}
+	
 	public static CouponAPI getCouponAPI() {
 		return (CouponAPI) cm;
 	}
@@ -289,5 +304,9 @@ public class CouponCodes extends JavaPlugin implements CouponCodesInterface {
 	
 	public SQLType getSQLType() {
 		return sqltype;
+	}
+	
+	public boolean isDebug() {
+		return debug;
 	}
 }

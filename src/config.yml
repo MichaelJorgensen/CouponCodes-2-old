@@ -12,3 +12,4 @@ MySQL-options:
  username: minecraft
  password: password
 use-economy: false
+debug: false

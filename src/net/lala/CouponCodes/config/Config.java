@@ -35,6 +35,10 @@ public class Config {
 		}
 	}
 	
+	public boolean getDebug() {
+		return config.getBoolean("debug");
+	}
+	
 	public String getSQLValue() {
 		return config.getString("sql-type");
 	}
