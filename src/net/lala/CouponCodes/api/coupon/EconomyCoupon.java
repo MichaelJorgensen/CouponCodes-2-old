@@ -1,12 +1,12 @@
 package net.lala.CouponCodes.api.coupon;
 
-import java.sql.Array;
+import java.util.ArrayList;
 
 public class EconomyCoupon extends Coupon {
 
 	private Integer money;
 	
-	public EconomyCoupon(String name, Integer usetimes, Array usedplayers, Integer money) {
+	public EconomyCoupon(String name, Integer usetimes, ArrayList<String> usedplayers, Integer money) {
 		super(name, usetimes, usedplayers);
 		this.money = money;
 	}

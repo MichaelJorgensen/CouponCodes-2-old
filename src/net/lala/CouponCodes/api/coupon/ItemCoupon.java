@@ -1,17 +1,23 @@
 package net.lala.CouponCodes.api.coupon;
 
-import java.sql.Array;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ItemCoupon extends Coupon {
 
-	private Array ids;
+	private HashMap<Integer, Integer> ids;
 	
-	public ItemCoupon(String name, Integer usetimes, Array usedplayers, Array ids) {
+	public ItemCoupon(String name, Integer usetimes, ArrayList<String> usedplayers, HashMap<Integer, Integer> ids) {
 		super(name, usetimes, usedplayers);
 		this.ids = ids;
 	}
 	
-	public Array getIDs() {
+	/**
+	 * Returns the list of item IDs and their amount
+	 * Use 
+	 * @return HashMap<Integer, Integer> the id list with their amount
+	 */
+	public HashMap<Integer, Integer> getIDs() {
 		return ids;
 	}
 }

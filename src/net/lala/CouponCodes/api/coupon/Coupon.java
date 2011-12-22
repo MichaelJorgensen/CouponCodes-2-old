@@ -1,7 +1,7 @@
 package net.lala.CouponCodes.api.coupon;
 
-import java.sql.Array;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.events.EventHandle;
@@ -14,9 +14,9 @@ public abstract class Coupon {
 	
 	private String name;
 	private int usetimes;
-	private Array usedplayers = null;
+	private ArrayList<String> usedplayers = null;
 	
-	public Coupon(String name, int usetimes, Array usedplayers) {
+	public Coupon(String name, int usetimes, ArrayList<String> usedplayers) {
 		this.name = name;
 		this.usetimes = usetimes;
 		this.usedplayers = usedplayers;
@@ -51,11 +51,11 @@ public abstract class Coupon {
 		this.usetimes = usetimes;
 	}
 	
-	public Array getUsedPlayers() {
+	public ArrayList<String> getUsedPlayers() {
 		return usedplayers;
 	}
 	
-	public void setUsedPlayers(Array usedplayers) {
+	public void setUsedPlayers(ArrayList<String> usedplayers) {
 		this.usedplayers = usedplayers;
 	}
 	

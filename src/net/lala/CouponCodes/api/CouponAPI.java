@@ -1,8 +1,8 @@
 package net.lala.CouponCodes.api;
 
-import java.sql.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.lala.CouponCodes.api.coupon.Coupon;
 
@@ -32,7 +32,7 @@ public interface CouponAPI {
 	 * @param usedplayers
 	 * @return Coupon
 	 */
-	public Coupon createNewItemCoupon(String name, int usetimes, Array ids, Array usedplayers);
+	public Coupon createNewItemCoupon(String name, int usetimes, HashMap<Integer, Integer> ids, ArrayList<String> usedplayers);
 	
 	/**
 	 * Creates a new economy coupon, meant for redeeming money for economy plugins
@@ -42,7 +42,7 @@ public interface CouponAPI {
 	 * @param money
 	 * @return Coupon
 	 */
-	public Coupon createNewEconomyCoupon(String name, int usetimes, Array usedplayers, int money);
+	public Coupon createNewEconomyCoupon(String name, int usetimes, ArrayList<String> usedplayers, int money);
 	
 	/**
 	 * Checks if the coupon exists in the database
@@ -66,4 +66,12 @@ public interface CouponAPI {
 	 * @throws SQLException
 	 */
 	public ArrayList<String> getCoupons() throws SQLException;
+	
+	/**
+	 * Gets the given coupon name from the database
+	 * @param coupon name
+	 * @return coupon
+	 * @throws SQLException
+	 */
+	public abstract Coupon getCoupon(String coupon) throws SQLException;
 }

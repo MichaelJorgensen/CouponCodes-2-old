@@ -1,10 +1,11 @@
 package net.lala.CouponCodes.api;
 
-import java.sql.Array;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.coupon.Coupon;
@@ -18,9 +19,11 @@ import net.lala.CouponCodes.api.events.EventHandle;
  */
 public class CouponManager implements CouponAPI {
 	
+	private CouponCodes plugin;
 	private SQLAPI sql;
 	
 	public CouponManager(CouponCodes plugin) {
+		this.plugin = plugin;
 		this.sql = plugin.getSQLAPI();
 	}
 	
@@ -33,11 +36,30 @@ public class CouponManager implements CouponAPI {
 		Connection con = sql.getConnection();
 		if (coupon instanceof ItemCoupon) {
 			ItemCoupon c = (ItemCoupon) coupon;
-			con.createStatement().executeUpdate("INSERT INTO couponcodes VALUES('"+c.getName()+"', '"+c.getType()+"', "+c.getUseTimes()+", "+c.getUsedPlayers()+", "+0);
+			PreparedStatement p = con.prepareStatement("INSERT INTO couponcodes VALUES(?, ?, ?, ?, ?, ?)");
+			p.setString(1, c.getName());
+			p.setString(2, c.getType());
+			p.setInt(3, c.getUseTimes());
+			p.setObject(4, c.getUsedPlayers());
+			p.setObject(5, c.getIDs());
+			p.setInt(6, 0);
+			con.setAutoCommit(false);
+			p.executeBatch();
+			con.setAutoCommit(true);
 		}
 		else if (coupon instanceof EconomyCoupon) {
 			EconomyCoupon c = (EconomyCoupon) coupon;
 			con.createStatement().executeUpdate("INSERT INTO couponcodes VALUES('"+c.getName()+"', '"+c.getType()+"', "+c.getUseTimes()+", "+c.getUsedPlayers()+", "+c.getMoney());
+			PreparedStatement p = con.prepareStatement("INSERT INTO couponcodes VALUES(?, ?, ?, ?, ?, ?)");
+			p.setString(1, c.getName());
+			p.setString(2, c.getType());
+			p.setInt(3, c.getUseTimes());
+			p.setObject(4, c.getUsedPlayers());
+			p.setObject(5, null);
+			p.setInt(6, c.getMoney());
+			con.setAutoCommit(false);
+			p.executeBatch();
+			con.setAutoCommit(true);
 		}
 		EventHandle.callCouponAddToDatabaseEvent(coupon);
 		return true;
@@ -72,12 +94,28 @@ public class CouponManager implements CouponAPI {
 	}
 	
 	@Override
-	public Coupon createNewItemCoupon(String name, int usetimes, Array ids, Array usedplayers) {
-		return new ItemCoupon(name, usetimes, ids, usedplayers);
+	public Coupon getCoupon(String coupon) throws SQLException {
+		int usetimes = sql.query("SELECT usetimes FROM couponcodes WHERE name='"+coupon+"'").getInt(1);
+		ArrayList<String> usedplayers = plugin.convertStringToArrayList(sql.query("SELECT usedplayers FROM couponcodes WHERE name='"+coupon+"'").getString(1));
+		
+		if (sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'").getString(1).equalsIgnoreCase("Item")) {
+			return createNewItemCoupon(coupon, usetimes, plugin.convertStringToHash(sql.query("SELECT ids FROM couponcodes WHERE name='"+coupon+"'").getString(1)), usedplayers);
+		}
+		
+		else if (sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'").getString(1).equalsIgnoreCase("Economy")) {
+			return createNewEconomyCoupon(coupon, usetimes, usedplayers, sql.query("SELECT money FROM couponcodes WHERE name='"+coupon+"'").getInt(1));
+		} else {
+			return null;
+		}
 	}
 	
 	@Override
-	public Coupon createNewEconomyCoupon(String name, int usetimes, Array usedplayers, int money) {
+	public Coupon createNewItemCoupon(String name, int usetimes, HashMap<Integer, Integer> ids, ArrayList<String> usedplayers) {
+		return new ItemCoupon(name, usetimes, usedplayers, ids);
+	}
+	
+	@Override
+	public Coupon createNewEconomyCoupon(String name, int usetimes, ArrayList<String> usedplayers, int money) {
 		return new EconomyCoupon(name, usetimes, usedplayers, money);
 	}
 }
