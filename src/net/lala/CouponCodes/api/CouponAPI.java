@@ -6,6 +6,10 @@ import java.util.HashMap;
 
 import net.lala.CouponCodes.api.coupon.Coupon;
 
+/**
+ * CouponAPI.java - Interface for handling coupons
+ * @author mike101102
+ */
 public interface CouponAPI {
 
 	/**

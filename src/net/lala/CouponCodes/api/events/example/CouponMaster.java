@@ -6,6 +6,10 @@ import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponListener;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
 
+/**
+ * CouponMaster.java - Example class of using couponcode's custom events
+ * @author mike101102
+ */
 public class CouponMaster extends CouponListener {
 
 	private CouponCodes plugin;

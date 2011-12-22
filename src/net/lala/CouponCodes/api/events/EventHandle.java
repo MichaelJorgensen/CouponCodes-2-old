@@ -12,6 +12,10 @@ import net.lala.CouponCodes.api.events.database.DatabaseOpenConnectionEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseQueryEvent;
 import net.lala.CouponCodes.sql.DatabaseOptions;
 
+/**
+ * EventHandle.java - Easy way to call couponcode's custom events
+ * @author mike101102
+ */
 public class EventHandle {
 
 	public static void callCouponAddToDatabaseEvent(Coupon coupon) {

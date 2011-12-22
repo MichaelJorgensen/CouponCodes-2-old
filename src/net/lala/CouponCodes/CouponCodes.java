@@ -33,7 +33,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * CouponCodes.java - Main class
- * @author LaLa
+ * @author mike101102
  */
 public class CouponCodes extends JavaPlugin {
 	
@@ -70,8 +70,8 @@ public class CouponCodes extends JavaPlugin {
 		}
 		
 		// This is for this plugin's own events!
-		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponMaster(this), Priority.Normal, this);
-		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new DatabaseMaster(this), Priority.Normal, this);
+		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponMaster(this), Priority.Lowest, this);
+		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new DatabaseMaster(this), Priority.Lowest, this);
 		
 		config = new Config(this);
 		sqltype = config.getSQLType();

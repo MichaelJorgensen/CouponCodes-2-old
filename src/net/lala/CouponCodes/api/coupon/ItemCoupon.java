@@ -3,6 +3,10 @@ package net.lala.CouponCodes.api.coupon;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * ItemCoupon.java - Provides an extension of a coupon for item use
+ * @author mike101102
+ */
 public class ItemCoupon extends Coupon {
 
 	private HashMap<Integer, Integer> ids;

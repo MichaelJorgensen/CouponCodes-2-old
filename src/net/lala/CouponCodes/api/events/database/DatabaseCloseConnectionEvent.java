@@ -7,6 +7,10 @@ import net.lala.CouponCodes.sql.DatabaseOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
+/**
+ * DatabaseCloseConnectionEvent.java - Extension of event used when the connection is closed to the database
+ * @author mike101102
+ */
 @SuppressWarnings("serial")
 public class DatabaseCloseConnectionEvent extends Event {
 

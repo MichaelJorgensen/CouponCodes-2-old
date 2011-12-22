@@ -13,7 +13,7 @@ import net.lala.CouponCodes.misc.SQLType;
 
 /**
  * SQL.java - MySQL, SQLite handling
- * @author LaLa
+ * @author mike101102
  */
 public class SQL extends SQLAPI {
 	

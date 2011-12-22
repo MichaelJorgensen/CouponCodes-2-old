@@ -6,6 +6,10 @@ import net.lala.CouponCodes.api.events.database.DatabaseListener;
 import net.lala.CouponCodes.api.events.database.DatabaseOpenConnectionEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseQueryEvent;
 
+/**
+ * DatabaseMaster.java - Example class of using couponcode's custom events
+ * @author mike101102
+ */
 public class DatabaseMaster extends DatabaseListener {
 
 	private CouponCodes plugin;

@@ -7,7 +7,7 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Config.java - Custom config handling
- * @author LaLa
+ * @author mike101102
  */
 public class Config {
 	

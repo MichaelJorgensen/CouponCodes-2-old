@@ -5,6 +5,10 @@ import net.lala.CouponCodes.api.coupon.Coupon;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 
+/**
+ * CouponRemoveFromDatabaseEvent.java - Extension of event used when a coupon is removed from the database
+ * @author mike101102
+ */
 @SuppressWarnings("serial")
 public class CouponRemoveFromDatabaseEvent extends Event {
 

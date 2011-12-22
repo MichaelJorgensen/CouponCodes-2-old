@@ -6,7 +6,7 @@ import net.lala.CouponCodes.misc.SQLType;
 
 /**
  * DatabaseOptions.java - Provides an easy way of sharing a database's options among classes
- * @author LaLa
+ * @author mike101102
  */
 public class DatabaseOptions {
 

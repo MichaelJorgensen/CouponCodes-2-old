@@ -3,7 +3,10 @@ package net.lala.CouponCodes.api.events.coupon;
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 
-
+/**
+ * CouponListener.java - Handles couponcode's custom events. Other classes can extend these events
+ * @author mike101102
+ */
 public class CouponListener extends CustomEventListener {
 
 	@Override

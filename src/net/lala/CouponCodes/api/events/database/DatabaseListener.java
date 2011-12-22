@@ -3,6 +3,10 @@ package net.lala.CouponCodes.api.events.database;
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 
+/**
+ * DatabaseListener.java - Handles couponcode's custom events. Other classes can extend these events
+ * @author mike101102
+ */
 public class DatabaseListener extends CustomEventListener {
 
 	@Override

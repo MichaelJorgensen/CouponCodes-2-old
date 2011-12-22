@@ -9,7 +9,7 @@ import net.lala.CouponCodes.sql.DatabaseOptions;
 
 /**
  * SQLAPI.java - Provides abstract handling for subclasses
- * @author Owner
+ * @author mike101102
  */
 public abstract class SQLAPI {
 

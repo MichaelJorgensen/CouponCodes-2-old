@@ -7,8 +7,8 @@ import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.events.EventHandle;
 
 /**
- * Coupon.java - Stores all of the coupon's information
- * @author LaLa
+ * Coupon.java - Stores generic coupon information
+ * @author mike101102
  */
 public abstract class Coupon {
 	

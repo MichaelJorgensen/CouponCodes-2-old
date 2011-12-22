@@ -15,7 +15,7 @@ import net.lala.CouponCodes.api.events.EventHandle;
 
 /**
  * CouponManager.java - Allows other plugins to interact with coupons
- * @author LaLa
+ * @author mike101102
  */
 public class CouponManager implements CouponAPI {
 	

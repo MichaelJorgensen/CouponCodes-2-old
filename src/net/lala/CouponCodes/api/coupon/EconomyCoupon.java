@@ -2,6 +2,10 @@ package net.lala.CouponCodes.api.coupon;
 
 import java.util.ArrayList;
 
+/**
+ * EconomyCoupon.java - Provides an extension of a coupon for economy use
+ * @author mike101102
+ */
 public class EconomyCoupon extends Coupon {
 
 	private Integer money;
