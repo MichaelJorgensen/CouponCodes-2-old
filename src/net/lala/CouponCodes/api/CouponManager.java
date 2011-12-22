@@ -40,8 +40,8 @@ public class CouponManager implements CouponAPI {
 			p.setString(1, c.getName());
 			p.setString(2, c.getType());
 			p.setInt(3, c.getUseTimes());
-			p.setObject(4, c.getUsedPlayers());
-			p.setObject(5, c.getIDs());
+			p.setString(4, plugin.convertArrayListToString(c.getUsedPlayers()));
+			p.setString(5, plugin.convertHashToString(c.getIDs()));
 			p.setInt(6, 0);
 			con.setAutoCommit(false);
 			p.executeBatch();
@@ -54,8 +54,8 @@ public class CouponManager implements CouponAPI {
 			p.setString(1, c.getName());
 			p.setString(2, c.getType());
 			p.setInt(3, c.getUseTimes());
-			p.setObject(4, c.getUsedPlayers());
-			p.setObject(5, null);
+			p.setString(4, plugin.convertArrayListToString(c.getUsedPlayers()));
+			p.setString(5, "");
 			p.setInt(6, c.getMoney());
 			con.setAutoCommit(false);
 			p.executeBatch();

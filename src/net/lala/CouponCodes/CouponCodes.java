@@ -245,6 +245,10 @@ public class CouponCodes extends JavaPlugin {
 					if (args.length == 2) {
 						try {
 							Coupon coupon = api.getCoupon(args[1]);
+							if (coupon.getUseTimes() <= 0 || coupon.getUsedPlayers().contains(player.getName())) {
+								player.sendMessage(ChatColor.RED+"You cannot use this coupon as it is expired for you.");
+								return true;
+							}
 							if (coupon instanceof ItemCoupon) {
 								ItemCoupon c = (ItemCoupon) coupon;
 								for (Map.Entry<Integer, Integer> en : c.getIDs().entrySet()) {
@@ -255,7 +259,7 @@ public class CouponCodes extends JavaPlugin {
 							}
 							else if (coupon instanceof EconomyCoupon) {
 								if (!econ.isEnabled()) {
-									player.sendMessage(ChatColor.DARK_RED+"Economy support is currently disabled. You cannot redeem an economy coupon");
+									player.sendMessage(ChatColor.DARK_RED+"Economy support is currently disabled. You cannot redeem an economy coupon.");
 									return true;
 								} else {
 									EconomyCoupon c = (EconomyCoupon) coupon;
@@ -342,6 +346,15 @@ public class CouponCodes extends JavaPlugin {
 			e.printStackTrace();
 		}
 		return ids;
+	}
+	
+	public String convertHashToString(HashMap<Integer, Integer> hash) {
+		StringBuilder sb = new StringBuilder();
+		for (Map.Entry<Integer, Integer> en : hash.entrySet()) {
+			sb.append(en.getKey()+":"+en.getValue()+",");
+		}
+		sb.deleteCharAt(sb.length()-1);
+		return sb.toString();
 	}
 	
 	public ArrayList<String> convertStringToArrayList(String args) {
