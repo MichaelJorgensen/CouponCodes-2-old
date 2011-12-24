@@ -1,6 +1,5 @@
-package net.lala.CouponCodes.config;
+package net.lala.CouponCodes;
 
-import net.lala.CouponCodes.misc.SQLType;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;

@@ -1,4 +1,4 @@
-package net.lala.CouponCodes.misc;
+package net.lala.CouponCodes;
 
 /**
  * SQLType.java - Enum for identifying various types of SQL

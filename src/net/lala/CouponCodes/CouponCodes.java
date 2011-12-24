@@ -17,8 +17,6 @@ import net.lala.CouponCodes.api.events.example.CouponCodesMaster;
 import net.lala.CouponCodes.api.events.example.CouponMaster;
 import net.lala.CouponCodes.api.events.example.DatabaseMaster;
 import net.lala.CouponCodes.api.events.plugin.CouponCodesCommandEvent;
-import net.lala.CouponCodes.config.Config;
-import net.lala.CouponCodes.misc.SQLType;
 import net.lala.CouponCodes.sql.DatabaseOptions;
 import net.lala.CouponCodes.sql.SQL;
 import net.milkbowl.vault.economy.Economy;

@@ -8,9 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import net.lala.CouponCodes.CouponCodes;
+import net.lala.CouponCodes.SQLType;
 import net.lala.CouponCodes.api.SQLAPI;
 import net.lala.CouponCodes.api.events.EventHandle;
-import net.lala.CouponCodes.misc.SQLType;
 
 /**
  * SQL.java - MySQL, SQLite handling

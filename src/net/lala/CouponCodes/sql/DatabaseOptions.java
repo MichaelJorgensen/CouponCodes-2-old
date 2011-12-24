@@ -2,7 +2,7 @@ package net.lala.CouponCodes.sql;
 
 import java.io.File;
 
-import net.lala.CouponCodes.misc.SQLType;
+import net.lala.CouponCodes.SQLType;
 
 /**
  * DatabaseOptions.java - Provides an easy way of sharing a database's options among classes
