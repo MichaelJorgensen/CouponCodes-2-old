@@ -36,7 +36,7 @@ public interface CouponAPI {
 	 * @param usedplayers
 	 * @return Coupon
 	 */
-	public Coupon createNewItemCoupon(String name, int usetimes, HashMap<Integer, Integer> ids, ArrayList<String> usedplayers);
+	public Coupon createNewItemCoupon(String name, int usetimes, HashMap<Integer, Integer> ids, HashMap<String, Boolean> usedplayers);
 	
 	/**
 	 * Creates a new economy coupon, meant for redeeming money for economy plugins
@@ -46,7 +46,7 @@ public interface CouponAPI {
 	 * @param money
 	 * @return Coupon
 	 */
-	public Coupon createNewEconomyCoupon(String name, int usetimes, ArrayList<String> usedplayers, int money);
+	public Coupon createNewEconomyCoupon(String name, int usetimes, HashMap<String, Boolean> usedplayers, int money);
 	
 	/**
 	 * Checks if the coupon exists in the database
@@ -78,4 +78,12 @@ public interface CouponAPI {
 	 * @throws SQLException
 	 */
 	public abstract Coupon getCoupon(String coupon) throws SQLException;
+	
+	/**
+	 * Updates the coupon and any changes that may have been made to the database
+	 * This will NEVER update the name
+	 * @param coupon to update
+	 * @throws SQLException
+	 */
+	public abstract void updateCoupon(Coupon coupon) throws SQLException;
 }

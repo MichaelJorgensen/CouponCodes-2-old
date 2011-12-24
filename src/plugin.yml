@@ -4,7 +4,8 @@ version: 2.0.0
 author: LaLa
 softdepend: [Vault]
 commands:
-    coupon:
+    c:
+        alias: [coupon]
         description: CouponCode's main command
         usage: /<command>
 permissions:
@@ -14,12 +15,16 @@ permissions:
             cc.add: true
             cc.redeem: true
             cc.remove: true
-    coupon.add:
+            cc.list: true
+    cc.add:
         description: Allows you to add a coupon
         default: false
-    coupon.redeem:
+    cc.redeem:
         description: Allows you to redeem a coupon
         default: false
-    coupon.remove:
+    cc.remove:
         description: Allows you to remove a coupon
+        default: false
+    cc.list:
+        description: Allows you to see a list of all the coupons
         default: false

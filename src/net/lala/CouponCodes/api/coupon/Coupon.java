@@ -1,7 +1,7 @@
 package net.lala.CouponCodes.api.coupon;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.events.EventHandle;
@@ -14,9 +14,9 @@ public abstract class Coupon {
 	
 	private String name;
 	private int usetimes;
-	private ArrayList<String> usedplayers = null;
+	private HashMap<String, Boolean> usedplayers = null;
 	
-	public Coupon(String name, int usetimes, ArrayList<String> usedplayers) {
+	public Coupon(String name, int usetimes, HashMap<String, Boolean> usedplayers) {
 		this.name = name;
 		this.usetimes = usetimes;
 		this.usedplayers = usedplayers;
@@ -35,6 +35,10 @@ public abstract class Coupon {
 		return CouponCodes.getCouponAPI().couponExists(this);
 	}
 	
+	public void updateWithDatabase() throws SQLException {
+		CouponCodes.getCouponAPI().updateCoupon(this);
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -51,11 +55,11 @@ public abstract class Coupon {
 		this.usetimes = usetimes;
 	}
 	
-	public ArrayList<String> getUsedPlayers() {
+	public HashMap<String, Boolean> getUsedPlayers() {
 		return usedplayers;
 	}
 	
-	public void setUsedPlayers(ArrayList<String> usedplayers) {
+	public void setUsedPlayers(HashMap<String, Boolean> usedplayers) {
 		this.usedplayers = usedplayers;
 	}
 	

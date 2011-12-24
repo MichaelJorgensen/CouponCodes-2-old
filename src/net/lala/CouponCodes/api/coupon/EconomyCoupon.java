@@ -1,6 +1,6 @@
 package net.lala.CouponCodes.api.coupon;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * EconomyCoupon.java - Provides an extension of a coupon for economy use
@@ -10,7 +10,7 @@ public class EconomyCoupon extends Coupon {
 
 	private Integer money;
 	
-	public EconomyCoupon(String name, Integer usetimes, ArrayList<String> usedplayers, Integer money) {
+	public EconomyCoupon(String name, Integer usetimes, HashMap<String, Boolean> usedplayers, Integer money) {
 		super(name, usetimes, usedplayers);
 		this.money = money;
 	}

@@ -1,6 +1,5 @@
 package net.lala.CouponCodes.api.coupon;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -11,7 +10,7 @@ public class ItemCoupon extends Coupon {
 
 	private HashMap<Integer, Integer> ids;
 	
-	public ItemCoupon(String name, Integer usetimes, ArrayList<String> usedplayers, HashMap<Integer, Integer> ids) {
+	public ItemCoupon(String name, Integer usetimes, HashMap<String, Boolean> usedplayers, HashMap<Integer, Integer> ids) {
 		super(name, usetimes, usedplayers);
 		this.ids = ids;
 	}

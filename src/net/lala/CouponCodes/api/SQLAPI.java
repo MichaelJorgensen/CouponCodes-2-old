@@ -48,9 +48,10 @@ public abstract class SQLAPI {
 	
 	/**
 	 * Closes the SQL Connection
+	 * @param disable - True if the plugin is disabling, then the event won't fire
 	 * @throws SQLException
 	 */
-	public abstract void close() throws SQLException;
+	public abstract void close(boolean disable) throws SQLException;
 	
 	/**
 	 * Reloads the SQL Connection, returning its success

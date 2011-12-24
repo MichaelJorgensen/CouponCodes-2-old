@@ -1,5 +1,6 @@
 package net.lala.CouponCodes.sql;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -20,12 +21,18 @@ public class SQL extends SQLAPI {
 	private DatabaseOptions dop;
 	
 	private SQLType sqltype = SQLType.Unknown;
-	private Connection con = null;
+	private Connection con;
 	
 	public SQL(CouponCodes plugin, DatabaseOptions dop) {
 		super(plugin);
 		this.dop = dop;
 		this.sqltype = plugin.getSQLType();
+		plugin.getDataFolder().mkdirs();
+		try {
+			dop.getSQLFile().createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -40,13 +47,20 @@ public class SQL extends SQLAPI {
 	
 	@Override
 	public boolean open() throws SQLException {
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			con = null;
+			return false;
+		}
 		if (sqltype.equals(SQLType.MySQL)){
-			con = DriverManager.getConnection("jdbc:mysql://"+dop.getHostname()+":"+dop.getPort()+"/"+dop.getDatabase(), dop.getUsername(), dop.getPassword());
+			this.con = DriverManager.getConnection("jdbc:mysql://"+dop.getHostname()+":"+dop.getPort()+"/"+dop.getDatabase(), dop.getUsername(), dop.getPassword());
 			EventHandle.callDatabaseOpenConnectionEvent(con, dop, true);
 			return true;
 		}
 		else if (sqltype.equals(SQLType.SQLite)) {
-			con = DriverManager.getConnection("jdbc:sqlite:"+dop.getSQLFile().getAbsolutePath());
+			this.con = DriverManager.getConnection("jdbc:sqlite:"+dop.getSQLFile().getAbsolutePath());
 			EventHandle.callDatabaseOpenConnectionEvent(con, dop, true);
 			return true;
 		} else {
@@ -56,9 +70,9 @@ public class SQL extends SQLAPI {
 	}
 	
 	@Override
-	public void close() throws SQLException {
+	public void close(boolean disable) throws SQLException {
 		con.close();
-		EventHandle.callDatabaseCloseConnectionEvent(con, dop);
+		if (disable) EventHandle.callDatabaseCloseConnectionEvent(con, dop);
 	}
 	
 	@Override
@@ -73,7 +87,7 @@ public class SQL extends SQLAPI {
 		ResultSet rs = null;
 		
 		st = con.createStatement();
-		if (query.toLowerCase().contains("delete")) {
+		if (query.toLowerCase().contains("delete") || query.toLowerCase().contains("update")) {
 			st.executeUpdate(query);
 			EventHandle.callDatabaseQueryEvent(dop, query, rs);
 			return rs;
