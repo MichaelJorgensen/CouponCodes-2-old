@@ -349,7 +349,7 @@ public class CouponCodes extends JavaPlugin {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
 				return true;
 			}
-		} else{
+		} else {
 			help(sender);
 			return true;
 		}
