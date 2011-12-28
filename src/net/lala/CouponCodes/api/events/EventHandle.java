@@ -11,7 +11,7 @@ import net.lala.CouponCodes.api.events.database.DatabaseCloseConnectionEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseOpenConnectionEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseQueryEvent;
 import net.lala.CouponCodes.api.events.plugin.CouponCodesCommandEvent;
-import net.lala.CouponCodes.sql.DatabaseOptions;
+import net.lala.CouponCodes.sql.options.DatabaseOptions;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

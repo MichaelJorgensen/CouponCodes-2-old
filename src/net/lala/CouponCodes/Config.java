@@ -21,19 +21,6 @@ public class Config {
 		config.options().copyDefaults(copy);
 	}
 	
-	public SQLType getSQLType() {
-		String type = getSQLValue();
-		
-		if (type.equalsIgnoreCase("MySQL")) {
-			return SQLType.MySQL;
-		}
-		else if (type.equalsIgnoreCase("SQLite")) {
-			return SQLType.SQLite;
-		} else {
-			return SQLType.Unknown;
-		}
-	}
-	
 	public boolean getDebug() {
 		return config.getBoolean("debug");
 	}

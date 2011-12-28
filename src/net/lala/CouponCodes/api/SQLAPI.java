@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import net.lala.CouponCodes.CouponCodes;
-import net.lala.CouponCodes.sql.DatabaseOptions;
+import net.lala.CouponCodes.sql.options.DatabaseOptions;
 
 /**
  * SQLAPI.java - Provides abstract handling for subclasses

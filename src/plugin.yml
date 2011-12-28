@@ -1,6 +1,6 @@
 name: Coupon Codes
 main: net.lala.CouponCodes.CouponCodes
-version: 2.0.0
+version: 2.0.1
 author: LaLa
 softdepend: [Vault]
 commands:
@@ -16,6 +16,7 @@ permissions:
             cc.redeem: true
             cc.remove: true
             cc.list: true
+            cc.reload: true
     cc.add:
         description: Allows you to add a coupon
         default: false
@@ -27,4 +28,7 @@ permissions:
         default: false
     cc.list:
         description: Allows you to see a list of all the coupons
+        default: false
+    cc.reload:
+        description: Allows you to reload the database and config.yml
         default: false

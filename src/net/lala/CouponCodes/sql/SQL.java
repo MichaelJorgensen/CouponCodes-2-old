@@ -8,9 +8,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import net.lala.CouponCodes.CouponCodes;
-import net.lala.CouponCodes.SQLType;
 import net.lala.CouponCodes.api.SQLAPI;
 import net.lala.CouponCodes.api.events.EventHandle;
+import net.lala.CouponCodes.sql.options.DatabaseOptions;
+import net.lala.CouponCodes.sql.options.MySQLOptions;
+import net.lala.CouponCodes.sql.options.SQLiteOptions;
 
 /**
  * SQL.java - MySQL, SQL handling
@@ -20,18 +22,19 @@ public class SQL extends SQLAPI {
 	
 	private DatabaseOptions dop;
 	
-	private SQLType sqltype = SQLType.Unknown;
 	private Connection con;
 	
 	public SQL(CouponCodes plugin, DatabaseOptions dop) {
 		super(plugin);
 		this.dop = dop;
-		this.sqltype = plugin.getSQLType();
 		plugin.getDataFolder().mkdirs();
-		try {
-			dop.getSQLFile().createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
+		
+		if (dop instanceof SQLiteOptions) {
+			try {
+				((SQLiteOptions) dop).getSQLFile().createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -54,13 +57,17 @@ public class SQL extends SQLAPI {
 			con = null;
 			return false;
 		}
-		if (sqltype.equals(SQLType.MySQL)){
-			this.con = DriverManager.getConnection("jdbc:mysql://"+dop.getHostname()+":"+dop.getPort()+"/"+dop.getDatabase(), dop.getUsername(), dop.getPassword());
+		if (dop instanceof MySQLOptions){
+			this.con = DriverManager.getConnection("jdbc:mysql://"+((MySQLOptions) dop).getHostname()+":"+
+					((MySQLOptions) dop).getPort()+"/"+
+					((MySQLOptions) dop).getDatabase(), 
+					((MySQLOptions) dop).getUsername(), 
+					((MySQLOptions) dop).getPassword());
 			EventHandle.callDatabaseOpenConnectionEvent(con, dop, true);
 			return true;
 		}
-		else if (sqltype.equals(SQLType.SQLite)) {
-			this.con = DriverManager.getConnection("jdbc:sqlite:"+dop.getSQLFile().getAbsolutePath());
+		else if (dop instanceof SQLiteOptions) {
+			this.con = DriverManager.getConnection("jdbc:sqlite:"+((SQLiteOptions) dop).getSQLFile().getAbsolutePath());
 			EventHandle.callDatabaseOpenConnectionEvent(con, dop, true);
 			return true;
 		} else {

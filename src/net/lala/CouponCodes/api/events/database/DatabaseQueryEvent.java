@@ -2,7 +2,7 @@ package net.lala.CouponCodes.api.events.database;
 
 import java.sql.ResultSet;
 
-import net.lala.CouponCodes.sql.DatabaseOptions;
+import net.lala.CouponCodes.sql.options.DatabaseOptions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;

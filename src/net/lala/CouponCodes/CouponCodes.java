@@ -17,8 +17,10 @@ import net.lala.CouponCodes.api.events.example.CouponCodesMaster;
 import net.lala.CouponCodes.api.events.example.CouponMaster;
 import net.lala.CouponCodes.api.events.example.DatabaseMaster;
 import net.lala.CouponCodes.api.events.plugin.CouponCodesCommandEvent;
-import net.lala.CouponCodes.sql.DatabaseOptions;
 import net.lala.CouponCodes.sql.SQL;
+import net.lala.CouponCodes.sql.options.DatabaseOptions;
+import net.lala.CouponCodes.sql.options.MySQLOptions;
+import net.lala.CouponCodes.sql.options.SQLiteOptions;
 import net.milkbowl.vault.economy.Economy;
 
 import org.bukkit.ChatColor;
@@ -46,7 +48,6 @@ public class CouponCodes extends JavaPlugin {
 	private boolean ec = false;
 	private boolean debug = false;
 	
-	private SQLType sqltype;
 	private SQL sql;
 	
 	public Server server = null;
@@ -71,35 +72,7 @@ public class CouponCodes extends JavaPlugin {
 		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new DatabaseMaster(this), Priority.Monitor, this);
 		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponCodesMaster(this), Priority.Monitor, this);
 		
-		config = new Config(this);
-		sqltype = config.getSQLType();
-		
-		debug = config.getDebug();
-		
-		if (sqltype.equals(SQLType.MySQL)) {
-			dataop = new DatabaseOptions(config.getHostname(), config.getPort(), config.getDatabase(), config.getUsername(), config.getPassword());
-		}
-		else if (sqltype.equals(SQLType.SQLite)) {
-			dataop = new DatabaseOptions(new File(this.getDataFolder()+"/coupon_data.db"));
-		}
-		else if (sqltype.equals(SQLType.Unknown)) {
-			sendErr("The SQLType has the unknown value of: "+config.getSQLValue()+" CouponCodes will now disable.");
-			this.setEnabled(false);
-			return;
-		}
-		
-		sql = new SQL(this, dataop);
-		
-		try {
-			sql.open();
-			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10))");
-			cm = new CouponManager(this, getSQLAPI());
-		} catch (SQLException e) {
-			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
-			e.printStackTrace();
-			this.setEnabled(false);
-			return;
-		}
+		setupSQL(true);
 		
 		this.saveConfig();
 		send("is now enabled! Version: "+this.getDescription().getVersion());
@@ -116,6 +89,38 @@ public class CouponCodes extends JavaPlugin {
 			sendErr("SQL is null. Connection doesn't exist");
 		}
 		send("is now disabled.");
+	}
+	
+	private boolean setupSQL(boolean start) {
+		config = new Config(this);		
+		debug = config.getDebug();
+		
+		if (config.getSQLValue().equalsIgnoreCase("MySQL")) {
+			dataop = new MySQLOptions(config.getHostname(), config.getPort(), config.getDatabase(), config.getUsername(), config.getPassword());
+		}
+		else if (config.getSQLValue().equalsIgnoreCase("SQLite")) {
+			dataop = new SQLiteOptions(new File(this.getDataFolder()+"/coupon_data.db"));
+		}
+		else if (!config.getSQLValue().equalsIgnoreCase("MySQL") && !config.getSQLValue().equalsIgnoreCase("SQLite")) {
+			sendErr("The SQLType has the unknown value of: "+config.getSQLValue()+" CouponCodes will now disable.");
+			if (start) this.setEnabled(false);
+			return false;
+		}
+		
+		sql = new SQL(this, dataop);
+		
+		try {
+			sql.open();
+			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10))");
+			cm = new CouponManager(this, getSQLAPI());
+		} catch (SQLException e) {
+			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
+			e.printStackTrace();
+			if (start) this.setEnabled(false);
+			return false;
+		}
+		if (!start) this.reloadConfig();
+		return true;
 	}
 	
 	private boolean setupEcon() {
@@ -349,6 +354,30 @@ public class CouponCodes extends JavaPlugin {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
 				return true;
 			}
+		}
+		
+		// Reload Command
+		else if (args[0].equalsIgnoreCase("reload")) {
+			if (sender.hasPermission("cc.reload")) {
+				try {
+					sql.close(false);
+					if (setupSQL(false)) {
+						sender.sendMessage(ChatColor.GREEN+"Database and config.yml have been reloaded.");
+						return true;
+					} else {
+						sender.sendMessage(ChatColor.RED+"Could not reload the database and/or the config.yml");
+						return true;
+					}
+				} catch (SQLException e) {
+					sender.sendMessage(ChatColor.DARK_RED+"Error while closing and opening the database. Please check the console for more info.");
+					sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+					e.printStackTrace();
+					return true;
+				}
+			} else {
+				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
+				return true;
+			}
 		} else {
 			help(sender);
 			return true;
@@ -460,10 +489,6 @@ public class CouponCodes extends JavaPlugin {
 	
 	public boolean isEconomyEnabled() {
 		return ec;
-	}
-	
-	public SQLType getSQLType() {
-		return sqltype;
 	}
 	
 	public boolean isDebug() {
