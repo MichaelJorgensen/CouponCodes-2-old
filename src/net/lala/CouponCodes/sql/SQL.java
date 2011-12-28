@@ -77,9 +77,9 @@ public class SQL extends SQLAPI {
 	}
 	
 	@Override
-	public void close(boolean disable) throws SQLException {
+	public void close() throws SQLException {
 		con.close();
-		if (disable) EventHandle.callDatabaseCloseConnectionEvent(con, dop);
+		EventHandle.callDatabaseCloseConnectionEvent(con, dop);
 	}
 	
 	@Override

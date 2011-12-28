@@ -82,7 +82,7 @@ public class CouponCodes extends JavaPlugin {
 	public void onDisable() {
 		this.saveConfig();
 		try {
-			sql.close(true);
+			sql.close();
 		} catch (SQLException e) {
 			sendErr("Could not close SQL connection");
 		} catch (NullPointerException e) {
@@ -92,6 +92,7 @@ public class CouponCodes extends JavaPlugin {
 	}
 	
 	private boolean setupSQL(boolean start) {
+		if (!start) this.reloadConfig();
 		config = new Config(this);		
 		debug = config.getDebug();
 		
@@ -119,7 +120,6 @@ public class CouponCodes extends JavaPlugin {
 			if (start) this.setEnabled(false);
 			return false;
 		}
-		if (!start) this.reloadConfig();
 		return true;
 	}
 	
@@ -360,7 +360,7 @@ public class CouponCodes extends JavaPlugin {
 		else if (args[0].equalsIgnoreCase("reload")) {
 			if (sender.hasPermission("cc.reload")) {
 				try {
-					sql.close(false);
+					sql.close();
 					if (setupSQL(false)) {
 						sender.sendMessage(ChatColor.GREEN+"Database and config.yml have been reloaded.");
 						return true;
