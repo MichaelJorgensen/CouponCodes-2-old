@@ -66,6 +66,7 @@ public abstract class Coupon {
 	public String getType() {
 		if (this instanceof ItemCoupon) return "Item";
 		if (this instanceof EconomyCoupon) return "Economy";
+		if (this instanceof RankCoupon) return "Rank";
 		else
 			return null;
 	}

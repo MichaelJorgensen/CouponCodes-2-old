@@ -44,6 +44,7 @@ public class CouponManager implements CouponAPI {
 			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
 			p.setString(5, plugin.convertHashToString(c.getIDs()));
 			p.setInt(6, 0);
+			p.setString(7, "");
 			p.addBatch();
 			con.setAutoCommit(false);
 			p.executeBatch();
@@ -58,6 +59,22 @@ public class CouponManager implements CouponAPI {
 			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
 			p.setString(5, "");
 			p.setInt(6, c.getMoney());
+			p.setString(7, "");
+			p.addBatch();
+			con.setAutoCommit(false);
+			p.executeBatch();
+			con.setAutoCommit(true);
+		}
+		else if (coupon instanceof RankCoupon) {
+			RankCoupon c = (RankCoupon) coupon;
+			PreparedStatement p = con.prepareStatement("INSERT INTO couponcodes VALUES(?, ?, ?, ?, ?, ?)");
+			p.setString(1, c.getName());
+			p.setString(2, c.getType());
+			p.setInt(3, c.getUseTimes());
+			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
+			p.setString(5, "");
+			p.setInt(6, 0);
+			p.setString(7, c.getGroup());
 			p.addBatch();
 			con.setAutoCommit(false);
 			p.executeBatch();

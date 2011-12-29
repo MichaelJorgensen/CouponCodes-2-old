@@ -116,7 +116,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		try {
 			sql.open();
-			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), group VARCHAR(20))");
 			cm = new CouponManager(this, getSQLAPI());
 		} catch (SQLException e) {
 			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
