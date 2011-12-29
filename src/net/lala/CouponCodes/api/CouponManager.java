@@ -11,6 +11,7 @@ import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.coupon.EconomyCoupon;
 import net.lala.CouponCodes.api.coupon.ItemCoupon;
+import net.lala.CouponCodes.api.coupon.RankCoupon;
 import net.lala.CouponCodes.api.events.EventHandle;
 
 /**
@@ -76,13 +77,11 @@ public class CouponManager implements CouponAPI {
 	
 	@Override
 	public boolean couponExists(Coupon coupon) throws SQLException {
-		if (getCoupons().isEmpty() || getCoupons().equals(null)) return false;
 		return getCoupons().contains(coupon.getName());
 	}
 	
 	@Override
 	public boolean couponExists(String name) throws SQLException {
-		if (getCoupons().isEmpty() || getCoupons().equals(null)) return false;
 		return getCoupons().contains(name);
 	}
 	
@@ -122,7 +121,7 @@ public class CouponManager implements CouponAPI {
 	
 	@Override
 	public Coupon getCoupon(String coupon) throws SQLException {
-		if (sql.query("SELECT name FROM couponcodes WHERE name='"+coupon+"'").equals(null)) return null;
+		if (!couponExists(coupon)) return null;
 		int usetimes = sql.query("SELECT usetimes FROM couponcodes WHERE name='"+coupon+"'").getInt(1);
 		HashMap<String, Boolean> usedplayers = plugin.convertStringToHash2(sql.query("SELECT usedplayers FROM couponcodes WHERE name='"+coupon+"'").getString(1));
 		ResultSet rs = sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'");
@@ -146,5 +145,10 @@ public class CouponManager implements CouponAPI {
 	@Override
 	public EconomyCoupon createNewEconomyCoupon(String name, int usetimes, HashMap<String, Boolean> usedplayers, int money) {
 		return new EconomyCoupon(name, usetimes, usedplayers, money);
+	}
+	
+	@Override
+	public RankCoupon createNewRankCoupon(String name, String group, int usetimes, HashMap<String, Boolean> usedplayers) {
+		return new RankCoupon(name, group, usetimes, usedplayers);
 	}
 }

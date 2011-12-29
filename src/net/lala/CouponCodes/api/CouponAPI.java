@@ -34,7 +34,7 @@ public interface CouponAPI {
 	 * @param usetimes
 	 * @param ids
 	 * @param usedplayers
-	 * @return Coupon
+	 * @return ItemCoupon
 	 */
 	public Coupon createNewItemCoupon(String name, int usetimes, HashMap<Integer, Integer> ids, HashMap<String, Boolean> usedplayers);
 	
@@ -44,9 +44,19 @@ public interface CouponAPI {
 	 * @param usetimes
 	 * @param usedplayers
 	 * @param money
-	 * @return Coupon
+	 * @return EconomyCoupon
 	 */
 	public Coupon createNewEconomyCoupon(String name, int usetimes, HashMap<String, Boolean> usedplayers, int money);
+	
+	/**
+	 * Creates a new rank coupon, meant for redeeming ranks using vault
+	 * @param name
+	 * @param group
+	 * @param usetimes
+	 * @param usedplayers
+	 * @return RankCoupon
+	 */
+	public Coupon createNewRankCoupon(String name, String group, int usetimes, HashMap<String, Boolean> usedplayers);
 	
 	/**
 	 * Checks if the coupon exists in the database

@@ -12,6 +12,7 @@ import net.lala.CouponCodes.api.SQLAPI;
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.coupon.EconomyCoupon;
 import net.lala.CouponCodes.api.coupon.ItemCoupon;
+import net.lala.CouponCodes.api.coupon.RankCoupon;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.api.events.example.CouponCodesMaster;
 import net.lala.CouponCodes.api.events.example.CouponMaster;
@@ -22,11 +23,13 @@ import net.lala.CouponCodes.sql.options.DatabaseOptions;
 import net.lala.CouponCodes.sql.options.MySQLOptions;
 import net.lala.CouponCodes.sql.options.SQLiteOptions;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
@@ -45,26 +48,27 @@ public class CouponCodes extends JavaPlugin {
 	private DatabaseOptions dataop = null;
 	private Config config = null;
 	
-	private boolean ec = false;
+	private boolean va = false;
 	private boolean debug = false;
 	
 	private SQL sql;
 	
 	public Server server = null;
 	public Economy econ = null;
+	public Permission perm = null;
 	
 	@Override
 	public void onEnable() {
 		server = getServer();
 		
-		if (!setupEcon()) {
+		if (!setupVault()) {
 			send("Economy support is disabled.");
-			ec = false;
+			va = false;
 		} else {
-			ec = true;
+			va = true;
 			if (!econ.isEnabled())
 				send("Economy support is disabled.");
-			    ec = false;
+			    va = false;
 		}
 		
 		// This is for this plugin's own events!
@@ -123,13 +127,17 @@ public class CouponCodes extends JavaPlugin {
 		return true;
 	}
 	
-	private boolean setupEcon() {
+	private boolean setupVault() {
 		try {
 			RegisteredServiceProvider<Economy> ep = server.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
+			RegisteredServiceProvider<Permission> pe = server.getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
 			if (ep == null)
+				return false;
+			else if (pe == null)
 				return false;
 			else
 				econ = ep.getProvider();
+				perm = pe.getProvider();
 				return true;
 		} catch (NoClassDefFoundError e) {
 			return false;
@@ -162,7 +170,7 @@ public class CouponCodes extends JavaPlugin {
 				help(sender);
 				return true;
 			} // carry on..
-			if (sender.hasPermission("cc.add")) {
+			if (has(sender, "cc.add")) {
 				if (args[1].equalsIgnoreCase("item")) {
 					if (args.length == 5) {
 						try {
@@ -192,8 +200,8 @@ public class CouponCodes extends JavaPlugin {
 				}
 				else if (args[1].equalsIgnoreCase("econ")) {
 					if (args.length == 5) {
-						if (!ec) {
-							sender.sendMessage(ChatColor.DARK_RED+"Economy support is currently disabled. You cannot add an economy coupon");
+						if (!va) {
+							sender.sendMessage(ChatColor.DARK_RED+"Vault support is not enabled and thus you cannot create an economy coupon.");
 							return true;
 						} else {
 							try {
@@ -221,6 +229,35 @@ public class CouponCodes extends JavaPlugin {
 						sender.sendMessage(ChatColor.YELLOW+"/c add econ [name] [money] [usetimes]");
 						return true;
 					}
+				}
+				else if (args[1].equalsIgnoreCase("rank")) {
+					if (args.length == 5) {
+						if (!va) {
+							sender.sendMessage(ChatColor.DARK_RED+"Vault support is not enabled and thus you cannot create a rank coupon.");
+							return true;
+						} else {
+							try {
+								Coupon coupon = api.createNewRankCoupon(args[2], args[3], Integer.parseInt(args[4]), new HashMap<String, Boolean>());
+								if (coupon.isInDatabase()) {
+									sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
+									return true;
+								} else {
+									coupon.addToDatabase();
+									sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+coupon.getName()+ChatColor.GREEN+" has been added!");
+									return true;
+								}
+							} catch (SQLException e) {
+								sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
+								sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+								e.printStackTrace();
+								return true;
+							}
+						}
+					} else {
+						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
+						sender.sendMessage(ChatColor.YELLOW+"/c add rank [name] [group] [usetimes]");
+						return true;
+					}
 				} else {
 					help(sender);
 					return true;
@@ -233,7 +270,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		// Remove command
 		else if (args[0].equalsIgnoreCase("remove")) {
-			if (sender.hasPermission("cc.remove")) {
+			if (has(sender, "cc.remove")) {
 				if (args.length == 2) {
 					try {
 						if (!api.couponExists(args[1])) {
@@ -267,7 +304,7 @@ public class CouponCodes extends JavaPlugin {
 				return true;
 			} else {
 				Player player = (Player) sender;
-				if (player.hasPermission("cc.redeem")) {
+				if (has(player, "cc.redeem")) {
 					if (args.length == 2) {
 						try {
 							if (!api.couponExists(args[1])) {
@@ -291,13 +328,26 @@ public class CouponCodes extends JavaPlugin {
 								player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and the items added to your inventory!");
 							}
 							else if (coupon instanceof EconomyCoupon) {
-								if (!econ.isEnabled()) {
-									player.sendMessage(ChatColor.DARK_RED+"Economy support is currently disabled. You cannot redeem an economy coupon.");
+								if (!va) {
+									player.sendMessage(ChatColor.DARK_RED+"Vault support is currently disabled. You cannot redeem an economy coupon.");
 									return true;
 								} else {
 									EconomyCoupon c = (EconomyCoupon) coupon;
 									econ.depositPlayer(player.getName(), c.getMoney());
 									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and the money added to your account!");
+								}
+							}
+							else if (coupon instanceof RankCoupon) {
+								if (!va) {
+									player.sendMessage(ChatColor.DARK_RED+"Vault support is currently disabled. You cannot redeem a rank coupon.");
+									return true;
+								} else {
+									RankCoupon c = (RankCoupon) coupon;
+									for (int i = 0; i < perm.getPlayerGroups(player).length; i++) {
+										perm.playerRemoveGroup(player, perm.getPlayerGroups(player)[i]);
+									}
+									perm.playerAddGroup(player, c.getGroup());
+									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and your group has been set to "+ChatColor.GOLD+c.getGroup());
 								}
 							}
 							HashMap<String, Boolean> up = coupon.getUsedPlayers();
@@ -307,7 +357,7 @@ public class CouponCodes extends JavaPlugin {
 							coupon.updateWithDatabase();
 							return true;
 						} catch (SQLException e) {
-							player.sendMessage(ChatColor.DARK_RED+"Error while trying to find "+args[1]+" in the database. Please check the console for more info.");
+							player.sendMessage(ChatColor.DARK_RED+"Error while trying to find "+ChatColor.GOLD+args[1]+ChatColor.DARK_RED+" in the database. Please check the console for more info.");
 							player.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 							e.printStackTrace();
 							return true;
@@ -326,7 +376,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		// List command
 		else if (args[0].equalsIgnoreCase("list")) {
-			if (sender.hasPermission("cc.list")) {
+			if (has(sender, "cc.list")) {
 				StringBuilder sb = new StringBuilder();
 				try {
 					ArrayList<String> c = api.getCoupons();
@@ -358,14 +408,14 @@ public class CouponCodes extends JavaPlugin {
 		
 		// Reload Command
 		else if (args[0].equalsIgnoreCase("reload")) {
-			if (sender.hasPermission("cc.reload")) {
+			if (has(sender, "cc.reload")) {
 				try {
 					sql.close();
 					if (setupSQL(false)) {
 						sender.sendMessage(ChatColor.GREEN+"Database and config.yml have been reloaded.");
 						return true;
 					} else {
-						sender.sendMessage(ChatColor.RED+"Could not reload the database and/or the config.yml");
+						sender.sendMessage(ChatColor.RED+"I attempted to reload, but there seems to be an error in the configuration. Please fix it or errors will emerge.");
 						return true;
 					}
 				} catch (SQLException e) {
@@ -384,12 +434,24 @@ public class CouponCodes extends JavaPlugin {
 		}
 	}
 	
+	public boolean has(CommandSender sender, String permission) {
+		if (sender instanceof ConsoleCommandSender) return true;
+		if (!va) return sender.hasPermission(permission);
+		return perm.has(sender, permission);
+	}
+	
+	public boolean has(Player player, String permission) {
+		if (!va) return player.hasPermission(permission);
+		return perm.has(player, permission);
+	}
+	
 	private void help(CommandSender sender) {
 		sender.sendMessage(ChatColor.GOLD+"|---------------------|");
 		sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"CouponCodes Help"+ChatColor.GOLD+"---|");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c help"+ChatColor.GOLD);
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c add item [name] [item1:amount,item2:amount,...] [usetimes]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c add econ [name] [money] [usetimes]");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c add rank [name] [group] [usetimes]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c redeem [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c remove [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c list");
@@ -447,21 +509,6 @@ public class CouponCodes extends JavaPlugin {
 		return sb.toString();
 	}
 	
-	/* Fail code is fail
-	public ArrayList<String> convertStringToArrayList(String args) {
-		ArrayList<String> list = new ArrayList<String>();
-		String[] slist = args.split(",");
-		for (int i = 0; i < slist.length; i++) {
-			list.add(slist[i]);
-		}
-		send(list.toString());
-		return list;
-	}
-	
-	public String convertArrayListToString(ArrayList<String> args) {
-		return args.toString().replace(",", "\t");
-	}*/
-	
 	public void send(String message) {
 		System.out.println("[CouponCodes] "+message);
 	}
@@ -487,8 +534,8 @@ public class CouponCodes extends JavaPlugin {
 		return dataop;
 	}
 	
-	public boolean isEconomyEnabled() {
-		return ec;
+	public boolean isVaultEnabled() {
+		return va;
 	}
 	
 	public boolean isDebug() {
