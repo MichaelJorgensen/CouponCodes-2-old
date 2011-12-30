@@ -62,13 +62,10 @@ public class CouponCodes extends JavaPlugin {
 		server = getServer();
 		
 		if (!setupVault()) {
-			send("Economy support is disabled.");
+			send("Vault support is disabled.");
 			va = false;
 		} else {
 			va = true;
-			if (!econ.isEnabled())
-				send("Economy support is disabled.");
-			    va = false;
 		}
 		
 		// This is for this plugin's own events!
@@ -116,7 +113,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		try {
 			sql.open();
-			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), group VARCHAR(20))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), groupname VARCHAR(20))");
 			cm = new CouponManager(this, getSQLAPI());
 		} catch (SQLException e) {
 			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
@@ -148,6 +145,7 @@ public class CouponCodes extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {
 		// Event handling
 		CouponCodesCommandEvent ev = EventHandle.callCouponCodesCommandEvent(sender, command, commandLabel, args);
+		if (ev.isCancelled()) return true;
 		sender = ev.getSender();
 		command = ev.getCommand();
 		commandLabel = ev.getCommandLabel();
@@ -171,10 +169,18 @@ public class CouponCodes extends JavaPlugin {
 				return true;
 			} // carry on..
 			if (has(sender, "cc.add")) {
+				String name = args[2];
+				try {
+					// Random!
+					if (args[2].equalsIgnoreCase("random")) name = Misc.generateName();
+					while (api.couponExists(name))
+						name = Misc.generateName();
+				} catch (SQLException e) {}
+				
 				if (args[1].equalsIgnoreCase("item")) {
 					if (args.length == 5) {
 						try {
-							Coupon coupon = api.createNewItemCoupon(args[2], Integer.parseInt(args[4]), this.convertStringToHash(args[3]), new HashMap<String, Boolean>());
+							Coupon coupon = api.createNewItemCoupon(name, Integer.parseInt(args[4]), this.convertStringToHash(args[3]), new HashMap<String, Boolean>());
 							if (coupon.isInDatabase()) {
 								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
 								return true;
@@ -205,7 +211,7 @@ public class CouponCodes extends JavaPlugin {
 							return true;
 						} else {
 							try {
-								Coupon coupon = api.createNewEconomyCoupon(args[2], Integer.parseInt(args[4]), new HashMap<String, Boolean>(), Integer.parseInt(args[3]));
+								Coupon coupon = api.createNewEconomyCoupon(name, Integer.parseInt(args[4]), new HashMap<String, Boolean>(), Integer.parseInt(args[3]));
 								if (coupon.isInDatabase()) {
 									sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
 									return true;
@@ -237,7 +243,7 @@ public class CouponCodes extends JavaPlugin {
 							return true;
 						} else {
 							try {
-								Coupon coupon = api.createNewRankCoupon(args[2], args[3], Integer.parseInt(args[4]), new HashMap<String, Boolean>());
+								Coupon coupon = api.createNewRankCoupon(name, args[3], Integer.parseInt(args[4]), new HashMap<String, Boolean>());
 								if (coupon.isInDatabase()) {
 									sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
 									return true;
@@ -523,11 +529,11 @@ public class CouponCodes extends JavaPlugin {
 	}
 	
 	public static CouponAPI getCouponAPI() {
-		return (CouponAPI) cm;
+		return cm;
 	}
 	
 	public SQLAPI getSQLAPI() {
-		return (SQLAPI) sql;
+		return sql;
 	}
 	
 	public DatabaseOptions getDatabaseOptions() {

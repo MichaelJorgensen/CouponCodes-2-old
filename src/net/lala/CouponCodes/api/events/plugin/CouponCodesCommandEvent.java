@@ -17,12 +17,22 @@ public class CouponCodesCommandEvent extends Event {
 	private String commandLabel;
 	private String[] args;
 	
+	private Boolean cancel = false;
+	
 	public CouponCodesCommandEvent(CommandSender sender, Command command, String commandLabel, String[] args) {
 		super("CouponCodesCommandEvent");
 		this.sender = sender;
 		this.command = command;
 		this.commandLabel = commandLabel;
 		this.args = args;
+	}
+	
+	public Boolean isCancelled() {
+		return cancel;
+	}
+	
+	public void setCancelled(Boolean cancel) {
+		this.cancel = cancel;
 	}
 	
 	public CommandSender getSender() {
