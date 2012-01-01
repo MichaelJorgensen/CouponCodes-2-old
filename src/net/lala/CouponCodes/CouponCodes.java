@@ -329,10 +329,17 @@ public class CouponCodes extends JavaPlugin {
 							} catch (NullPointerException e) {}
 							if (coupon instanceof ItemCoupon) {
 								ItemCoupon c = (ItemCoupon) coupon;
-								for (Map.Entry<Integer, Integer> en : c.getIDs().entrySet()) {
-									player.getInventory().addItem(new ItemStack(en.getKey(), en.getValue()));
+								if (player.getInventory().firstEmpty() == -1) {
+									for (Map.Entry<Integer, Integer> en : c.getIDs().entrySet()) {
+										player.getLocation().getWorld().dropItem(player.getLocation(), new ItemStack(en.getKey(), en.getValue()));
+									}
+									player.sendMessage(ChatColor.RED+"Your inventory is full, so the items have been dropped below you.");
+								} else {
+									for (Map.Entry<Integer, Integer> en : c.getIDs().entrySet()) {
+										player.getInventory().addItem(new ItemStack(en.getKey(), en.getValue()));
+									}
+									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and the items added to your inventory!");
 								}
-								player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and the items added to your inventory!");
 							}
 							else if (coupon instanceof EconomyCoupon) {
 								if (!va) {
