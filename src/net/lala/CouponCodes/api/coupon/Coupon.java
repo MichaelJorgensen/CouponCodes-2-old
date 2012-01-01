@@ -22,7 +22,7 @@ public abstract class Coupon {
 		this.name = name;
 		this.usetimes = usetimes;
 		this.usedplayers = usedplayers;
-		this.expired = false;
+		this.expired = usetimes <= 0;
 		EventHandle.callCouponCreateEvent(this);
 	}
 	
@@ -76,12 +76,12 @@ public abstract class Coupon {
 			return null;
 	}
 	
-	public Boolean isExpired() {
+	public boolean isExpired() {
 		return expired;
 	}
 	
-	public void setExpired(Boolean expired) {
+	public void setExpired(boolean expired) {
 		this.expired = expired;
-		new CouponExpireEvent(this).call();
+		if (expired) new CouponExpireEvent(this).call();
 	}
 }

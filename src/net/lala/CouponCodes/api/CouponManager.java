@@ -31,7 +31,7 @@ public class CouponManager implements CouponAPI {
 	public CouponManager(SQLAPI sql) {
 		this.sql = sql;
 	}
-	
+	// TODO: store use times as int!!
 	@Override
 	public boolean addCouponToDatabase(Coupon coupon) throws SQLException {		
 		Connection con = sql.getConnection();
