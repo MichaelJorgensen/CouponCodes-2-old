@@ -434,6 +434,37 @@ public class CouponCodes extends JavaPlugin {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
 				return true;
 			}
+		}
+		
+		// Info command
+		else if (args[0].equalsIgnoreCase("info")) {
+			if (has(sender, "cc.info")) {
+				try {
+					Coupon c = api.getCoupon(args[1]);
+					if (!c.equals(null)) {
+						sender.sendMessage(ChatColor.GOLD+"|---------------------|");
+						sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"Coupon "+ChatColor.YELLOW+c.getName()+ChatColor.DARK_RED+" info"+ChatColor.GOLD+"---|");
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Name: "+ChatColor.DARK_PURPLE+c.getName());
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Type: "+ChatColor.DARK_PURPLE+c.getType());
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Use times left: "+ChatColor.DARK_PURPLE+c.getUseTimes());
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Used players: "+ChatColor.DARK_PURPLE+convertHashToString2(c.getUsedPlayers()));
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Totally random name: "+ChatColor.DARK_PURPLE+Misc.generateName());
+						sender.sendMessage(ChatColor.GOLD+"|---------------------|");
+						return true;
+					} else {
+						sender.sendMessage(ChatColor.RED+"That coupon doesn't exist!");
+						return true;
+					}
+				} catch (SQLException e) {
+					sender.sendMessage(ChatColor.DARK_RED+"Error while finding "+ChatColor.GOLD+args[1]+ChatColor.DARK_RED+" in the database. Please check the console for more info.");
+					sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+					e.printStackTrace();
+					return true;
+				}
+			} else {
+				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
+				return true;
+			}
 		} else {
 			help(sender);
 			return true;

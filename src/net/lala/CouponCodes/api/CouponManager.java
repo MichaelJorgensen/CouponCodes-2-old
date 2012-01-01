@@ -40,7 +40,7 @@ public class CouponManager implements CouponAPI {
 			PreparedStatement p = con.prepareStatement("INSERT INTO couponcodes VALUES(?, ?, ?, ?, ?, ?, ?)");
 			p.setString(1, c.getName());
 			p.setString(2, c.getType());
-			p.setString(3, String.valueOf(c.getUseTimes()));
+			p.setInt(3, c.getUseTimes());
 			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
 			p.setString(5, plugin.convertHashToString(c.getIDs()));
 			p.setInt(6, 0);
@@ -55,7 +55,7 @@ public class CouponManager implements CouponAPI {
 			PreparedStatement p = con.prepareStatement("INSERT INTO couponcodes VALUES(?, ?, ?, ?, ?, ?, ?)");
 			p.setString(1, c.getName());
 			p.setString(2, c.getType());
-			p.setString(3, String.valueOf(c.getUseTimes()));
+			p.setInt(3, c.getUseTimes());
 			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
 			p.setString(5, "");
 			p.setInt(6, c.getMoney());
@@ -70,7 +70,7 @@ public class CouponManager implements CouponAPI {
 			PreparedStatement p = con.prepareStatement("INSERT INTO couponcodes VALUES(?, ?, ?, ?, ?, ?, ?)");
 			p.setString(1, c.getName());
 			p.setString(2, c.getType());
-			p.setString(3, String.valueOf(c.getUseTimes()));
+			p.setInt(3, c.getUseTimes());
 			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
 			p.setString(5, "");
 			p.setInt(6, 0);
@@ -121,21 +121,21 @@ public class CouponManager implements CouponAPI {
 		if (coupon instanceof ItemCoupon) {
 			ItemCoupon c = (ItemCoupon) coupon;
 			sql.query("UPDATE couponcodes SET ctype='"+c.getType()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET usetimes='"+String.valueOf(c.getUseTimes())+"' WHERE name='"+c.getName()+"'");
+			sql.query("UPDATE couponcodes SET usetimes='"+c.getUseTimes()+"' WHERE name='"+c.getName()+"'");
 			sql.query("UPDATE couponcodes SET usedplayers='"+plugin.convertHashToString2(c.getUsedPlayers())+"' WHERE name='"+c.getName()+"'");
 			sql.query("UPDATE couponcodes SET ids='"+plugin.convertHashToString(c.getIDs())+"' WHERE name='"+c.getName()+"'");
 		}
 		else if (coupon instanceof EconomyCoupon) {
 			EconomyCoupon c = (EconomyCoupon) coupon;
 			sql.query("UPDATE couponcodes SET ctype='"+c.getType()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET usetimes='"+String.valueOf(c.getUseTimes())+"' WHERE name='"+c.getName()+"'");
+			sql.query("UPDATE couponcodes SET usetimes='"+c.getUseTimes()+"' WHERE name='"+c.getName()+"'");
 			sql.query("UPDATE couponcodes SET usedplayers='"+plugin.convertHashToString2(c.getUsedPlayers())+"' WHERE name='"+c.getName()+"'");
 			sql.query("UPDATE couponcodes SET money='"+c.getMoney()+"' WHERE name='"+c.getName()+"'");
 		}
 		else if (coupon instanceof RankCoupon) {
 			RankCoupon c = (RankCoupon) coupon;
 			sql.query("UPDATE couponcodes SET ctype='"+c.getType()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET usetimes='"+String.valueOf(c.getUseTimes())+"' WHERE name='"+c.getName()+"'");
+			sql.query("UPDATE couponcodes SET usetimes='"+c.getUseTimes()+"' WHERE name='"+c.getName()+"'");
 			sql.query("UPDATE couponcodes SET usedplayers='"+plugin.convertHashToString2(c.getUsedPlayers())+"' WHERE name='"+c.getName()+"'");
 			sql.query("UPDATE couponcodes SET groupname='"+c.getGroup()+"' WHERE name='"+c.getName()+"'");
 		}
@@ -144,7 +144,7 @@ public class CouponManager implements CouponAPI {
 	@Override
 	public Coupon getCoupon(String coupon) throws SQLException {
 		if (!couponExists(coupon)) return null;
-		int usetimes = Integer.parseInt(sql.query("SELECT usetimes FROM couponcodes WHERE name='"+coupon+"'").getString(1));
+		int usetimes = sql.query("SELECT usetimes FROM couponcodes WHERE name='"+coupon+"'").getInt(1);
 		HashMap<String, Boolean> usedplayers = plugin.convertStringToHash2(sql.query("SELECT usedplayers FROM couponcodes WHERE name='"+coupon+"'").getString(1));
 		ResultSet rs = sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'");
 		
