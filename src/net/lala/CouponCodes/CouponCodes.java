@@ -2,6 +2,7 @@ package net.lala.CouponCodes;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -440,19 +441,64 @@ public class CouponCodes extends JavaPlugin {
 		else if (args[0].equalsIgnoreCase("info")) {
 			if (has(sender, "cc.info")) {
 				try {
-					Coupon c = api.getCoupon(args[1]);
-					if (!c.equals(null)) {
-						sender.sendMessage(ChatColor.GOLD+"|---------------------|");
-						sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"Coupon "+ChatColor.YELLOW+c.getName()+ChatColor.DARK_RED+" info"+ChatColor.GOLD+"---|");
-						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Name: "+ChatColor.DARK_PURPLE+c.getName());
-						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Type: "+ChatColor.DARK_PURPLE+c.getType());
-						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Use times left: "+ChatColor.DARK_PURPLE+c.getUseTimes());
-						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Used players: "+ChatColor.DARK_PURPLE+convertHashToString2(c.getUsedPlayers()));
-						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Totally random name: "+ChatColor.DARK_PURPLE+Misc.generateName());
-						sender.sendMessage(ChatColor.GOLD+"|---------------------|");
-						return true;
+					if (args.length == 2) {
+						Coupon c = api.getCoupon(args[1]);
+						if (c != null) {
+							sender.sendMessage(ChatColor.GOLD+"|----------------------|");
+							sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"Coupon "+ChatColor.YELLOW+c.getName()+ChatColor.DARK_RED+" info"+ChatColor.GOLD+"---|");
+							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Name: "+ChatColor.DARK_PURPLE+c.getName());
+							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Type: "+ChatColor.DARK_PURPLE+c.getType());
+							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Use times left: "+ChatColor.DARK_PURPLE+c.getUseTimes());
+							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Used players: "+ChatColor.DARK_PURPLE+convertHashToString2(c.getUsedPlayers()));
+							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Totally random name: "+ChatColor.DARK_PURPLE+Misc.generateName());
+							sender.sendMessage(ChatColor.GOLD+"|----------------------|");
+							return true;
+						} else {
+							sender.sendMessage(ChatColor.RED+"That coupon doesn't exist!");
+							return true;
+						}
 					} else {
-						sender.sendMessage(ChatColor.RED+"That coupon doesn't exist!");
+						StringBuilder sb1 = new StringBuilder();
+						StringBuilder sb2 = new StringBuilder();
+						ArrayList<String> co = api.getCoupons();
+						if (co.isEmpty() || co.equals(null)) {
+							sb1.append("None");
+							sb2.append("Out of those, 0% are item, 0% are economy, and 0% are rank coupons.");
+						} else {
+							double j = co.size();
+							double it = 0;
+							double ec = 0;
+							double ra = 0;
+							String it2 = null;
+							String ec2 = null;
+							String ra2 = null;
+							DecimalFormat d1 = new DecimalFormat("#.##");
+							DecimalFormat d2 = new DecimalFormat("##.##");
+							for (int i = 0; i < co.size(); i++) {
+								sb1.append(co.get(i));
+								Coupon coo = api.getCoupon(co.get(i));
+								if (coo instanceof ItemCoupon) it++;
+								if (coo instanceof EconomyCoupon) ec++;
+								if (coo instanceof RankCoupon) ra++;
+								if (!(Integer.valueOf(i+1).equals(co.size()))){
+									sb1.append(", ");
+								}
+							}
+							it2 = d2.format(it/j*100);
+							ec2 = d2.format(ec/j*100);
+							ra2 = d2.format(ra/j*100);
+							if (it < 10) it2 = d1.format(it/j*100);
+							if (ec < 10) ec2 = d1.format(ec/j*100);
+							if (ra < 10) ra2 = d1.format(ra/j*100);
+							sb2.append("Out of those, "+it2+"% are item, "+ec2+"% are economy, and "+ra2+"% are rank coupons.");
+						}
+						sender.sendMessage(ChatColor.GOLD+"|-----------------------|");
+						sender.sendMessage(ChatColor.GOLD+"|-"+ChatColor.DARK_RED+"Info on current coupons"+ChatColor.GOLD+"-|");
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.GOLD+"Use /c info [name] to view a specific coupon");
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Current coupons: "+ChatColor.DARK_PURPLE+sb1.toString());
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+sb2.toString());
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Totally random name: "+ChatColor.DARK_PURPLE+Misc.generateName());
+						sender.sendMessage(ChatColor.GOLD+"|-----------------------|");
 						return true;
 					}
 				} catch (SQLException e) {
@@ -492,6 +538,8 @@ public class CouponCodes extends JavaPlugin {
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c redeem [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c remove [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c list");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c info");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"/c info [name]");
 		sender.sendMessage(ChatColor.GOLD+"|---------------------|");
 	}
 	
