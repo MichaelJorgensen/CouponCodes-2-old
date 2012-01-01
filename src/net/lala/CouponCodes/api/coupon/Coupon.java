@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.events.EventHandle;
+import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 
 /**
  * Coupon.java - Stores generic coupon information
@@ -14,12 +15,14 @@ public abstract class Coupon {
 	
 	private String name;
 	private int usetimes;
+	private boolean expired;
 	private HashMap<String, Boolean> usedplayers = null;
 	
 	public Coupon(String name, int usetimes, HashMap<String, Boolean> usedplayers) {
 		this.name = name;
 		this.usetimes = usetimes;
 		this.usedplayers = usedplayers;
+		this.expired = false;
 		EventHandle.callCouponCreateEvent(this);
 	}
 	
@@ -53,6 +56,8 @@ public abstract class Coupon {
 	
 	public void setUseTimes(int usetimes) {
 		this.usetimes = usetimes;
+		if (usetimes <= 0)
+			this.setExpired(true);
 	}
 	
 	public HashMap<String, Boolean> getUsedPlayers() {
@@ -69,5 +74,14 @@ public abstract class Coupon {
 		if (this instanceof RankCoupon) return "Rank";
 		else
 			return null;
+	}
+	
+	public Boolean isExpired() {
+		return expired;
+	}
+	
+	public void setExpired(Boolean expired) {
+		this.expired = expired;
+		new CouponExpireEvent(this).call();
 	}
 }

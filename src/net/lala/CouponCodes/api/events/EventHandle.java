@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.events.coupon.CouponAddToDatabaseEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
+import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseCloseConnectionEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseOpenConnectionEvent;
@@ -17,7 +18,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 /**
- * EventHandle.java - Easy way to call couponcode's custom events
+ * EventHandle.java - Easy way to call couponcode's custom events and return the possibly altered event
  * @author mike101102
  */
 public class EventHandle {
@@ -36,6 +37,12 @@ public class EventHandle {
 	
 	public static CouponCreateEvent callCouponCreateEvent(Coupon coupon) {
 		CouponCreateEvent ev = new CouponCreateEvent(coupon);
+		ev.call();
+		return ev;
+	}
+	
+	public static CouponExpireEvent callCouponExpireEvent(Coupon coupon) {
+		CouponExpireEvent ev = new CouponExpireEvent(coupon);
 		ev.call();
 		return ev;
 	}

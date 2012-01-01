@@ -20,6 +20,9 @@ public class CouponListener extends CustomEventListener {
 		else if (event instanceof CouponRemoveFromDatabaseEvent) {
 			this.onCouponRemoveFromDatabase((CouponRemoveFromDatabaseEvent) event);
 		}
+		else if (event instanceof CouponExpireEvent) {
+			this.onCouponExpire((CouponExpireEvent) event);
+		}
 	}
 	
 	/**
@@ -41,4 +44,10 @@ public class CouponListener extends CustomEventListener {
 	 * @param event
 	 */
 	public void onCouponRemoveFromDatabase(CouponRemoveFromDatabaseEvent event) {}
+	
+	/**
+	 * Called after a coupon expires
+	 * @param event
+	 */
+	public void onCouponExpire(CouponExpireEvent event) {}
 }

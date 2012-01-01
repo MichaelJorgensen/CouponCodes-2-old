@@ -3,6 +3,7 @@ package net.lala.CouponCodes.api.events.example;
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.events.coupon.CouponAddToDatabaseEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
+import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponListener;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
 
@@ -31,5 +32,10 @@ public class CouponMaster extends CouponListener {
 	@Override
 	public void onCouponRemoveFromDatabase(CouponRemoveFromDatabaseEvent event) {
 		plugin.debug("Coupon removed from database: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType());
+	}
+	
+	@Override
+	public void onCouponExpire(CouponExpireEvent event) {
+		plugin.debug("Coupon "+event.getCoupon().getName()+" has expired! Type: "+event.getCoupon().getType());
 	}
 }

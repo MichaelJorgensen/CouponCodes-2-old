@@ -320,7 +320,7 @@ public class CouponCodes extends JavaPlugin {
 							Coupon coupon = api.getCoupon(args[1]);
 							try {
 								if (!coupon.getUseTimes().equals(null) || !coupon.getUsedPlayers().isEmpty()) {
-									if (coupon.getUseTimes() <= 0 || coupon.getUsedPlayers().get(player.getName()) == true) {
+									if (coupon.isExpired() || coupon.getUsedPlayers().get(player.getName())) {
 										player.sendMessage(ChatColor.RED+"You cannot use this coupon as it is expired for you.");
 										return true;
 									}
