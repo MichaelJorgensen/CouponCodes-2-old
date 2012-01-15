@@ -1,3 +1,5 @@
+package net.lala.CouponCodes.misc;
+
 /*
  * Copyright 2011 Tyler Blair. All rights reserved.
  *
