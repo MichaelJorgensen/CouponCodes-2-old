@@ -1,7 +1,11 @@
 package net.lala.CouponCodes;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -18,6 +22,7 @@ import net.lala.CouponCodes.api.events.example.CouponCodesMaster;
 import net.lala.CouponCodes.api.events.example.CouponMaster;
 import net.lala.CouponCodes.api.events.example.DatabaseMaster;
 import net.lala.CouponCodes.api.events.plugin.CouponCodesCommandEvent;
+import net.lala.CouponCodes.listeners.PlayerListen;
 import net.lala.CouponCodes.misc.Metrics;
 import net.lala.CouponCodes.misc.Misc;
 import net.lala.CouponCodes.runnable.CouponTimer;
@@ -83,6 +88,9 @@ public class CouponCodes extends JavaPlugin {
 		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponMaster(this), Priority.Monitor, this);
 		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new DatabaseMaster(this), Priority.Monitor, this);
 		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponCodesMaster(this), Priority.Monitor, this);
+		
+		// Bukkit listeners
+		server.getPluginManager().registerEvent(Type.PLAYER_JOIN, new PlayerListen(this), Priority.Normal, this);
 		
 		setupSQL(true);
 		
@@ -575,6 +583,26 @@ public class CouponCodes extends JavaPlugin {
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"list");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info [name]");
+	}
+	
+	public boolean checkForUpdate() {
+		String ver = null;
+		try {
+			URL url = new URL("http://www.craftmod.net/jar/CouponCodes/version.txt");
+			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
+			ver = br.readLine();
+			br.close();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (ver == null)
+			return false;
+		else if (ver.equals(getDescription().getVersion()))
+			return false;
+		else
+			return true;
 	}
 	
 	public HashMap<Integer, Integer> convertStringToHash(String args) {
