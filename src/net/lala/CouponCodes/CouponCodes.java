@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.lala.CouponCodes.api.CouponManager;
-import net.lala.CouponCodes.api.SQLAPI;
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.coupon.EconomyCoupon;
 import net.lala.CouponCodes.api.coupon.ItemCoupon;
@@ -137,7 +136,7 @@ public class CouponCodes extends JavaPlugin {
 		try {
 			sql.open();
 			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), groupname VARCHAR(20), timeuse INT(100))");
-			cm = new CouponManager(this, getSQLAPI());
+			cm = new CouponManager(this, sql);
 		} catch (SQLException e) {
 			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
 			e.printStackTrace();
@@ -646,7 +645,7 @@ public class CouponCodes extends JavaPlugin {
 		return cm;
 	}
 	
-	public SQLAPI getSQLAPI() {
+	public SQL getSQLAPI() {
 		return sql;
 	}
 	

@@ -13,6 +13,7 @@ import net.lala.CouponCodes.api.coupon.EconomyCoupon;
 import net.lala.CouponCodes.api.coupon.ItemCoupon;
 import net.lala.CouponCodes.api.coupon.RankCoupon;
 import net.lala.CouponCodes.api.events.EventHandle;
+import net.lala.CouponCodes.sql.SQL;
 
 /**
  * CouponManager.java - Allows other plugins to interact with coupons
@@ -21,14 +22,10 @@ import net.lala.CouponCodes.api.events.EventHandle;
 public class CouponManager {
 	
 	private CouponCodes plugin;
-	private SQLAPI sql;
+	private SQL sql;
 	
-	public CouponManager(CouponCodes plugin, SQLAPI sql) {
+	public CouponManager(CouponCodes plugin, SQL sql) {
 		this.plugin = plugin;
-		this.sql = sql;
-	}
-	
-	public CouponManager(SQLAPI sql) {
 		this.sql = sql;
 	}
 	
