@@ -57,9 +57,6 @@ public class CouponCodes extends JavaPlugin {
 	private DatabaseOptions dataop = null;
 	private Config config = null;
 	
-	private CouponTimer ct = null;
-	private ReconnectTimer rt = null;
-	
 	private boolean va = false;
 	private boolean debug = false;
 	
@@ -74,8 +71,6 @@ public class CouponCodes extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		server = getServer();
-		ct = new CouponTimer(this);
-		rt = new ReconnectTimer(this);
 		
 		if (!setupVault()) {
 			send("Vault support is disabled.");
@@ -83,6 +78,9 @@ public class CouponCodes extends JavaPlugin {
 		} else {
 			va = true;
 		}
+		
+		if (checkForUpdate())
+			send("New update is available for CouponCodes! Current version: "+getDescription().getVersion()+" New version: "+getUpdateVersion());
 		
 		// This is for this plugin's own events!
 		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponMaster(this), Priority.Monitor, this);
@@ -93,24 +91,24 @@ public class CouponCodes extends JavaPlugin {
 		server.getPluginManager().registerEvent(Type.PLAYER_JOIN, new PlayerListen(this), Priority.Normal, this);
 		
 		setupSQL(true);
-		
-		this.saveConfig();
+		saveConfig();
 		
 		//Timers!
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, ct, 60L, 60L);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, rt, 1200L, 1200L);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(this), 60L, 60L);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ReconnectTimer(this), 1200L, 1200L);
 		
 		try {
 			mt = new Metrics();
 			mt.beginMeasuringPlugin(this);
-		} catch (IOException e) {}
+		} catch (IOException e) {
+			debug("Error while trying to measure plugin");
+		}
 		
-		send("is now enabled! Version: "+this.getDescription().getVersion());
+		send("is now enabled! Version: "+getDescription().getVersion());
 	}
 	
 	@Override
 	public void onDisable() {
-		this.saveConfig();
 		try {
 			sql.close();
 		} catch (SQLException e) {
@@ -119,6 +117,7 @@ public class CouponCodes extends JavaPlugin {
 			sendErr("SQL is null. Connection doesn't exist");
 		}
 		getServer().getScheduler().cancelTasks(this);
+		cm = null;
 		send("is now disabled.");
 	}
 	
@@ -589,6 +588,16 @@ public class CouponCodes extends JavaPlugin {
 	}
 	
 	public boolean checkForUpdate() {
+		String ver = getUpdateVersion();
+		if (ver == null)
+			return false;
+		else if (ver.equals(getDescription().getVersion()))
+			return false;
+		else
+			return true;
+	}
+	
+	public String getUpdateVersion() {
 		String ver = null;
 		try {
 			URL url = new URL("http://www.craftmod.net/jar/CouponCodes/version.txt");
@@ -600,12 +609,7 @@ public class CouponCodes extends JavaPlugin {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		if (ver == null)
-			return false;
-		else if (ver.equals(getDescription().getVersion()))
-			return false;
-		else
-			return true;
+		return ver;
 	}
 	
 	public HashMap<Integer, Integer> convertStringToHash(String args) {

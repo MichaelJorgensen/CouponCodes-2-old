@@ -18,6 +18,7 @@ permissions:
             cc.list: true
             cc.reload: true
             cc.info: true
+            cc.update: true
     cc.add:
         description: Allows you to add a coupon
         default: false
@@ -35,4 +36,7 @@ permissions:
         default: false
     cc.info:
         description: Allows you to view information on coupons
+        default: false
+    cc.update:
+        description: Notifies you when there is an update
         default: false
