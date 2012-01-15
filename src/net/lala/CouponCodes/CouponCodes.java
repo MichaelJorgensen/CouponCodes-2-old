@@ -1,6 +1,7 @@
 package net.lala.CouponCodes;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -93,10 +94,10 @@ public class CouponCodes extends JavaPlugin {
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, ct, 60L, 60L);
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, rt, 1200L, 1200L);
 		
-		/*try {
+		try {
 			mt = new Metrics();
 			mt.beginMeasuringPlugin(this);
-		} catch (IOException e) {}*/
+		} catch (IOException e) {}
 		
 		send("is now enabled! Version: "+this.getDescription().getVersion());
 	}
