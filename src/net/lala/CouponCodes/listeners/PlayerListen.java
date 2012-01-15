@@ -20,8 +20,9 @@ public class PlayerListen extends PlayerListener {
 		Player player = event.getPlayer();
 		if (plugin.has(player, "cc.update")) {
 			if (plugin.checkForUpdate()) {
-				player.sendMessage(ChatColor.GREEN+"There is a new update for CouponCodes! Please download it at http://dev.bukkit.org/server-mods/couponcodes/");
-				player.sendMessage(ChatColor.GREEN+"Current version: "+plugin.getDescription().getVersion()+" New version: "+plugin.getUpdateVersion());
+				String[] info = plugin.getUpdateInfo();
+				player.sendMessage(ChatColor.GREEN+"There is a new update for CouponCodes! Current version: "+plugin.getDescription().getVersion()+" New version: "+info[0]);
+				player.sendMessage(ChatColor.GOLD+"About the update: "+info[1]);
 			}
 		}
 	}

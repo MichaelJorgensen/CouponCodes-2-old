@@ -80,7 +80,7 @@ public class CouponCodes extends JavaPlugin {
 		}
 		
 		if (checkForUpdate())
-			send("New update is available for CouponCodes! Current version: "+getDescription().getVersion()+" New version: "+getUpdateVersion());
+			send("New update is available for CouponCodes! Current version: "+getDescription().getVersion()+" New version: "+getUpdateInfo()[0]);
 		
 		// This is for this plugin's own events!
 		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponMaster(this), Priority.Monitor, this);
@@ -583,12 +583,11 @@ public class CouponCodes extends JavaPlugin {
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"redeem [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"remove [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"list");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info [name]");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info (name)");
 	}
 	
 	public boolean checkForUpdate() {
-		String ver = getUpdateVersion();
+		String ver = getUpdateInfo()[0];
 		if (ver == null)
 			return false;
 		else if (ver.equals(getDescription().getVersion()))
@@ -597,19 +596,24 @@ public class CouponCodes extends JavaPlugin {
 			return true;
 	}
 	
-	public String getUpdateVersion() {
-		String ver = null;
+	public String[] getUpdateInfo() {
+		String info[] = new String[2];
 		try {
 			URL url = new URL("http://www.craftmod.net/jar/CouponCodes/version.txt");
 			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-			ver = br.readLine();
+			info[0] = br.readLine();
+			
+			url = new URL("http://www.craftmod.net/jar/CouponCodes/info.txt");
+			br = new BufferedReader(new InputStreamReader(url.openStream()));
+			info[1] = br.readLine();
+			
 			br.close();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return ver;
+		return info;
 	}
 	
 	public HashMap<Integer, Integer> convertStringToHash(String args) {
