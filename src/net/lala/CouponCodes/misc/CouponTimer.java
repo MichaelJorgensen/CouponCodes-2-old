@@ -31,7 +31,7 @@ public class CouponTimer implements Runnable {
 			
 			for (int i = 0; i < cl.size(); i++) {
 				Coupon c = cm.getCoupon(cl.get(i));
-				if (c.isExpired()) continue;
+				if (c.isExpired() || c.getTime() == -1) continue;
 				CouponTimeChangeEvent ev = EventHandle.callCouponTimeChangeEvent(c);
 				if (ev.isCancelled()) return;
 				c.setTime(c.getTime()-1);

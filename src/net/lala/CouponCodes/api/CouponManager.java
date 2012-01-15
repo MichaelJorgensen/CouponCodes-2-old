@@ -143,20 +143,24 @@ public class CouponManager {
 	
 	public Coupon getCoupon(String coupon) throws SQLException {
 		if (!couponExists(coupon)) return null;
-		int usetimes = sql.query("SELECT usetimes FROM couponcodes WHERE name='"+coupon+"'").getInt(1);
-		int time = sql.query("SELECT timeuse FROM couponcodes WHERE name='"+coupon+"'").getInt(1);
-		HashMap<String, Boolean> usedplayers = plugin.convertStringToHash2(sql.query("SELECT usedplayers FROM couponcodes WHERE name='"+coupon+"'").getString(1));
-		ResultSet rs = sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'");
+		ResultSet rs1 = sql.query("SELECT * FROM couponcodes WHERE name='"+coupon+"'");
+		rs1.first();
+		int usetimes = rs1.getInt("usetimes");
+		int time = rs1.getInt("timeuse");
 		
-		if (rs.getString(1).equalsIgnoreCase("Item")) {
-			return createNewItemCoupon(coupon, usetimes, time, plugin.convertStringToHash(sql.query("SELECT ids FROM couponcodes WHERE name='"+coupon+"'").getString(1)), usedplayers);
+		HashMap<String, Boolean> usedplayers = plugin.convertStringToHash2(rs1.getString("usedplayers"));
+		ResultSet rs2 = sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'");
+		rs2.first();
+		
+		if (rs2.getString(1).equalsIgnoreCase("Item")) {
+			return createNewItemCoupon(coupon, usetimes, time, plugin.convertStringToHash(rs1.getString("ids")), usedplayers);
 		}
 		
-		else if (rs.getString(1).equalsIgnoreCase("Economy")) {
-			return createNewEconomyCoupon(coupon, usetimes, time, usedplayers, sql.query("SELECT money FROM couponcodes WHERE name='"+coupon+"'").getInt(1));
+		else if (rs2.getString(1).equalsIgnoreCase("Economy")) {
+			return createNewEconomyCoupon(coupon, usetimes, time, usedplayers, rs1.getInt("money"));
 		}
-		else if (rs.getString(1).equalsIgnoreCase("Rank")) {
-			return createNewRankCoupon(coupon, sql.query("SELECT groupname FROM couponcodes WHERE name='"+coupon+"'").getString(1), usetimes, time, usedplayers);
+		else if (rs2.getString(1).equalsIgnoreCase("Rank")) {
+			return createNewRankCoupon(coupon, rs1.getString("groupname"), usetimes, time, usedplayers);
 		} else {
 			return null;
 		}

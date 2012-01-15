@@ -348,12 +348,14 @@ public class CouponCodes extends JavaPlugin {
 								return true;
 							}
 							Coupon coupon = api.getCoupon(args[1]);
-							if (coupon.getUseTimes() != null || !coupon.getUsedPlayers().isEmpty()) {
-								if (coupon.isExpired() || coupon.getUsedPlayers().get(player.getName())) {
-									player.sendMessage(ChatColor.RED+"You cannot use this coupon as it is expired for you.");
-									return true;
+							try {
+								if (coupon.getUseTimes() != null || !coupon.getUsedPlayers().isEmpty()) {
+									if (coupon.isExpired() || coupon.getUsedPlayers().get(player.getName())) {
+										player.sendMessage(ChatColor.RED+"You cannot use this coupon as it is expired for you.");
+										return true;
+									}
 								}
-							}
+							} catch (NullPointerException e) {}
 							if (coupon instanceof ItemCoupon) {
 								ItemCoupon c = (ItemCoupon) coupon;
 								if (player.getInventory().firstEmpty() == -1) {
