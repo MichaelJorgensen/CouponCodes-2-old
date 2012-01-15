@@ -14,6 +14,7 @@ import net.lala.CouponCodes.api.coupon.ItemCoupon;
 import net.lala.CouponCodes.api.coupon.RankCoupon;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.sql.SQL;
+import net.lala.CouponCodes.sql.options.MySQLOptions;
 
 /**
  * CouponManager.java - Allows other plugins to interact with coupons
@@ -141,13 +142,13 @@ public class CouponManager {
 	public Coupon getCoupon(String coupon) throws SQLException {
 		if (!couponExists(coupon)) return null;
 		ResultSet rs1 = sql.query("SELECT * FROM couponcodes WHERE name='"+coupon+"'");
-		rs1.first();
+		if (sql.getDatabaseOptions() instanceof MySQLOptions) rs1.first();
 		int usetimes = rs1.getInt("usetimes");
 		int time = rs1.getInt("timeuse");
 		
 		HashMap<String, Boolean> usedplayers = plugin.convertStringToHash2(rs1.getString("usedplayers"));
 		ResultSet rs2 = sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'");
-		rs2.first();
+		if (sql.getDatabaseOptions() instanceof MySQLOptions) rs2.first();
 		
 		if (rs2.getString(1).equalsIgnoreCase("Item")) {
 			return createNewItemCoupon(coupon, usetimes, time, plugin.convertStringToHash(rs1.getString("ids")), usedplayers);
