@@ -1,6 +1,6 @@
 name: CouponCodes
 main: net.lala.CouponCodes.CouponCodes
-version: 2.0.1
+version: 2.0.2
 author: LaLa
 softdepend: [Vault]
 commands:

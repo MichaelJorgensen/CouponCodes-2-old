@@ -15,31 +15,33 @@ public abstract class Coupon {
 	
 	private String name;
 	private int usetimes;
+	private int time;
 	private boolean expired;
 	private HashMap<String, Boolean> usedplayers = null;
 	
-	public Coupon(String name, int usetimes, HashMap<String, Boolean> usedplayers) {
+	public Coupon(String name, int usetimes, int time, HashMap<String, Boolean> usedplayers) {
 		this.name = name;
 		this.usetimes = usetimes;
+		this.time = time;
 		this.usedplayers = usedplayers;
-		this.expired = usetimes <= 0;
+		this.expired = (usetimes <= 0 || time == 0);
 		EventHandle.callCouponCreateEvent(this);
 	}
 	
 	public boolean addToDatabase() throws SQLException {
-		return CouponCodes.getCouponAPI().addCouponToDatabase(this);
+		return CouponCodes.getCouponManager().addCouponToDatabase(this);
 	}
 	
 	public boolean removeFromDatabase() throws SQLException {
-		return CouponCodes.getCouponAPI().removeCouponFromDatabase(this);
+		return CouponCodes.getCouponManager().removeCouponFromDatabase(this);
 	}
 	
 	public boolean isInDatabase() throws SQLException {
-		return CouponCodes.getCouponAPI().couponExists(this);
+		return CouponCodes.getCouponManager().couponExists(this);
 	}
 	
 	public void updateWithDatabase() throws SQLException {
-		CouponCodes.getCouponAPI().updateCoupon(this);
+		CouponCodes.getCouponManager().updateCoupon(this);
 	}
 	
 	public String getName() {
@@ -56,7 +58,17 @@ public abstract class Coupon {
 	
 	public void setUseTimes(int usetimes) {
 		this.usetimes = usetimes;
-		if (usetimes <= 0)
+		if (this.usetimes <= 0)
+			this.setExpired(true);
+	}
+	
+	public Integer getTime() {
+		return time;
+	}
+	
+	public void setTime(int time) {
+		this.time = time;
+		if (this.time == 0)
 			this.setExpired(true);
 	}
 	

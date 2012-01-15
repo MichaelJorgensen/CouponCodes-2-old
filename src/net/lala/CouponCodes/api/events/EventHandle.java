@@ -8,6 +8,7 @@ import net.lala.CouponCodes.api.events.coupon.CouponAddToDatabaseEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
+import net.lala.CouponCodes.api.events.coupon.CouponTimeChangeEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseCloseConnectionEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseOpenConnectionEvent;
 import net.lala.CouponCodes.api.events.database.DatabaseQueryEvent;
@@ -67,6 +68,12 @@ public class EventHandle {
 	
 	public static CouponCodesCommandEvent callCouponCodesCommandEvent(CommandSender sender, Command command, String commandLabel, String[] args) {
 		CouponCodesCommandEvent ev = new CouponCodesCommandEvent(sender, command, commandLabel, args);
+		ev.call();
+		return ev;
+	}
+	
+	public static CouponTimeChangeEvent callCouponTimeChangeEvent(Coupon coupon) {
+		CouponTimeChangeEvent ev = new CouponTimeChangeEvent(coupon);
 		ev.call();
 		return ev;
 	}

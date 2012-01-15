@@ -6,10 +6,10 @@
 sql-type: SQLite
 sql-options: [SQLite, MySQL]
 MySQL-options:
- hostname: localhost
- port: '3306'
- database: CouponCodes
- username: minecraft
- password: password
+   hostname: localhost
+   port: '3306'
+   database: CouponCodes
+   username: minecraft
+   password: password
 use-vault: false
 debug: false

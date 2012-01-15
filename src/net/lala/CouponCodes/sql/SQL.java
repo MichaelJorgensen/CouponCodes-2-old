@@ -84,7 +84,7 @@ public class SQL extends SQLAPI {
 	
 	@Override
 	public boolean reload() throws SQLException {
-		con.close();
+		close();
 		return open();
 	}
 	

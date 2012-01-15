@@ -10,8 +10,8 @@ public class EconomyCoupon extends Coupon {
 
 	private Integer money;
 	
-	public EconomyCoupon(String name, Integer usetimes, HashMap<String, Boolean> usedplayers, Integer money) {
-		super(name, usetimes, usedplayers);
+	public EconomyCoupon(String name, Integer usetimes, Integer time, HashMap<String, Boolean> usedplayers, Integer money) {
+		super(name, usetimes, time, usedplayers);
 		this.money = money;
 	}
 	

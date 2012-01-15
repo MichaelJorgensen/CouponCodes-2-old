@@ -10,8 +10,8 @@ public class RankCoupon extends Coupon {
 
 	private String group;
 	
-	public RankCoupon(String name, String group, int usetimes, HashMap<String, Boolean> usedplayers) {
-		super(name, usetimes, usedplayers);
+	public RankCoupon(String name, String group, int usetimes, int time, HashMap<String, Boolean> usedplayers) {
+		super(name, usetimes, time, usedplayers);
 		this.group = group;
 	}
 	

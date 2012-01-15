@@ -6,6 +6,7 @@ import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponListener;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
+import net.lala.CouponCodes.api.events.coupon.CouponTimeChangeEvent;
 
 /**
  * CouponMaster.java - Example class of using couponcode's custom events
@@ -37,5 +38,10 @@ public class CouponMaster extends CouponListener {
 	@Override
 	public void onCouponExpire(CouponExpireEvent event) {
 		plugin.debug("Coupon "+event.getCoupon().getName()+" has expired! Type: "+event.getCoupon().getType());
+	}
+	
+	@Override
+	public void onCouponTimeChange(CouponTimeChangeEvent event) {
+		plugin.debug("Coupon "+event.getCoupon().getName()+"'s time has been changed! It is now "+event.getCoupon().getTime()+"! Expired: "+event.getCoupon().isExpired()+" Type: "+event.getCoupon().getType());
 	}
 }

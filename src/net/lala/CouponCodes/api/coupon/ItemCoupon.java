@@ -10,8 +10,8 @@ public class ItemCoupon extends Coupon {
 
 	private HashMap<Integer, Integer> ids;
 	
-	public ItemCoupon(String name, Integer usetimes, HashMap<String, Boolean> usedplayers, HashMap<Integer, Integer> ids) {
-		super(name, usetimes, usedplayers);
+	public ItemCoupon(String name, Integer usetimes, Integer time, HashMap<String, Boolean> usedplayers, HashMap<Integer, Integer> ids) {
+		super(name, usetimes, time, usedplayers);
 		this.ids = ids;
 	}
 	

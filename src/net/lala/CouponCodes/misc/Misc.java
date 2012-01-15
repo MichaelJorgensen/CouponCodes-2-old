@@ -1,4 +1,4 @@
-package net.lala.CouponCodes;
+package net.lala.CouponCodes.misc;
 
 import java.util.Random;
 

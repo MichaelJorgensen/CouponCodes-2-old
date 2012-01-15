@@ -23,6 +23,9 @@ public class CouponListener extends CustomEventListener {
 		else if (event instanceof CouponExpireEvent) {
 			this.onCouponExpire((CouponExpireEvent) event);
 		}
+		else if (event instanceof CouponTimeChangeEvent) {
+			this.onCouponTimeChange((CouponTimeChangeEvent) event);
+		}
 	}
 	
 	/**
@@ -50,4 +53,10 @@ public class CouponListener extends CustomEventListener {
 	 * @param event
 	 */
 	public void onCouponExpire(CouponExpireEvent event) {}
+	
+	/**
+	 * Called after the time is changed on a coupon
+	 * @param event
+	 */
+	public void onCouponTimeChange(CouponTimeChangeEvent event) {}
 }
