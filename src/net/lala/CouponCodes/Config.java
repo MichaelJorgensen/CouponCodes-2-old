@@ -1,4 +1,4 @@
-package net.lala.CouponCodes.misc;
+package net.lala.CouponCodes;
 
 
 import org.bukkit.configuration.file.FileConfiguration;
