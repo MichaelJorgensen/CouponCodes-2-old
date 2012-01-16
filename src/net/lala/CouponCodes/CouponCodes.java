@@ -455,30 +455,6 @@ public class CouponCodes extends JavaPlugin {
 			}
 		}
 		
-		// Reload Command
-		else if (args[0].equalsIgnoreCase("reload")) {
-			if (has(sender, "cc.reload")) {
-				try {
-					sql.close();
-					if (setupSQL(false)) {
-						sender.sendMessage(ChatColor.GREEN+"Database and config.yml have been reloaded.");
-						return true;
-					} else {
-						sender.sendMessage(ChatColor.RED+"I attempted to reload, but there seems to be an error in the configuration. Please fix it or errors will emerge.");
-						return true;
-					}
-				} catch (SQLException e) {
-					sender.sendMessage(ChatColor.DARK_RED+"Error while closing and opening the database. Please check the console for more info.");
-					sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
-					e.printStackTrace();
-					return true;
-				}
-			} else {
-				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
-				return true;
-			}
-		}
-		
 		// Info command
 		else if (args[0].equalsIgnoreCase("info")) {
 			if (has(sender, "cc.info")) {
@@ -558,6 +534,26 @@ public class CouponCodes extends JavaPlugin {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
 				return true;
 			}
+		}
+		
+		// Reload command
+		else if (args[0].equalsIgnoreCase("reload")) {
+			if (has(sender, "cc.reload")) {
+				boolean y = false;
+				try {
+					y = sql.reload();
+				} catch (SQLException e) {y = false;}
+				if (y) {
+					sender.sendMessage(ChatColor.GREEN+"Database reloaded");
+					return true;
+				} else {
+					sender.sendMessage(ChatColor.RED+"Error reloading the database");
+					return true;
+				}
+			} else {
+				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
+				return true;
+			}
 		} else {
 			help(sender);
 			return true;
@@ -585,6 +581,7 @@ public class CouponCodes extends JavaPlugin {
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"remove [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"list");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info (name)");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"reload");
 	}
 	
 	public boolean checkForUpdate() {
