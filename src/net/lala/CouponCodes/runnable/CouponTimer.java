@@ -10,31 +10,27 @@ import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.api.events.coupon.CouponTimeChangeEvent;
 
 public class CouponTimer implements Runnable {
-
-	private CouponCodes plugin;
-	private int z = 0;
 	
-	public CouponTimer(CouponCodes plugin) {
-		this.plugin = plugin;
+	private CouponManager cm;
+	
+	public CouponTimer() {
+		cm = CouponCodes.getCouponManager();
 	}
 	
 	@Override
 	public void run() {
 		try {
-			z = z+3;
-			if (z == 30) {
-				plugin.debug("CouponTimer.run() executed (this message appears every 30 seconds, thread is ran every 3 seconds!)");
-				z = 0;
-			}
-			CouponManager cm = CouponCodes.getCouponManager();
 			ArrayList<String> cl = cm.getCoupons();
 			
-			for (int i = 0; i < cl.size(); i++) {
-				Coupon c = cm.getCoupon(cl.get(i));
+			for (String name : cl) {
+				Coupon c = cm.getCoupon(name);
 				if (c.isExpired() || c.getTime() == -1) continue;
 				CouponTimeChangeEvent ev = EventHandle.callCouponTimeChangeEvent(c);
 				if (ev.isCancelled()) return;
-				c.setTime(c.getTime()-1);
+				
+				if (c.getTime()-2 < 0) c.setTime(0);
+				else
+					c.setTime(c.getTime()-2);
 				cm.updateCoupon(c);
 			}
 		} catch (SQLException e) {}

@@ -26,7 +26,6 @@ import net.lala.CouponCodes.listeners.PlayerListen;
 import net.lala.CouponCodes.misc.Metrics;
 import net.lala.CouponCodes.misc.Misc;
 import net.lala.CouponCodes.runnable.CouponTimer;
-import net.lala.CouponCodes.runnable.ReconnectTimer;
 import net.lala.CouponCodes.sql.SQL;
 import net.lala.CouponCodes.sql.options.DatabaseOptions;
 import net.lala.CouponCodes.sql.options.MySQLOptions;
@@ -94,8 +93,7 @@ public class CouponCodes extends JavaPlugin {
 		saveConfig();
 		
 		//Timers!
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(this), 60L, 60L);
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new ReconnectTimer(this), 1200L, 1200L);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 40L, 40L);
 		
 		try {
 			mt = new Metrics();
@@ -391,7 +389,7 @@ public class CouponCodes extends JavaPlugin {
 									return true;
 								} else {
 									RankCoupon c = (RankCoupon) coupon;
-									if (perm.getPlayerGroups(player) != null) {
+									if (perm.getPlayerGroups((String) null, player.getName()) != null) {
 										perm.playerAddGroup(player, c.getGroup());
 										for (String i : perm.getPlayerGroups(player)) {
 											if (i.equalsIgnoreCase(c.getGroup())) continue;
