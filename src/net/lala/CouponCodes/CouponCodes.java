@@ -391,10 +391,13 @@ public class CouponCodes extends JavaPlugin {
 									return true;
 								} else {
 									RankCoupon c = (RankCoupon) coupon;
-									for (int i = 0; i < perm.getPlayerGroups(player).length; i++) {
-										perm.playerRemoveGroup(player, perm.getPlayerGroups(player)[i]);
+									if (perm.getPlayerGroups(player) != null) {
+										perm.playerAddGroup(player, c.getGroup());
+										for (String i : perm.getPlayerGroups(player)) {
+											if (i.equalsIgnoreCase(c.getGroup())) continue;
+											perm.playerRemoveGroup(player, i);
+										}
 									}
-									perm.playerAddGroup(player, c.getGroup());
 									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and your group has been set to "+ChatColor.GOLD+c.getGroup());
 								}
 							}
