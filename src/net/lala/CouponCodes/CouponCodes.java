@@ -70,6 +70,8 @@ public class CouponCodes extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		server = getServer();
+		config = new Config(this);
+		debug = config.getDebug();
 		
 		if (!setupVault()) {
 			send("Vault support is disabled.");
@@ -89,10 +91,12 @@ public class CouponCodes extends JavaPlugin {
 		// Bukkit listeners
 		server.getPluginManager().registerEvent(Type.PLAYER_JOIN, new PlayerListen(this), Priority.Normal, this);
 		
-		setupSQL(true);
-		saveConfig();
+		if (!setupSQL()) {
+			send("Database could not be setup. CouponCodes will now disable");
+			server.getPluginManager().disablePlugin(this);
+		}
 		
-		//Timers!
+		// Timers!
 		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 40L, 40L);
 		
 		try {
@@ -119,11 +123,7 @@ public class CouponCodes extends JavaPlugin {
 		send("is now disabled.");
 	}
 	
-	private boolean setupSQL(boolean start) {
-		if (!start) this.reloadConfig();
-		config = new Config(this);
-		debug = config.getDebug();
-		
+	private boolean setupSQL() {
 		if (config.getSQLValue().equalsIgnoreCase("MySQL")) {
 			dataop = new MySQLOptions(config.getHostname(), config.getPort(), config.getDatabase(), config.getUsername(), config.getPassword());
 		}
@@ -131,8 +131,7 @@ public class CouponCodes extends JavaPlugin {
 			dataop = new SQLiteOptions(new File(getDataFolder()+"/coupon_data.db"));
 		}
 		else if (!config.getSQLValue().equalsIgnoreCase("MySQL") && !config.getSQLValue().equalsIgnoreCase("SQLite")) {
-			sendErr("The SQLType has the unknown value of: "+config.getSQLValue()+" CouponCodes will now disable.");
-			if (start) this.setEnabled(false);
+			sendErr("The SQLType has the unknown value of: "+config.getSQLValue());
 			return false;
 		}
 		
@@ -143,9 +142,7 @@ public class CouponCodes extends JavaPlugin {
 			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), groupname VARCHAR(20), timeuse INT(100))");
 			cm = new CouponManager(this, sql);
 		} catch (SQLException e) {
-			sendErr("SQLException while creating couponcodes table. CouponCodes will now disable.");
 			e.printStackTrace();
-			if (start) this.setEnabled(false);
 			return false;
 		}
 		return true;
@@ -155,6 +152,8 @@ public class CouponCodes extends JavaPlugin {
 		try {
 			RegisteredServiceProvider<Economy> ep = server.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 			RegisteredServiceProvider<Permission> pe = server.getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+			if (!config.getVault())
+				return false;
 			if (ep == null)
 				return false;
 			else if (pe == null)

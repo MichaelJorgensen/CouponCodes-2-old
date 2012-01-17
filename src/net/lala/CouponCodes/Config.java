@@ -15,10 +15,15 @@ public class Config {
 	public Config(Plugin plugin) {
 		this.config = plugin.getConfig();
 		copyDefaults(true);
+		plugin.saveConfig();
 	}
 	
 	public void copyDefaults(boolean copy) {
 		config.options().copyDefaults(copy);
+	}
+	
+	public boolean getVault() {
+		return config.getBoolean("use-vault");
 	}
 	
 	public boolean getDebug() {
