@@ -388,12 +388,17 @@ public class CouponCodes extends JavaPlugin {
 									return true;
 								} else {
 									RankCoupon c = (RankCoupon) coupon;
-									if (perm.getPlayerGroups((String) null, player.getName()) != null) {
+									boolean permbuk = (perm.getName().equalsIgnoreCase("PermissionsBukkit"));
+									if (permbuk)
+										perm.playerAddGroup((String) null, player.getName(), c.getGroup());
+									else
 										perm.playerAddGroup(player, c.getGroup());
-										for (String i : perm.getPlayerGroups(player)) {
-											if (i.equalsIgnoreCase(c.getGroup())) continue;
+									for (String i : perm.getPlayerGroups((String) null, player.getName())) {
+										if (i.equalsIgnoreCase(c.getGroup())) continue;
+										if (permbuk)
+											perm.playerRemoveGroup((String) null, player.getName(), i);
+										else
 											perm.playerRemoveGroup(player, i);
-										}
 									}
 									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and your group has been set to "+ChatColor.GOLD+c.getGroup());
 								}
