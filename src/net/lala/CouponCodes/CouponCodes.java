@@ -149,11 +149,11 @@ public class CouponCodes extends JavaPlugin {
 	}
 	
 	private boolean setupVault() {
+		if (!config.getVault())
+			return false;
 		try {
 			RegisteredServiceProvider<Economy> ep = server.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 			RegisteredServiceProvider<Permission> pe = server.getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
-			if (!config.getVault())
-				return false;
 			if (ep == null)
 				return false;
 			else if (pe == null)

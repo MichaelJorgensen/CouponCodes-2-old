@@ -103,13 +103,13 @@ public class CouponManager {
 		ArrayList<String> c = new ArrayList<String>();
 		try {
 			ResultSet rs = sql.query("SELECT name FROM couponcodes");
-			if (rs.equals(null)) return null;
+			if (rs == null) return null;
 			while (rs.next())
 				c.add(rs.getString(1));
-			return c;
 		} catch (NullPointerException e) {
-			return c;
+			e.printStackTrace();
 		}
+		return c;
 	}
 	
 	public void updateCoupon(Coupon coupon) throws SQLException {
