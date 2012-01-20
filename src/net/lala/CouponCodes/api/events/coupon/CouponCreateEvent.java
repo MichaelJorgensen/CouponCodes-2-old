@@ -1,21 +1,19 @@
 package net.lala.CouponCodes.api.events.coupon;
 
-import org.bukkit.Bukkit;
-import org.bukkit.event.Event;
-
 import net.lala.CouponCodes.api.coupon.Coupon;
 
-/**
- * CouponCreateEvent.java - Extension of event used when a coupon is created
- * @author mike101102
- */
+import org.bukkit.Bukkit;
+import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
+
 @SuppressWarnings("serial")
 public class CouponCreateEvent extends Event {
 
+	private static final HandlerList h = new HandlerList();
+	
 	private Coupon coupon;
 	
 	public CouponCreateEvent(Coupon coupon) {
-		super("CouponCreateEvent");
 		this.coupon = coupon;
 	}
 	
@@ -23,9 +21,14 @@ public class CouponCreateEvent extends Event {
 		return coupon;
 	}
 	
-	/**
-	 * Calls the event
-	 */
+	public HandlerList getHandlers() {
+		return h;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return h;
+	}
+	
 	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}

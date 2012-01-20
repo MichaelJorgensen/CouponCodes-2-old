@@ -18,10 +18,8 @@ import net.lala.CouponCodes.api.coupon.EconomyCoupon;
 import net.lala.CouponCodes.api.coupon.ItemCoupon;
 import net.lala.CouponCodes.api.coupon.RankCoupon;
 import net.lala.CouponCodes.api.events.EventHandle;
-import net.lala.CouponCodes.api.events.example.CouponCodesMaster;
-import net.lala.CouponCodes.api.events.example.CouponMaster;
-import net.lala.CouponCodes.api.events.example.DatabaseMaster;
 import net.lala.CouponCodes.api.events.plugin.CouponCodesCommandEvent;
+import net.lala.CouponCodes.listeners.DebugListen;
 import net.lala.CouponCodes.listeners.PlayerListen;
 import net.lala.CouponCodes.misc.Metrics;
 import net.lala.CouponCodes.misc.Misc;
@@ -39,16 +37,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * CouponCodes.java - Main class
- * @author mike101102
- */
 public class CouponCodes extends JavaPlugin {
 	
 	private static CouponManager cm = null;
@@ -84,12 +76,10 @@ public class CouponCodes extends JavaPlugin {
 			send("New update is available for CouponCodes! Current version: "+getDescription().getVersion()+" New version: "+getUpdateInfo()[0]);
 		
 		// This is for this plugin's own events!
-		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponMaster(this), Priority.Monitor, this);
-		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new DatabaseMaster(this), Priority.Monitor, this);
-		server.getPluginManager().registerEvent(Type.CUSTOM_EVENT, new CouponCodesMaster(this), Priority.Monitor, this);
+		server.getPluginManager().registerEvents(new DebugListen(this), this);
 		
 		// Bukkit listeners
-		server.getPluginManager().registerEvent(Type.PLAYER_JOIN, new PlayerListen(this), Priority.Normal, this);
+		server.getPluginManager().registerEvents(new PlayerListen(this), this);
 		
 		if (!setupSQL()) {
 			send("Database could not be setup. CouponCodes will now disable");

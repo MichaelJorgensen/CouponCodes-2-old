@@ -7,7 +7,6 @@ import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.events.EventHandle;
-import net.lala.CouponCodes.api.events.coupon.CouponTimeChangeEvent;
 
 public class CouponTimer implements Runnable {
 	
@@ -21,18 +20,21 @@ public class CouponTimer implements Runnable {
 	public void run() {
 		try {
 			ArrayList<String> cl = cm.getCoupons();
+			if (cl == null) return;
 			
 			for (String name : cl) {
-				Coupon c = cm.getCoupon(name);
+				Coupon c = cm.getBasicCoupon(name);
+				if (c == null) continue;
 				if (c.isExpired() || c.getTime() == -1) continue;
-				CouponTimeChangeEvent ev = EventHandle.callCouponTimeChangeEvent(c);
-				if (ev.isCancelled()) return;
 				
 				if (c.getTime()-2 < 0) c.setTime(0);
 				else
 					c.setTime(c.getTime()-2);
-				cm.updateCoupon(c);
+				cm.updateCouponTime(c);
+				EventHandle.callCouponTimeChangeEvent(c);
 			}
-		} catch (SQLException e) {}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }

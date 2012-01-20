@@ -18,10 +18,6 @@ import net.lala.CouponCodes.sql.options.DatabaseOptions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-/**
- * EventHandle.java - Easy way to call couponcode's custom events and return the possibly altered event
- * @author mike101102
- */
 public class EventHandle {
 
 	public static CouponAddToDatabaseEvent callCouponAddToDatabaseEvent(Coupon coupon) {

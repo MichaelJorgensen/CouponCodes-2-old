@@ -7,17 +7,13 @@ import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 
-/**
- * Coupon.java - Stores generic coupon information
- * @author mike101102
- */
 public abstract class Coupon {
 	
 	private String name;
 	private int usetimes;
 	private int time;
 	private boolean expired;
-	private HashMap<String, Boolean> usedplayers = null;
+	private HashMap<String, Boolean> usedplayers;
 	
 	public Coupon(String name, int usetimes, int time, HashMap<String, Boolean> usedplayers) {
 		this.name = name;
@@ -42,6 +38,10 @@ public abstract class Coupon {
 	
 	public void updateWithDatabase() throws SQLException {
 		CouponCodes.getCouponManager().updateCoupon(this);
+	}
+	
+	public void updateTimeWithDatabase() throws SQLException {
+		CouponCodes.getCouponManager().updateCouponTime(this);
 	}
 	
 	public String getName() {

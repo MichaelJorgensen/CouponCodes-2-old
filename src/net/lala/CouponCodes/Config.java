@@ -4,22 +4,13 @@ package net.lala.CouponCodes;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
-/**
- * Config.java - Custom config handling
- * @author mike101102
- */
 public class Config {
 	
 	private FileConfiguration config;
 	
 	public Config(Plugin plugin) {
 		this.config = plugin.getConfig();
-		copyDefaults(true);
-		plugin.saveConfig();
-	}
-	
-	public void copyDefaults(boolean copy) {
-		config.options().copyDefaults(copy);
+		plugin.saveDefaultConfig();
 	}
 	
 	public boolean getVault() {

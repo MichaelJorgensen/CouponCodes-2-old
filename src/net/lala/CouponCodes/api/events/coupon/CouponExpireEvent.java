@@ -4,18 +4,16 @@ import net.lala.CouponCodes.api.coupon.Coupon;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-/**
- * CouponExpireEvent.java - Extension of event used when a coupon expires
- * @author mike101102
- */
 @SuppressWarnings("serial")
 public class CouponExpireEvent extends Event {
 
+	private static final HandlerList h = new HandlerList();
+	
 	private Coupon coupon;
 	
 	public CouponExpireEvent(Coupon coupon) {
-		super("CouponExpireEvent");
 		this.coupon = coupon;
 	}
 	
@@ -23,9 +21,14 @@ public class CouponExpireEvent extends Event {
 		return coupon;
 	}
 	
-	/**
-	 * Calls the event
-	 */
+	public HandlerList getHandlers() {
+		return h;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return h;
+	}
+	
 	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}

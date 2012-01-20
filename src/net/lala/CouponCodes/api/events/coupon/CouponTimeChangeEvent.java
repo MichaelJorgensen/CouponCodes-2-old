@@ -3,21 +3,17 @@ package net.lala.CouponCodes.api.events.coupon;
 import net.lala.CouponCodes.api.coupon.Coupon;
 
 import org.bukkit.Bukkit;
-import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-/**
- * CouponTimeChangeEvent.java - Extension of event used when a coupon's time is changed
- * @author mike101102
- */
 @SuppressWarnings("serial")
-public class CouponTimeChangeEvent extends Event implements Cancellable {
+public class CouponTimeChangeEvent extends Event {
 
+	private static final HandlerList h = new HandlerList();
+	
 	private Coupon coupon;
-	private boolean cancel;
 	
 	public CouponTimeChangeEvent(Coupon coupon) {
-		super("CouponTimeChangeEvent");
 		this.coupon = coupon;
 	}
 	
@@ -25,20 +21,15 @@ public class CouponTimeChangeEvent extends Event implements Cancellable {
 		return coupon;
 	}
 	
-	/**
-	 * Calls the event
-	 */
+	public HandlerList getHandlers() {
+		return h;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return h;
+	}
+	
 	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
-	}
-
-	@Override
-	public boolean isCancelled() {
-		return cancel;
-	}
-
-	@Override
-	public void setCancelled(boolean arg0) {
-		this.cancel = arg0;
 	}
 }

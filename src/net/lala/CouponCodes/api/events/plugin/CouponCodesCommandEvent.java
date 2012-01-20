@@ -3,15 +3,15 @@ package net.lala.CouponCodes.api.events.plugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-/**
- * CouponCodesCommandEvent.java - Extension of event used when a command is send through coupon codes.
- * @author mike101102
- */
 @SuppressWarnings("serial")
-public class CouponCodesCommandEvent extends Event {
+public class CouponCodesCommandEvent extends Event implements Cancellable {
 
+	private static final HandlerList h = new HandlerList();
+	
 	private CommandSender sender;
 	private Command command;
 	private String commandLabel;
@@ -20,18 +20,17 @@ public class CouponCodesCommandEvent extends Event {
 	private Boolean cancel = false;
 	
 	public CouponCodesCommandEvent(CommandSender sender, Command command, String commandLabel, String[] args) {
-		super("CouponCodesCommandEvent");
 		this.sender = sender;
 		this.command = command;
 		this.commandLabel = commandLabel;
 		this.args = args;
 	}
 	
-	public Boolean isCancelled() {
+	public boolean isCancelled() {
 		return cancel;
 	}
 	
-	public void setCancelled(Boolean cancel) {
+	public void setCancelled(boolean cancel) {
 		this.cancel = cancel;
 	}
 	
@@ -67,9 +66,14 @@ public class CouponCodesCommandEvent extends Event {
 		this.args = args;
 	}
 	
-	/**
-	 * Calls the event
-	 */
+	public HandlerList getHandlers() {
+		return h;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return h;
+	}
+	
 	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}

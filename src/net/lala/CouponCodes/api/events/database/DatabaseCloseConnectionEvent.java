@@ -6,19 +6,17 @@ import net.lala.CouponCodes.sql.options.DatabaseOptions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-/**
- * DatabaseCloseConnectionEvent.java - Extension of event used when the connection is closed to the database
- * @author mike101102
- */
 @SuppressWarnings("serial")
 public class DatabaseCloseConnectionEvent extends Event {
 
+	private static final HandlerList h = new HandlerList();
+	
 	private Connection con;
 	private DatabaseOptions dop;
 	
 	public DatabaseCloseConnectionEvent(Connection con, DatabaseOptions dop) {
-		super("DatabaseCloseConnectionEvent");
 		this.con = con;
 		this.dop = dop;
 	}
@@ -31,9 +29,14 @@ public class DatabaseCloseConnectionEvent extends Event {
 		return dop;
 	}
 	
-	/**
-	 * Calls the event
-	 */
+	public HandlerList getHandlers() {
+		return h;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return h;
+	}
+	
 	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}

@@ -6,20 +6,18 @@ import net.lala.CouponCodes.sql.options.DatabaseOptions;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
+import org.bukkit.event.HandlerList;
 
-/**
- * DatabaseQueryEvent.java - Extension of event used when the database is sent a query
- * @author mike101102
- */
 @SuppressWarnings("serial")
 public class DatabaseQueryEvent extends Event {
 
+	private static final HandlerList h = new HandlerList();
+	
 	private DatabaseOptions dop;
 	private String query;
 	private ResultSet rs;
 	
 	public DatabaseQueryEvent(DatabaseOptions dop, String query, ResultSet rs) {
-		super("DatabaseQueryEvent");
 		this.dop = dop;
 		this.query = query;
 		this.rs = rs;
@@ -37,9 +35,14 @@ public class DatabaseQueryEvent extends Event {
 		return rs;
 	}
 	
-	/**
-	 * Calls the event
-	 */
+	public HandlerList getHandlers() {
+		return h;
+	}
+	
+	public static HandlerList getHandlerList() {
+		return h;
+	}
+	
 	public void call() {
 		Bukkit.getServer().getPluginManager().callEvent(this);
 	}

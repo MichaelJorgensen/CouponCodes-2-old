@@ -16,10 +16,6 @@ import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.sql.SQL;
 import net.lala.CouponCodes.sql.options.MySQLOptions;
 
-/**
- * CouponManager.java - Allows other plugins to interact with coupons
- * @author mike101102
- */
 public class CouponManager {
 	
 	private CouponCodes plugin;
@@ -139,29 +135,47 @@ public class CouponManager {
 		}
 	}
 	
+	public void updateCouponTime(Coupon c) throws SQLException {
+		sql.query("UPDATE couponcodes SET timeuse='"+c.getTime()+"' WHERE name='"+c.getName()+"'");
+	}
+	
 	public Coupon getCoupon(String coupon) throws SQLException {
 		if (!couponExists(coupon)) return null;
-		ResultSet rs1 = sql.query("SELECT * FROM couponcodes WHERE name='"+coupon+"'");
-		if (sql.getDatabaseOptions() instanceof MySQLOptions) rs1.first();
-		int usetimes = rs1.getInt("usetimes");
-		int time = rs1.getInt("timeuse");
+		ResultSet rs = sql.query("SELECT * FROM couponcodes WHERE name='"+coupon+"'");
+		if (sql.getDatabaseOptions() instanceof MySQLOptions) rs.first();
+		int usetimes = rs.getInt("usetimes");
+		int time = rs.getInt("timeuse");
+		HashMap<String, Boolean> usedplayers = plugin.convertStringToHash2(rs.getString("usedplayers"));
 		
-		HashMap<String, Boolean> usedplayers = plugin.convertStringToHash2(rs1.getString("usedplayers"));
-		ResultSet rs2 = sql.query("SELECT ctype FROM couponcodes WHERE name='"+coupon+"'");
-		if (sql.getDatabaseOptions() instanceof MySQLOptions) rs2.first();
-		
-		if (rs2.getString(1).equalsIgnoreCase("Item")) {
-			return createNewItemCoupon(coupon, usetimes, time, plugin.convertStringToHash(rs1.getString("ids")), usedplayers);
+		if (rs.getString("ctype").equalsIgnoreCase("Item")) {
+			return createNewItemCoupon(coupon, usetimes, time, plugin.convertStringToHash(rs.getString("ids")), usedplayers);
 		}
-		
-		else if (rs2.getString(1).equalsIgnoreCase("Economy")) {
-			return createNewEconomyCoupon(coupon, usetimes, time, usedplayers, rs1.getInt("money"));
+		else if (rs.getString("ctype").equalsIgnoreCase("Economy")) {
+			return createNewEconomyCoupon(coupon, usetimes, time, usedplayers, rs.getInt("money"));
 		}
-		else if (rs2.getString(1).equalsIgnoreCase("Rank")) {
-			return createNewRankCoupon(coupon, rs1.getString("groupname"), usetimes, time, usedplayers);
+		else if (rs.getString("ctype").equalsIgnoreCase("Rank")) {
+			return createNewRankCoupon(coupon, rs.getString("groupname"), usetimes, time, usedplayers);
 		} else {
 			return null;
 		}
+	}
+	
+	public Coupon getBasicCoupon(String coupon) throws SQLException {
+		ResultSet rs = sql.query("SELECT * FROM couponcodes WHERE name='"+coupon+"'");
+		if (rs == null) return null;
+		if (sql.getDatabaseOptions() instanceof MySQLOptions) rs.first();
+		int usetimes = rs.getInt("usetimes");
+		int time = rs.getInt("timeuse");
+		String type = rs.getString("ctype");
+		
+		if (type.equalsIgnoreCase("Item"))
+			return createNewItemCoupon(coupon, usetimes, time, null, null);
+		else if (type.equalsIgnoreCase("Economy"))
+			return createNewEconomyCoupon(coupon, usetimes, time, null, 0);
+		else if (type.equalsIgnoreCase("Rank"))
+			return createNewRankCoupon(coupon, null, usetimes, time, null);
+		else
+			return null;
 	}
 	
 	public ItemCoupon createNewItemCoupon(String name, int usetimes, int time, HashMap<Integer, Integer> ids, HashMap<String, Boolean> usedplayers) {
