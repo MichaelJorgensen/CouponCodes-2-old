@@ -21,10 +21,9 @@ public class PlayerListen implements Listener {
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		if (plugin.has(player, "cc.update")) {
-			if (plugin.checkForUpdate()) {
-				String[] info = plugin.getUpdateInfo();
-				player.sendMessage(ChatColor.GREEN+"There is a new update for CouponCodes! Current version: "+plugin.getDescription().getVersion()+" New version: "+info[0]);
-				player.sendMessage(ChatColor.GOLD+"About the update: "+info[1]);
+			if (!plugin.version.equals(plugin.newversion)) {
+				player.sendMessage(ChatColor.GREEN+"There is a new update for CouponCodes! Current version: "+plugin.version+" New version: "+plugin.newversion);
+				player.sendMessage(ChatColor.GOLD+"About the update: "+plugin.verinfo);
 			}
 		}
 	}

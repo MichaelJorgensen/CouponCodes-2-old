@@ -13,12 +13,16 @@ public class Config {
 		plugin.saveDefaultConfig();
 	}
 	
+	public boolean getUseThread() {
+		return config.getBoolean("use-thread", true);
+	}
+	
 	public boolean getVault() {
-		return config.getBoolean("use-vault");
+		return config.getBoolean("use-vault", false);
 	}
 	
 	public boolean getDebug() {
-		return config.getBoolean("debug");
+		return config.getBoolean("debug", false);
 	}
 	
 	public String getSQLValue() {

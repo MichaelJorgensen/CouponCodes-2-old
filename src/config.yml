@@ -27,5 +27,8 @@ MySQL-options:
 # This will decide to use vault or not. Leave false if you do not have vault enabled
 use-vault: false
 
+# Leave this true UNLESS you want to disable timed coupons
+use-thread: true
+
 # I recommend to leave this at false. Your console will be spammed with debug messages
 debug: false

@@ -29,7 +29,7 @@ public class DebugListen implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onCouponRemoveFromDatabase(CouponRemoveFromDatabaseEvent event) {
-		plugin.debug("Coupon removed from database. Name: "+event.getCoupon().getName());
+		plugin.debug("Coupon removed from database. Name: "+event.getCoupon());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)

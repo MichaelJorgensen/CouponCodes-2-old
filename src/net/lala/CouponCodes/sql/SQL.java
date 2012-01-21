@@ -85,7 +85,7 @@ public class SQL {
 		ResultSet rs = null;
 		
 		st = con.createStatement();
-		if (query.toLowerCase().contains("delete") || query.toLowerCase().contains("update")) {
+		if (query.toLowerCase().contains("delete") || query.toLowerCase().contains("update") || query.toLowerCase().contains("insert")) {
 			st.executeUpdate(query);
 			EventHandle.callDatabaseQueryEvent(dop, query, rs);
 			return rs;

@@ -43,10 +43,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CouponCodes extends JavaPlugin {
 	
-	private static CouponManager cm = null;
+	private static CouponManager cm;
+	private static boolean usethread = true;
 	
-	private DatabaseOptions dataop = null;
-	private Config config = null;
+	private DatabaseOptions dataop;
+	private Config config;
 	
 	private boolean va = false;
 	private boolean debug = false;
@@ -55,25 +56,34 @@ public class CouponCodes extends JavaPlugin {
 	
 	private Metrics mt = null;
 	
-	public Server server = null;
-	public Economy econ = null;
-	public Permission perm = null;
+	public Server server;
+	public Economy econ;
+	public Permission perm;
+	
+	public String version;
+	public String newversion;
+	public String verinfo;
 	
 	@Override
 	public void onEnable() {
 		server = getServer();
 		config = new Config(this);
 		debug = config.getDebug();
+		version = getDescription().getVersion();
+		usethread = config.getUseThread();
+		
+		setUpdateInfo();
 		
 		if (!setupVault()) {
 			send("Vault support is disabled.");
 			va = false;
 		} else {
+			send("Vault support is enabled.");
 			va = true;
 		}
 		
-		if (checkForUpdate())
-			send("New update is available for CouponCodes! Current version: "+getDescription().getVersion()+" New version: "+getUpdateInfo()[0]);
+		if (!version.equals(newversion))
+			send("New update is available for CouponCodes! Current version: "+version+" New version: "+newversion);
 		
 		// This is for this plugin's own events!
 		server.getPluginManager().registerEvents(new DebugListen(this), this);
@@ -84,10 +94,11 @@ public class CouponCodes extends JavaPlugin {
 		if (!setupSQL()) {
 			send("Database could not be setup. CouponCodes will now disable");
 			server.getPluginManager().disablePlugin(this);
+			return;
 		}
 		
 		// Timers!
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 40L, 40L);
+		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 100L, 100L);
 		
 		try {
 			mt = new Metrics();
@@ -96,11 +107,12 @@ public class CouponCodes extends JavaPlugin {
 			debug("Error while trying to measure plugin");
 		}
 		
-		send("is now enabled! Version: "+getDescription().getVersion());
+		send("is now enabled! Version: "+version);
 	}
 	
 	@Override
 	public void onDisable() {
+		getServer().getScheduler().cancelTasks(this);
 		try {
 			sql.close();
 		} catch (SQLException e) {
@@ -108,7 +120,6 @@ public class CouponCodes extends JavaPlugin {
 		} catch (NullPointerException e) {
 			sendErr("SQL is null. Connection doesn't exist");
 		}
-		getServer().getScheduler().cancelTasks(this);
 		cm = null;
 		send("is now disabled.");
 	}
@@ -301,6 +312,15 @@ public class CouponCodes extends JavaPlugin {
 			if (has(sender, "cc.remove")) {
 				if (args.length == 2) {
 					try {
+						if (args[1].equalsIgnoreCase("all")) {
+							int j = 0;
+							for (String i : cm.getCoupons()) {
+								cm.removeCouponFromDatabase(i);
+								j++;
+							}
+							sender.sendMessage(ChatColor.GREEN+"A total of "+ChatColor.GOLD+j+ChatColor.GREEN+" coupons have been removed.");
+							return true;
+						}
 						if (!api.couponExists(args[1])) {
 							sender.sendMessage(ChatColor.RED+"That coupon doesn't exist!");
 							return true;
@@ -466,7 +486,16 @@ public class CouponCodes extends JavaPlugin {
 							else
 								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: "+ChatColor.DARK_PURPLE+"Unlimited");
 							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Expired: "+ChatColor.DARK_PURPLE+c.isExpired());
-							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Used players: "+ChatColor.DARK_PURPLE+convertHashToString2(c.getUsedPlayers()));
+							if (c.getUsedPlayers().isEmpty())
+								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Used players: "+ChatColor.DARK_PURPLE+"None");
+							else
+								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Used players: "+ChatColor.DARK_PURPLE+convertHashToString2(c.getUsedPlayers()));
+							if (c instanceof ItemCoupon)
+								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Items: "+ChatColor.DARK_PURPLE+convertHashToString(((ItemCoupon) c).getIDs()));
+							else if (c instanceof EconomyCoupon)
+								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Money: "+ChatColor.DARK_PURPLE+((EconomyCoupon) c).getMoney());
+							else if (c instanceof RankCoupon)
+								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Items: "+ChatColor.DARK_PURPLE+((RankCoupon) c).getGroup());
 							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Totally random name: "+ChatColor.DARK_PURPLE+Misc.generateName());
 							sender.sendMessage(ChatColor.GOLD+"|----------------------|");
 							return true;
@@ -493,7 +522,7 @@ public class CouponCodes extends JavaPlugin {
 							DecimalFormat d2 = new DecimalFormat("##.##");
 							for (int i = 0; i < co.size(); i++) {
 								sb1.append(co.get(i));
-								Coupon coo = api.getCoupon(co.get(i));
+								Coupon coo = api.getBasicCoupon(co.get(i));
 								if (coo instanceof ItemCoupon) it++;
 								if (coo instanceof EconomyCoupon) ec++;
 								if (coo instanceof RankCoupon) ra++;
@@ -579,25 +608,23 @@ public class CouponCodes extends JavaPlugin {
 	}
 	
 	public boolean checkForUpdate() {
-		String ver = getUpdateInfo()[0];
-		if (ver == null)
+		if (newversion == null)
 			return false;
-		else if (ver.equals(getDescription().getVersion()))
+		else if (newversion.equals(version))
 			return false;
 		else
 			return true;
 	}
 	
-	public String[] getUpdateInfo() {
-		String info[] = new String[2];
+	public void setUpdateInfo() {
 		try {
 			URL url = new URL("http://www.craftmod.net/jar/CouponCodes/version.txt");
 			BufferedReader br = new BufferedReader(new InputStreamReader(url.openStream()));
-			info[0] = br.readLine();
+			newversion = br.readLine();
 			
 			url = new URL("http://www.craftmod.net/jar/CouponCodes/info.txt");
 			br = new BufferedReader(new InputStreamReader(url.openStream()));
-			info[1] = br.readLine();
+			verinfo = br.readLine();
 			
 			br.close();
 		} catch (MalformedURLException e) {
@@ -605,7 +632,6 @@ public class CouponCodes extends JavaPlugin {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return info;
 	}
 	
 	public HashMap<Integer, Integer> convertStringToHash(String args) {
@@ -690,5 +716,9 @@ public class CouponCodes extends JavaPlugin {
 	
 	public boolean isDebug() {
 		return debug;
+	}
+	
+	public static boolean useThread() {
+		return usethread;
 	}
 }

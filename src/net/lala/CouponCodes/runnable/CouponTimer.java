@@ -11,13 +11,16 @@ import net.lala.CouponCodes.api.events.EventHandle;
 public class CouponTimer implements Runnable {
 	
 	private CouponManager cm;
+	private boolean usethread;
 	
 	public CouponTimer() {
 		cm = CouponCodes.getCouponManager();
+		usethread = CouponCodes.useThread();
 	}
 	
 	@Override
 	public void run() {
+		if (!usethread) return;
 		try {
 			ArrayList<String> cl = cm.getCoupons();
 			if (cl == null) return;
@@ -27,9 +30,9 @@ public class CouponTimer implements Runnable {
 				if (c == null) continue;
 				if (c.isExpired() || c.getTime() == -1) continue;
 				
-				if (c.getTime()-2 < 0) c.setTime(0);
+				if (c.getTime()-5 < 0) c.setTime(0);
 				else
-					c.setTime(c.getTime()-2);
+					c.setTime(c.getTime()-5);
 				cm.updateCouponTime(c);
 				EventHandle.callCouponTimeChangeEvent(c);
 			}

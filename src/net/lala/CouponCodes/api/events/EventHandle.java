@@ -26,7 +26,7 @@ public class EventHandle {
 		return ev;
 	}
 	
-	public static CouponRemoveFromDatabaseEvent callCouponRemoveFromDatabaseEvent(Coupon coupon) {
+	public static CouponRemoveFromDatabaseEvent callCouponRemoveFromDatabaseEvent(String coupon) {
 		CouponRemoveFromDatabaseEvent ev = new CouponRemoveFromDatabaseEvent(coupon);
 		ev.call();
 		return ev;
