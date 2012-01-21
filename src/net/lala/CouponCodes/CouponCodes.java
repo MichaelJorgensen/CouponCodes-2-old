@@ -17,10 +17,12 @@ import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.coupon.EconomyCoupon;
 import net.lala.CouponCodes.api.coupon.ItemCoupon;
 import net.lala.CouponCodes.api.coupon.RankCoupon;
+import net.lala.CouponCodes.api.coupon.XpCoupon;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.api.events.plugin.CouponCodesCommandEvent;
 import net.lala.CouponCodes.listeners.DebugListen;
 import net.lala.CouponCodes.listeners.PlayerListen;
+import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Metrics;
 import net.lala.CouponCodes.misc.Misc;
 import net.lala.CouponCodes.runnable.CouponTimer;
@@ -83,7 +85,8 @@ public class CouponCodes extends JavaPlugin {
 		}
 		
 		if (!version.equals(newversion))
-			send("New update is available for CouponCodes! Current version: "+version+" New version: "+newversion);
+			if (!version.contains("TEST"))
+					send("New update is available for CouponCodes! Current version: "+version+" New version: "+newversion);
 		
 		// This is for this plugin's own events!
 		server.getPluginManager().registerEvents(new DebugListen(this), this);
@@ -140,7 +143,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		try {
 			sql.open();
-			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), groupname VARCHAR(20), timeuse INT(100))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), groupname VARCHAR(20), timeuse INT(100), xp INT(10))");
 			cm = new CouponManager(this, sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -178,131 +181,192 @@ public class CouponCodes extends JavaPlugin {
 		commandLabel = ev.getCommandLabel();
 		args = ev.getArgs();
 		
-		boolean pl = false;
-		if (sender instanceof Player) pl = true;
-		
-		if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
+		if (args.length == 0) {
 			help(sender);
 			return true;
 		}
 		
+		boolean pl = false;
+		if (sender instanceof Player) pl = true;
+		
 		CouponManager api = CouponCodes.getCouponManager();
 		
-		// Add command
+		// Add command 2.0
 		if (args[0].equalsIgnoreCase("add")) {
-			// Fix for being retarded
-			if (!(args.length >= 5)) {
-				help(sender);
+			if (args.length < 2) {
+				sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
+				sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
+				sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
+				sender.sendMessage(CommandUsage.C_ADD_XP.toString());
 				return true;
-			} // carry on..
+			}
 			if (has(sender, "cc.add")) {
-				String name = args[2];
-				try {
-					// Random!
-					if (args[2].equalsIgnoreCase("random")) name = Misc.generateName();
-					while (api.couponExists(name))
-						name = Misc.generateName();
-				} catch (SQLException e) {}
-				
 				if (args[1].equalsIgnoreCase("item")) {
-					if (args.length >= 5) {
+					if (args.length >= 4) {
 						try {
+							String name = args[2];
+							int usetimes = 1;
 							int time = -1;
+							
+							if (name.equalsIgnoreCase("random")) name = Misc.generateName();
+							if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
 							if (args.length >= 6) time = Integer.parseInt(args[5]);
-							Coupon coupon = api.createNewItemCoupon(name, Integer.parseInt(args[4]), time, this.convertStringToHash(args[3]), new HashMap<String, Boolean>());
-							if (coupon.isInDatabase()) {
-								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
+							if (args.length > 6) {
+								sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
+								return true;
+							}
+							
+							ItemCoupon ic = api.createNewItemCoupon(name, usetimes, time, convertStringToHash(args[3]), new HashMap<String, Boolean>());
+							
+							if (ic.addToDatabase()) {
+								sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 								return true;
 							} else {
-								coupon.addToDatabase();
-								sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+coupon.getName()+ChatColor.GREEN+" has been added!");
+								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
 								return true;
 							}
 						} catch (NumberFormatException e) {
-							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got "+ChatColor.YELLOW+args[4]+ChatColor.DARK_RED+" or received "+ChatColor.YELLOW+args[5]);
+							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got a string. Please check your syntax.");
 							return true;
 						} catch (SQLException e) {
-							sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
+							sender.sendMessage(ChatColor.DARK_RED+"Error while interacting with the database. See console for more info.");
 							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 							e.printStackTrace();
 							return true;
 						}
 					} else {
-						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
-						sender.sendMessage(ChatColor.YELLOW+"/c add item [name] [item1:amount,item2:amount,...] [usetimes]");
+						sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
 						return true;
 					}
 				}
+				
 				else if (args[1].equalsIgnoreCase("econ")) {
-					if (args.length >= 5) {
-						if (!va) {
-							sender.sendMessage(ChatColor.DARK_RED+"Vault support is not enabled and thus you cannot create an economy coupon.");
-							return true;
-						} else {
-							try {
-								int time = -1;
-								if (args.length >= 6) time = Integer.parseInt(args[5]);
-								Coupon coupon = api.createNewEconomyCoupon(name, Integer.parseInt(args[4]), time, new HashMap<String, Boolean>(), Integer.parseInt(args[3]));
-								if (coupon.isInDatabase()) {
-									sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
-									return true;
-								} else {
-									coupon.addToDatabase();
-									sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+coupon.getName()+ChatColor.GREEN+" has been added!");
-									return true;
-								}
-							} catch (NumberFormatException e) {
-								sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got "+ChatColor.YELLOW+args[3]);
-								return true;
-							} catch (SQLException e) {
-								sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
-								sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
-								e.printStackTrace();
+					if (args.length >= 4) {
+						try {
+							String name = args[2];
+							int usetimes = 1;
+							int time = -1;
+							int money = Integer.parseInt(args[3]);
+							
+							if (name.equalsIgnoreCase("random")) name = Misc.generateName();
+							if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
+							if (args.length >= 6) time = Integer.parseInt(args[5]);
+							if (args.length > 6) {
+								sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
 								return true;
 							}
+							
+							EconomyCoupon ec = api.createNewEconomyCoupon(name, usetimes, time, new HashMap<String, Boolean>(), money);
+							
+							if (ec.addToDatabase()) {
+								sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
+								return true;
+							} else {
+								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
+								return true;
+							}
+						} catch (NumberFormatException e) {
+							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got a string. Please check your syntax.");
+							return true;
+						} catch (SQLException e) {
+							sender.sendMessage(ChatColor.DARK_RED+"Error while interacting with the database. See console for more info.");
+							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+							e.printStackTrace();
+							return true;
 						}
 					} else {
-						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
-						sender.sendMessage(ChatColor.YELLOW+"/c add econ [name] [money] [usetimes]");
+						sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
 						return true;
 					}
 				}
+				
 				else if (args[1].equalsIgnoreCase("rank")) {
-					if (args.length >= 5) {
-						if (!va) {
-							sender.sendMessage(ChatColor.DARK_RED+"Vault support is not enabled and thus you cannot create a rank coupon.");
-							return true;
-						} else {
-							try {
-								int time = -1;
-								if (args.length >= 6) time = Integer.parseInt(args[5]);
-								Coupon coupon = api.createNewRankCoupon(name, args[3], Integer.parseInt(args[4]), time, new HashMap<String, Boolean>());
-								if (coupon.isInDatabase()) {
-									sender.sendMessage(ChatColor.DARK_RED+"This coupon already exists!");
-									return true;
-								} else {
-									coupon.addToDatabase();
-									sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+coupon.getName()+ChatColor.GREEN+" has been added!");
-									return true;
-								}
-							} catch (SQLException e) {
-								sender.sendMessage(ChatColor.DARK_RED+"Error while adding coupon to database. Please check console for more info.");
-								sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
-								e.printStackTrace();
+					if (args.length >= 4) {
+						try {
+							String name = args[2];
+							String group = args[3];
+							int usetimes = 1;
+							int time = -1;
+							
+							if (name.equalsIgnoreCase("random")) name = Misc.generateName();
+							if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
+							if (args.length >= 6) time = Integer.parseInt(args[5]);
+							if (args.length > 6) {
+								sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
 								return true;
 							}
+							
+							RankCoupon rc = api.createNewRankCoupon(name, group, usetimes, time, new HashMap<String, Boolean>());
+							
+							if (rc.addToDatabase()) {
+								sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
+								return true;
+							} else {
+								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
+								return true;
+							}
+						} catch (NumberFormatException e) {
+							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got a string. Please check your syntax.");
+							return true;
+						} catch (SQLException e) {
+							sender.sendMessage(ChatColor.DARK_RED+"Error while interacting with the database. See console for more info.");
+							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+							e.printStackTrace();
+							return true;
 						}
 					} else {
-						sender.sendMessage(ChatColor.RED+"Invalid syntax length");
-						sender.sendMessage(ChatColor.YELLOW+"/c add rank [name] [group] [usetimes]");
+						sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
+						return true;
+					}
+				}
+				
+				else if (args[1].equalsIgnoreCase("xp")) {
+					if (args.length >= 4) {
+						try {
+							String name = args[2];
+							int xp = Integer.parseInt(args[3]);
+							int usetimes = 1;
+							int time = -1;
+							
+							if (name.equalsIgnoreCase("random")) name = Misc.generateName();
+							if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
+							if (args.length >= 6) time = Integer.parseInt(args[5]);
+							if (args.length > 6) {
+								sender.sendMessage(CommandUsage.C_ADD_XP.toString());
+								return true;
+							}
+							
+							XpCoupon xc = api.createNewXpCoupon(name, xp, usetimes, time, new HashMap<String, Boolean>());
+							
+							if (xc.addToDatabase()) {
+								sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
+								return true;
+							} else {
+								sender.sendMessage(ChatColor.RED+"This coupon already exists!");
+								return true;
+							}
+						} catch (NumberFormatException e) {
+							sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got a string. Please check your syntax.");
+							return true;
+						} catch (SQLException e) {
+							sender.sendMessage(ChatColor.DARK_RED+"Error while interacting with the database. See console for more info.");
+							sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+							e.printStackTrace();
+							return true;
+						}
+					} else {
+						sender.sendMessage(CommandUsage.C_ADD_XP.toString());
 						return true;
 					}
 				} else {
-					help(sender);
+					sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
+					sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
+					sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
+					sender.sendMessage(CommandUsage.C_ADD_XP.toString());
 					return true;
 				}
 			} else {
-				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
+				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command.");
 				return true;
 			}
 		}
@@ -314,7 +378,8 @@ public class CouponCodes extends JavaPlugin {
 					try {
 						if (args[1].equalsIgnoreCase("all")) {
 							int j = 0;
-							for (String i : cm.getCoupons()) {
+							ArrayList<String> cs = cm.getCoupons();
+							for (String i : cs) {
 								cm.removeCouponFromDatabase(i);
 								j++;
 							}
@@ -335,8 +400,7 @@ public class CouponCodes extends JavaPlugin {
 						return true;
 					}
 				} else {
-					sender.sendMessage(ChatColor.RED+"Invalid syntax length");
-					sender.sendMessage(ChatColor.YELLOW+"/c remove [name]");
+					sender.sendMessage(CommandUsage.C_REMOVE.toString());
 					return true;
 				}
 			} else {
@@ -355,19 +419,19 @@ public class CouponCodes extends JavaPlugin {
 				if (has(player, "cc.redeem")) {
 					if (args.length == 2) {
 						try {
-							if (!api.couponExists(args[1])) {
+							Coupon coupon = api.getCoupon(args[1]);
+							if (coupon == null) {
 								player.sendMessage(ChatColor.RED+"That coupon doesn't exist!");
 								return true;
 							}
-							Coupon coupon = api.getCoupon(args[1]);
-							try {
-								if (coupon.getUseTimes() != null || !coupon.getUsedPlayers().isEmpty()) {
-									if (coupon.isExpired() || coupon.getUsedPlayers().get(player.getName())) {
-										player.sendMessage(ChatColor.RED+"You cannot use this coupon as it is expired for you.");
-										return true;
-									}
+							
+							if (!coupon.getUsedPlayers().isEmpty()) {
+								if (coupon.getUseTimes() < 1 || coupon.getUsedPlayers().get(player.getName())) {
+									player.sendMessage(ChatColor.RED+"This coupon has expired for you");
+									return true;
 								}
-							} catch (NullPointerException e) {}
+							}
+							
 							if (coupon instanceof ItemCoupon) {
 								ItemCoupon c = (ItemCoupon) coupon;
 								if (player.getInventory().firstEmpty() == -1) {
@@ -382,6 +446,7 @@ public class CouponCodes extends JavaPlugin {
 									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and the items added to your inventory!");
 								}
 							}
+							
 							else if (coupon instanceof EconomyCoupon) {
 								if (!va) {
 									player.sendMessage(ChatColor.DARK_RED+"Vault support is currently disabled. You cannot redeem an economy coupon.");
@@ -392,6 +457,7 @@ public class CouponCodes extends JavaPlugin {
 									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and the money added to your account!");
 								}
 							}
+							
 							else if (coupon instanceof RankCoupon) {
 								if (!va) {
 									player.sendMessage(ChatColor.DARK_RED+"Vault support is currently disabled. You cannot redeem a rank coupon.");
@@ -413,6 +479,13 @@ public class CouponCodes extends JavaPlugin {
 									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and your group has been set to "+ChatColor.GOLD+c.getGroup());
 								}
 							}
+							
+							else if (coupon instanceof XpCoupon) {
+								XpCoupon c = (XpCoupon) coupon;
+								player.setLevel(player.getLevel()+c.getXp());
+								player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and you have received "+ChatColor.GOLD+c.getXp()+ChatColor.GREEN+" XP levels!");
+							}
+							
 							HashMap<String, Boolean> up = coupon.getUsedPlayers();
 							up.put(player.getName(), true);
 							coupon.setUsedPlayers(up);
@@ -426,8 +499,7 @@ public class CouponCodes extends JavaPlugin {
 							return true;
 						}
 					} else {
-						player.sendMessage(ChatColor.RED+"Invalid syntax length");
-						player.sendMessage(ChatColor.YELLOW+"/c redeem [name]");
+						player.sendMessage(CommandUsage.C_REDEEM.toString());
 						return true;
 					}
 				} else {
@@ -496,6 +568,8 @@ public class CouponCodes extends JavaPlugin {
 								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Money: "+ChatColor.DARK_PURPLE+((EconomyCoupon) c).getMoney());
 							else if (c instanceof RankCoupon)
 								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Items: "+ChatColor.DARK_PURPLE+((RankCoupon) c).getGroup());
+							else if (c instanceof XpCoupon)
+								sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"XP: "+ChatColor.DARK_PURPLE+((XpCoupon) c).getXp());
 							sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Totally random name: "+ChatColor.DARK_PURPLE+Misc.generateName());
 							sender.sendMessage(ChatColor.GOLD+"|----------------------|");
 							return true;
@@ -515,9 +589,11 @@ public class CouponCodes extends JavaPlugin {
 							double it = 0;
 							double ec = 0;
 							double ra = 0;
+							double xp = 0;
 							String it2 = null;
 							String ec2 = null;
 							String ra2 = null;
+							String xp2 = null;
 							DecimalFormat d1 = new DecimalFormat("#.##");
 							DecimalFormat d2 = new DecimalFormat("##.##");
 							for (int i = 0; i < co.size(); i++) {
@@ -526,6 +602,7 @@ public class CouponCodes extends JavaPlugin {
 								if (coo instanceof ItemCoupon) it++;
 								if (coo instanceof EconomyCoupon) ec++;
 								if (coo instanceof RankCoupon) ra++;
+								if (coo instanceof XpCoupon) xp++;
 								if (!(Integer.valueOf(i+1).equals(co.size()))){
 									sb1.append(", ");
 								}
@@ -533,10 +610,12 @@ public class CouponCodes extends JavaPlugin {
 							it2 = d2.format(it/j*100);
 							ec2 = d2.format(ec/j*100);
 							ra2 = d2.format(ra/j*100);
+							xp2 = d2.format(xp/j*100);
 							if (it < 10) it2 = d1.format(it/j*100);
 							if (ec < 10) ec2 = d1.format(ec/j*100);
 							if (ra < 10) ra2 = d1.format(ra/j*100);
-							sb2.append("Out of those, "+it2+"% are item, "+ec2+"% are economy, and "+ra2+"% are rank coupons.");
+							if (xp < 10) xp2 = d1.format(xp/j*100);
+							sb2.append("Out of those, "+it2+"% are item, "+ec2+"% are economy, "+ra2+"% are rank, and "+xp2+"% are XP coupons.");
 						}
 						sender.sendMessage(ChatColor.GOLD+"|-----------------------|");
 						sender.sendMessage(ChatColor.GOLD+"|-"+ChatColor.DARK_RED+"Info on current coupons"+ChatColor.GOLD+"-|");
@@ -596,10 +675,10 @@ public class CouponCodes extends JavaPlugin {
 	
 	private void help(CommandSender sender) {
 		sender.sendMessage(ChatColor.GOLD+"|-[] = required-"+ChatColor.DARK_RED+"CouponCodes Help"+ChatColor.GOLD+"-() = optional-|");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"help"+ChatColor.GOLD);
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add item [name] [item1:amount,item2:amount,..] [usetimes] (time)");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add econ [name] [money] [usetimes] (time)");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add rank [name] [group] [usetimes] (time)");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add item [name] [item1:amount,item2:amount,..] (usetimes) (time)");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add econ [name] [money] (usetimes) (time)");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add rank [name] [group] (usetimes) (time)");
+		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add xp [name] [xp] (usetimes) (time)");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"redeem [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"remove [name]");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"list");

@@ -84,6 +84,7 @@ public abstract class Coupon {
 		if (this instanceof ItemCoupon) return "Item";
 		if (this instanceof EconomyCoupon) return "Economy";
 		if (this instanceof RankCoupon) return "Rank";
+		if (this instanceof XpCoupon) return "Xp";
 		else
 			return null;
 	}

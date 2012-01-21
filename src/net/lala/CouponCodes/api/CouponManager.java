@@ -12,6 +12,7 @@ import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.coupon.EconomyCoupon;
 import net.lala.CouponCodes.api.coupon.ItemCoupon;
 import net.lala.CouponCodes.api.coupon.RankCoupon;
+import net.lala.CouponCodes.api.coupon.XpCoupon;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.sql.SQL;
 import net.lala.CouponCodes.sql.options.MySQLOptions;
@@ -27,6 +28,7 @@ public class CouponManager {
 	}
 	
 	public boolean addCouponToDatabase(Coupon coupon) throws SQLException {
+		if (couponExists(coupon)) return false;
 		Connection con = sql.getConnection();
 		PreparedStatement p = null;
 		if (coupon instanceof ItemCoupon) {
@@ -61,6 +63,17 @@ public class CouponManager {
 			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
 			p.setString(5, c.getGroup());
 			p.setInt(6, c.getTime());
+		}
+		else if (coupon instanceof XpCoupon) {
+			XpCoupon c = (XpCoupon) coupon;
+			p = con.prepareStatement("INSERT INTO couponcodes (name, ctype, usetimes, usedplayers, timeuse, xp) "+
+					"VALUES (?, ?, ?, ?, ?, ?)");
+			p.setString(1, c.getName());
+			p.setString(2, c.getType());
+			p.setInt(3, c.getUseTimes());
+			p.setString(4, plugin.convertHashToString2(c.getUsedPlayers()));
+			p.setInt(5, c.getTime());
+			p.setInt(6, c.getXp());
 		}
 		p.addBatch();
 		con.setAutoCommit(false);
@@ -106,27 +119,18 @@ public class CouponManager {
 	}
 	
 	public void updateCoupon(Coupon coupon) throws SQLException {
-		if (coupon instanceof ItemCoupon) {
-			ItemCoupon c = (ItemCoupon) coupon;
-			sql.query("UPDATE couponcodes SET usetimes='"+c.getUseTimes()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET usedplayers='"+plugin.convertHashToString2(c.getUsedPlayers())+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET ids='"+plugin.convertHashToString(c.getIDs())+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET timeuse='"+c.getTime()+"' WHERE name='"+c.getName()+"'");
-		}
-		else if (coupon instanceof EconomyCoupon) {
-			EconomyCoupon c = (EconomyCoupon) coupon;
-			sql.query("UPDATE couponcodes SET usetimes='"+c.getUseTimes()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET usedplayers='"+plugin.convertHashToString2(c.getUsedPlayers())+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET money='"+c.getMoney()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET timeuse='"+c.getTime()+"' WHERE name='"+c.getName()+"'");
-		}
-		else if (coupon instanceof RankCoupon) {
-			RankCoupon c = (RankCoupon) coupon;
-			sql.query("UPDATE couponcodes SET usetimes='"+c.getUseTimes()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET usedplayers='"+plugin.convertHashToString2(c.getUsedPlayers())+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET groupname='"+c.getGroup()+"' WHERE name='"+c.getName()+"'");
-			sql.query("UPDATE couponcodes SET timeuse='"+c.getTime()+"' WHERE name='"+c.getName()+"'");
-		}
+		sql.query("UPDATE couponcodes SET usetimes='"+coupon.getUseTimes()+"' WHERE name='"+coupon.getName()+"'");
+		sql.query("UPDATE couponcodes SET usedplayers='"+plugin.convertHashToString2(coupon.getUsedPlayers())+"' WHERE name='"+coupon.getName()+"'");
+		sql.query("UPDATE couponcodes SET timeuse='"+coupon.getTime()+"' WHERE name='"+coupon.getName()+"'");
+		
+		if (coupon instanceof ItemCoupon)
+			sql.query("UPDATE couponcodes SET ids='"+plugin.convertHashToString(((ItemCoupon) coupon).getIDs())+"' WHERE name='"+coupon.getName()+"'");
+		else if (coupon instanceof EconomyCoupon)
+			sql.query("UPDATE couponcodes SET money='"+((EconomyCoupon) coupon).getMoney()+"' WHERE name='"+coupon.getName()+"'");
+		else if (coupon instanceof RankCoupon)
+			sql.query("UPDATE couponcodes SET groupname='"+((RankCoupon) coupon).getGroup()+"' WHERE name='"+coupon.getName()+"'");
+		else if (coupon instanceof XpCoupon)
+			sql.query("UPDATE couponcodes SET xp='"+((XpCoupon) coupon).getXp()+"' WHERE name='"+coupon.getName()+"'");
 	}
 	
 	public void updateCouponTime(Coupon c) throws SQLException {
@@ -147,6 +151,8 @@ public class CouponManager {
 			return createNewEconomyCoupon(coupon, usetimes, time, usedplayers, rs.getInt("money"));
 		else if (rs.getString("ctype").equalsIgnoreCase("Rank"))
 			return createNewRankCoupon(coupon, rs.getString("groupname"), usetimes, time, usedplayers);
+		else if (rs.getString("ctype").equalsIgnoreCase("Xp"))
+			return createNewXpCoupon(coupon, rs.getInt("xp"), usetimes, time, usedplayers);
 		else
 			return null;
 	}
@@ -165,6 +171,8 @@ public class CouponManager {
 			return createNewEconomyCoupon(coupon, usetimes, time, null, 0);
 		else if (type.equalsIgnoreCase("Rank"))
 			return createNewRankCoupon(coupon, null, usetimes, time, null);
+		else if (type.equalsIgnoreCase("Xp"))
+			return this.createNewXpCoupon(coupon, 0, usetimes, time, null);
 		else
 			return null;
 	}
@@ -179,5 +187,9 @@ public class CouponManager {
 	
 	public RankCoupon createNewRankCoupon(String name, String group, int usetimes, int time, HashMap<String, Boolean> usedplayers) {
 		return new RankCoupon(name, group, usetimes, time, usedplayers);
+	}
+	
+	public XpCoupon createNewXpCoupon(String name, int xp, int usetimes, int time, HashMap<String, Boolean> usedplayers) {
+		return new XpCoupon(name, usetimes, time, usedplayers, xp);
 	}
 }

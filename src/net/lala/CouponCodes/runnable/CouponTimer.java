@@ -13,20 +13,24 @@ public class CouponTimer implements Runnable {
 	private CouponManager cm;
 	private boolean usethread;
 	
+	private ArrayList<String> cl;
+	private Coupon c;
+	
 	public CouponTimer() {
 		cm = CouponCodes.getCouponManager();
 		usethread = CouponCodes.useThread();
+		cl = new ArrayList<String>();
 	}
 	
 	@Override
 	public void run() {
 		if (!usethread) return;
 		try {
-			ArrayList<String> cl = cm.getCoupons();
+			cl = cm.getCoupons();
 			if (cl == null) return;
 			
 			for (String name : cl) {
-				Coupon c = cm.getBasicCoupon(name);
+				c = cm.getBasicCoupon(name);
 				if (c == null) continue;
 				if (c.isExpired() || c.getTime() == -1) continue;
 				
