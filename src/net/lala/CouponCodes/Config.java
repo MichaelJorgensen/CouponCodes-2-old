@@ -15,7 +15,8 @@ public class Config {
 		
 		if (!(new File("plugins/CouponCodes/config.yml").exists()))
 			plugin.saveDefaultConfig();
-		config.options().copyDefaults(true);
+		if (!config.options().copyDefaults(true).configuration().equals(config))
+			plugin.saveConfig();
 	}
 	
 	public boolean getUseThread() {
