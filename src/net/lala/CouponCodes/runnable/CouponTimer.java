@@ -11,20 +11,17 @@ import net.lala.CouponCodes.api.events.EventHandle;
 public class CouponTimer implements Runnable {
 	
 	private CouponManager cm;
-	private boolean usethread;
 	
 	private ArrayList<String> cl;
 	private Coupon c;
 	
 	public CouponTimer() {
 		cm = CouponCodes.getCouponManager();
-		usethread = CouponCodes.useThread();
 		cl = new ArrayList<String>();
 	}
 	
 	@Override
 	public void run() {
-		if (!usethread) return;
 		try {
 			cl = cm.getCoupons();
 			if (cl == null) return;

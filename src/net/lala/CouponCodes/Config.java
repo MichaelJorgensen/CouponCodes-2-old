@@ -1,6 +1,8 @@
 package net.lala.CouponCodes;
 
 
+import java.io.File;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 
@@ -10,7 +12,10 @@ public class Config {
 	
 	public Config(Plugin plugin) {
 		this.config = plugin.getConfig();
-		plugin.saveDefaultConfig();
+		
+		if (!(new File("plugins/CouponCodes/config.yml").exists()))
+			plugin.saveDefaultConfig();
+		config.options().copyDefaults(true);
 	}
 	
 	public boolean getUseThread() {

@@ -46,13 +46,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class CouponCodes extends JavaPlugin {
 	
 	private static CouponManager cm;
-	private static boolean usethread = true;
 	
 	private DatabaseOptions dataop;
 	private Config config;
 	
 	private boolean va = false;
 	private boolean debug = false;
+	private boolean usethread = true;
 	
 	private SQL sql;
 	
@@ -84,15 +84,14 @@ public class CouponCodes extends JavaPlugin {
 			va = true;
 		}
 		
-		if (!version.equals(newversion))
-			if (!version.contains("TEST"))
-					send("New update is available for CouponCodes! Current version: "+version+" New version: "+newversion);
+		if (!version.equals(newversion) && !version.contains("TEST"))
+			send("New update is available for CouponCodes! Current version: "+version+" New version: "+newversion);
 		
 		// This is for this plugin's own events!
 		server.getPluginManager().registerEvents(new DebugListen(this), this);
 		
 		// Bukkit listeners
-		server.getPluginManager().registerEvents(new PlayerListen(this), this);
+		if (usethread) server.getPluginManager().registerEvents(new PlayerListen(this), this);
 		
 		if (!setupSQL()) {
 			send("Database could not be setup. CouponCodes will now disable");
@@ -194,10 +193,7 @@ public class CouponCodes extends JavaPlugin {
 		// Add command 2.0
 		if (args[0].equalsIgnoreCase("add")) {
 			if (args.length < 2) {
-				sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
-				sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
-				sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
-				sender.sendMessage(CommandUsage.C_ADD_XP.toString());
+				helpAdd(sender);
 				return true;
 			}
 			if (has(sender, "cc.add")) {
@@ -359,10 +355,7 @@ public class CouponCodes extends JavaPlugin {
 						return true;
 					}
 				} else {
-					sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
-					sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
-					sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
-					sender.sendMessage(CommandUsage.C_ADD_XP.toString());
+					helpAdd(sender);
 					return true;
 				}
 			} else {
@@ -379,6 +372,7 @@ public class CouponCodes extends JavaPlugin {
 						if (args[1].equalsIgnoreCase("all")) {
 							int j = 0;
 							ArrayList<String> cs = cm.getCoupons();
+							if (cs.size() > 20) sender.sendMessage(ChatColor.GOLD+"This may take a few moments..");
 							for (String i : cs) {
 								cm.removeCouponFromDatabase(i);
 								j++;
@@ -641,17 +635,14 @@ public class CouponCodes extends JavaPlugin {
 		// Reload command
 		else if (args[0].equalsIgnoreCase("reload")) {
 			if (has(sender, "cc.reload")) {
-				boolean y = false;
-				try {
-					y = sql.reload();
-				} catch (SQLException e) {y = false;}
-				if (y) {
+				if (!sql.reload())
+					sender.sendMessage(ChatColor.DARK_RED+"Could not reload the database");
+				else
 					sender.sendMessage(ChatColor.GREEN+"Database reloaded");
-					return true;
-				} else {
-					sender.sendMessage(ChatColor.RED+"Error reloading the database");
-					return true;
-				}
+				reloadConfig();
+				config = new Config(this);
+				sender.sendMessage(ChatColor.GREEN+"Config reloaded");
+				return true;
 			} else {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
 				return true;
@@ -668,11 +659,6 @@ public class CouponCodes extends JavaPlugin {
 		return perm.has(sender, permission);
 	}
 	
-	public boolean has(Player player, String permission) {
-		if (!va) return player.hasPermission(permission);
-		return perm.has(player, permission);
-	}
-	
 	private void help(CommandSender sender) {
 		sender.sendMessage(ChatColor.GOLD+"|-[] = required-"+ChatColor.DARK_RED+"CouponCodes Help"+ChatColor.GOLD+"-() = optional-|");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add item [name] [item1:amount,item2:amount,..] (usetimes) (time)");
@@ -684,6 +670,13 @@ public class CouponCodes extends JavaPlugin {
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"list");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info (name)");
 		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"reload");
+	}
+	
+	private void helpAdd(CommandSender sender) {
+		sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
+		sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
+		sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
+		sender.sendMessage(CommandUsage.C_ADD_XP.toString());
 	}
 	
 	public boolean checkForUpdate() {
@@ -797,7 +790,7 @@ public class CouponCodes extends JavaPlugin {
 		return debug;
 	}
 	
-	public static boolean useThread() {
+	public boolean useThread() {
 		return usethread;
 	}
 }

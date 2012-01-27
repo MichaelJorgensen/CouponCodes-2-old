@@ -2,10 +2,6 @@ package net.lala.CouponCodes.misc;
 
 import java.util.Random;
 
-/**
- * For misc. methods
- * @author mike101102
- */
 public class Misc {
 
 	private static Random random = new Random();

@@ -13,10 +13,6 @@ import net.lala.CouponCodes.sql.options.DatabaseOptions;
 import net.lala.CouponCodes.sql.options.MySQLOptions;
 import net.lala.CouponCodes.sql.options.SQLiteOptions;
 
-/**
- * SQL.java - MySQL, SQL handling
- * @author mike101102
- */
 public class SQL {
 	
 	private DatabaseOptions dop;
@@ -75,9 +71,13 @@ public class SQL {
 		EventHandle.callDatabaseCloseConnectionEvent(con, dop);
 	}
 	
-	public boolean reload() throws SQLException {
-		close();
-		return open();
+	public boolean reload() {
+		try {
+			close();
+			return open();
+		} catch (SQLException e) {
+			return false;
+		}
 	}
 	
 	public ResultSet query(String query) throws SQLException {
