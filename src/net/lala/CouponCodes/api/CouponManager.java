@@ -31,6 +31,7 @@ public class CouponManager {
 		if (couponExists(coupon)) return false;
 		Connection con = sql.getConnection();
 		PreparedStatement p = null;
+		
 		if (coupon instanceof ItemCoupon) {
 			ItemCoupon c = (ItemCoupon) coupon;
 			p = con.prepareStatement("INSERT INTO couponcodes (name, ctype, usetimes, usedplayers, ids, timeuse) "+
@@ -42,6 +43,7 @@ public class CouponManager {
 			p.setString(5, plugin.convertHashToString(c.getIDs()));
 			p.setInt(6, c.getTime());
 		}
+		
 		else if (coupon instanceof EconomyCoupon) {
 			EconomyCoupon c = (EconomyCoupon) coupon;
 			p = con.prepareStatement("INSERT INTO couponcodes (name, ctype, usetimes, usedplayers, money, timeuse) "+
@@ -53,6 +55,7 @@ public class CouponManager {
 			p.setInt(5, c.getMoney());
 			p.setInt(6, c.getTime());
 		}
+		
 		else if (coupon instanceof RankCoupon) {
 			RankCoupon c = (RankCoupon) coupon;
 			p = con.prepareStatement("INSERT INTO couponcodes (name, ctype, usetimes, usedplayers, groupname, timeuse) "+
@@ -64,6 +67,7 @@ public class CouponManager {
 			p.setString(5, c.getGroup());
 			p.setInt(6, c.getTime());
 		}
+		
 		else if (coupon instanceof XpCoupon) {
 			XpCoupon c = (XpCoupon) coupon;
 			p = con.prepareStatement("INSERT INTO couponcodes (name, ctype, usetimes, usedplayers, timeuse, xp) "+
@@ -75,6 +79,7 @@ public class CouponManager {
 			p.setInt(5, c.getTime());
 			p.setInt(6, c.getXp());
 		}
+		
 		p.addBatch();
 		con.setAutoCommit(false);
 		p.executeBatch();
