@@ -419,10 +419,18 @@ public class CouponCodes extends JavaPlugin {
 								return true;
 							}
 							
-							if (!coupon.getUsedPlayers().isEmpty()) {
-								if (coupon.getUseTimes() < 1 || coupon.getUsedPlayers().get(player.getName())) {
-									player.sendMessage(ChatColor.RED+"This coupon has expired for you");
-									return true;
+							if (!(coupon.getUsedPlayers() == null)) {
+								if (!coupon.getUsedPlayers().isEmpty()) {
+									if (coupon.getUseTimes() < 1) {
+										player.sendMessage(ChatColor.RED+"This coupon has been used up!");
+										return true;
+									}
+									if (coupon.getUsedPlayers().containsKey(player.getName())) {
+										if (coupon.getUsedPlayers().get(player.getName())) {
+											player.sendMessage(ChatColor.RED+"You have already used this coupon");
+											return true;
+										}
+									}
 								}
 							}
 							
