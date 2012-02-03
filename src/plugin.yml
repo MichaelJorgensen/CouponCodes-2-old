@@ -5,7 +5,7 @@ author: mike101102
 softdepend: [Vault]
 commands:
     c:
-        alias: [coupon]
+        aliases: [coupon]
         description: CouponCode's main command
         usage: /<command>
 permissions:
