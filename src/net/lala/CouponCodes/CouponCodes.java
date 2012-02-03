@@ -55,7 +55,6 @@ public class CouponCodes extends JavaPlugin {
 	private boolean usethread = true;
 	
 	private SQL sql;
-	
 	private Metrics mt = null;
 	
 	public Server server;
@@ -91,7 +90,7 @@ public class CouponCodes extends JavaPlugin {
 		server.getPluginManager().registerEvents(new DebugListen(this), this);
 		
 		// Bukkit listeners
-		if (usethread) server.getPluginManager().registerEvents(new PlayerListen(this), this);
+		server.getPluginManager().registerEvents(new PlayerListen(this), this);
 		
 		if (!setupSQL()) {
 			send("Database could not be setup. CouponCodes will now disable");
@@ -100,7 +99,9 @@ public class CouponCodes extends JavaPlugin {
 		}
 		
 		// Timers!
-		getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 100L, 100L);
+		if (usethread) {
+			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 100L, 100L);
+		}
 		
 		try {
 			mt = new Metrics();
@@ -468,16 +469,18 @@ public class CouponCodes extends JavaPlugin {
 								} else {
 									RankCoupon c = (RankCoupon) coupon;
 									boolean permbuk = (perm.getName().equalsIgnoreCase("PermissionsBukkit"));
-									if (permbuk)
+									if (permbuk) {
 										perm.playerAddGroup((String) null, player.getName(), c.getGroup());
-									else
-										perm.playerAddGroup(player, c.getGroup());
-									for (String i : perm.getPlayerGroups((String) null, player.getName())) {
-										if (i.equalsIgnoreCase(c.getGroup())) continue;
-										if (permbuk)
+										for (String i : perm.getPlayerGroups((String) null, player.getName())) {
+											if (i.equalsIgnoreCase(c.getGroup())) continue;
 											perm.playerRemoveGroup((String) null, player.getName(), i);
-										else
+										}
+									} else {
+										perm.playerAddGroup(player, c.getGroup());
+										for (String i : perm.getPlayerGroups(player)) {
+											if (i.equalsIgnoreCase(c.getGroup())) continue;
 											perm.playerRemoveGroup(player, i);
+										}
 									}
 									player.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+c.getName()+ChatColor.GREEN+" has been redeemed, and your group has been set to "+ChatColor.GOLD+c.getGroup());
 								}
