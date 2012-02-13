@@ -7,6 +7,7 @@ import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.sql.SQL;
+import net.lala.CouponCodes.sql.options.MySQLOptions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -28,8 +29,12 @@ public class QuedRemoveCommand implements Runnable {
 	public void run() {
 		if (args.length == 2) {
 			try {
-				api = new CouponManager(plugin, new SQL(plugin, plugin.getDatabaseOptions()));
-				api.getSQL().open();
+				if (CouponCodes.getCouponManager().getSQL().getDatabaseOptions() instanceof MySQLOptions) {
+					api = new CouponManager(plugin, new SQL(plugin, plugin.getDatabaseOptions()));
+					api.getSQL().open();
+				} else {
+					api = CouponCodes.getCouponManager();
+				}
 				if (args[1].equalsIgnoreCase("all")) {
 					int j = 0;
 					ArrayList<String> cs = api.getCoupons();

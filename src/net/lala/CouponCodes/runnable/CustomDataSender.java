@@ -6,7 +6,6 @@ import java.sql.SQLException;
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.misc.Metrics;
-import net.lala.CouponCodes.sql.SQL;
 
 public class CustomDataSender implements Runnable {
 
@@ -17,12 +16,7 @@ public class CustomDataSender implements Runnable {
 	public CustomDataSender(CouponCodes plugin, Metrics mt) {
 		this.plugin = plugin;
 		this.mt = mt;
-		cm = new CouponManager(plugin, new SQL(plugin, plugin.getDatabaseOptions()));
-		try {
-			cm.getSQL().open();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		this.cm = CouponCodes.getCouponManager();
 	}
 	
 	@Override
