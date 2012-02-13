@@ -4,7 +4,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 import net.lala.CouponCodes.CouponCodes;
-import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 
 public abstract class Coupon {
@@ -21,7 +20,6 @@ public abstract class Coupon {
 		this.time = time;
 		this.usedplayers = usedplayers;
 		this.expired = (usetimes <= 0 || time == 0);
-		EventHandle.callCouponCreateEvent(this);
 	}
 	
 	public boolean addToDatabase() throws SQLException {

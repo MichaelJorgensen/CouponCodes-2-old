@@ -2,7 +2,6 @@ package net.lala.CouponCodes.listeners;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.events.coupon.CouponAddToDatabaseEvent;
-import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponTimeChangeEvent;
@@ -30,11 +29,6 @@ public class DebugListen implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onCouponRemoveFromDatabase(CouponRemoveFromDatabaseEvent event) {
 		plugin.debug("Coupon removed from database. Name: "+event.getCoupon());
-	}
-	
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onCouponCreateEvent(CouponCreateEvent event) {
-		plugin.debug("Coupon generated. Name: "+event.getCoupon().getName()+" Type: "+event.getCoupon().getType());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)

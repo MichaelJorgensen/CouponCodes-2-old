@@ -27,6 +27,7 @@ public class CouponTimer implements Runnable {
 			if (cl == null) return;
 			
 			for (String name : cl) {
+				if (cm.getSQL().getConnection().isClosed()) return;
 				c = cm.getBasicCoupon(name);
 				if (c == null) continue;
 				if (c.isExpired() || c.getTime() == -1) continue;
@@ -39,6 +40,8 @@ public class CouponTimer implements Runnable {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			
 		}
 	}
 }

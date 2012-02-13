@@ -182,6 +182,33 @@ public class CouponManager {
 			return null;
 	}
 	
+	public int getAmountOf(String type) throws SQLException {
+		ArrayList<String> list = getCoupons();
+		int item = 0;
+		int econ = 0;
+		int rank = 0;
+		int xp = 0;
+		
+		for (String name : list) {
+			Coupon c = getBasicCoupon(name);
+			if (c instanceof ItemCoupon) item++;
+			if (c instanceof EconomyCoupon) econ++;
+			if (c instanceof RankCoupon) rank++;
+			if (c instanceof XpCoupon) xp++;
+		}
+		
+		if (type.equalsIgnoreCase("Item"))
+			return item;
+		else if (type.equalsIgnoreCase("Economy"))
+			return econ;
+		else if (type.equalsIgnoreCase("Rank"))
+			return rank;
+		else if (type.equalsIgnoreCase("Xp"))
+			return xp;
+		else
+			return 0;
+	}
+	
 	public ItemCoupon createNewItemCoupon(String name, int usetimes, int time, HashMap<Integer, Integer> ids, HashMap<String, Boolean> usedplayers) {
 		return new ItemCoupon(name, usetimes, time, usedplayers, ids);
 	}
@@ -196,5 +223,9 @@ public class CouponManager {
 	
 	public XpCoupon createNewXpCoupon(String name, int xp, int usetimes, int time, HashMap<String, Boolean> usedplayers) {
 		return new XpCoupon(name, usetimes, time, usedplayers, xp);
+	}
+	
+	public SQL getSQL() {
+		return sql;
 	}
 }

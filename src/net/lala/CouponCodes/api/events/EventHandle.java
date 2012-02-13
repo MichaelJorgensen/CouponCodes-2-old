@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.events.coupon.CouponAddToDatabaseEvent;
-import net.lala.CouponCodes.api.events.coupon.CouponCreateEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponRemoveFromDatabaseEvent;
 import net.lala.CouponCodes.api.events.coupon.CouponTimeChangeEvent;
@@ -28,12 +27,6 @@ public class EventHandle {
 	
 	public static CouponRemoveFromDatabaseEvent callCouponRemoveFromDatabaseEvent(String coupon) {
 		CouponRemoveFromDatabaseEvent ev = new CouponRemoveFromDatabaseEvent(coupon);
-		ev.call();
-		return ev;
-	}
-	
-	public static CouponCreateEvent callCouponCreateEvent(Coupon coupon) {
-		CouponCreateEvent ev = new CouponCreateEvent(coupon);
 		ev.call();
 		return ev;
 	}
