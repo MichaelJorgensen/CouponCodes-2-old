@@ -24,7 +24,7 @@ public class QuedListCommand implements Runnable {
 		StringBuilder sb = new StringBuilder();
 		try {
 			ArrayList<String> c = api.getCoupons();
-			if (c.isEmpty() || c.size() <= 0 || c.equals(null)) {
+			if (c.isEmpty() || c.size() <= 0 || c == null) {
 				sender.sendMessage(ChatColor.RED+"No coupons found.");
 				return;
 			} else {

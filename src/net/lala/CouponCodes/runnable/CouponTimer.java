@@ -7,6 +7,8 @@ import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.events.EventHandle;
+import net.lala.CouponCodes.sql.SQL;
+import net.lala.CouponCodes.sql.options.MySQLOptions;
 
 public class CouponTimer implements Runnable {
 	
@@ -16,7 +18,16 @@ public class CouponTimer implements Runnable {
 	private Coupon c;
 	
 	public CouponTimer() {
-		cm = CouponCodes.getCouponManager();
+		if (CouponCodes.getCouponManager().getSQL().getDatabaseOptions() instanceof MySQLOptions) {
+			cm = new CouponManager(CouponCodes.getInstance(), new SQL(CouponCodes.getInstance(), CouponCodes.getCouponManager().getSQL().getDatabaseOptions()));
+			try {
+				cm.getSQL().open();
+			} catch (SQLException e) {
+				cm = CouponCodes.getCouponManager();
+			}
+		} else {
+			cm = CouponCodes.getCouponManager();
+		}
 		cl = new ArrayList<String>();
 	}
 	
@@ -32,9 +43,15 @@ public class CouponTimer implements Runnable {
 				if (c == null) continue;
 				if (c.isExpired() || c.getTime() == -1) continue;
 				
-				if (c.getTime()-5 < 0) c.setTime(0);
-				else
-					c.setTime(c.getTime()-5);
+				if (c.getTime()-10 < 0) {
+					if (c.getTime()-5 < 0 || c.getTime()-5 == 0) {
+						c.setTime(0);
+					} else {
+						c.setTime(5);
+					}
+				} else {
+					c.setTime(c.getTime()-10);
+				}
 				cm.updateCouponTime(c);
 				EventHandle.callCouponTimeChangeEvent(c);
 			}

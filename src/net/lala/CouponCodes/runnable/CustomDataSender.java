@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.misc.Metrics;
+import net.lala.CouponCodes.sql.options.MySQLOptions;
+import net.lala.CouponCodes.sql.options.SQLiteOptions;
 
 public class CustomDataSender implements Runnable {
 
@@ -109,6 +111,38 @@ public class CustomDataSender implements Runnable {
 			@Override
 			public String getColumnName() {
 				return "Xp Coupons";
+			}
+		});
+		
+		mt.addCustomData(plugin, new Metrics.Plotter() {
+			
+			@Override
+			public int getValue() {
+				if (cm.getSQL().getDatabaseOptions() instanceof MySQLOptions)
+					return 1;
+				else
+					return 0;
+			}
+			
+			@Override
+			public String getColumnName() {
+				return ("MySQL Users");
+			}
+		});
+		
+		mt.addCustomData(plugin, new Metrics.Plotter() {
+			
+			@Override
+			public int getValue() {
+				if (cm.getSQL().getDatabaseOptions() instanceof SQLiteOptions)
+					return 1;
+				else
+					return 0;
+			}
+			
+			@Override
+			public String getColumnName() {
+				return ("SQLite Users");
 			}
 		});
 		

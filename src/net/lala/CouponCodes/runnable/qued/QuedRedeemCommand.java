@@ -64,6 +64,16 @@ public class QuedRedeemCommand implements Runnable {
 					}
 				}
 				
+				if (coupon.getTime() == 0) {
+					player.sendMessage(ChatColor.RED+"This coupon has ran out of time to be redeemed!");
+					return;
+				}
+				
+				if (coupon.isExpired()) {
+					player.sendMessage(ChatColor.RED+"This coupon has expired!");
+					return;
+				}
+				
 				if (coupon instanceof ItemCoupon) {
 					ItemCoupon c = (ItemCoupon) coupon;
 					if (player.getInventory().firstEmpty() == -1) {
@@ -124,7 +134,7 @@ public class QuedRedeemCommand implements Runnable {
 				up.put(player.getName(), true);
 				coupon.setUsedPlayers(up);
 				coupon.setUseTimes(coupon.getUseTimes()-1);
-				coupon.updateWithDatabase();
+				api.updateCoupon(coupon);
 				return;
 			} catch (SQLException e) {
 				player.sendMessage(ChatColor.DARK_RED+"Error while trying to find "+ChatColor.GOLD+args[1]+ChatColor.DARK_RED+" in the database. Please check the console for more info.");

@@ -12,8 +12,6 @@ import net.lala.CouponCodes.api.coupon.ItemCoupon;
 import net.lala.CouponCodes.api.coupon.RankCoupon;
 import net.lala.CouponCodes.api.coupon.XpCoupon;
 import net.lala.CouponCodes.misc.Misc;
-import net.lala.CouponCodes.sql.SQL;
-import net.lala.CouponCodes.sql.options.MySQLOptions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -29,17 +27,12 @@ public class QuedInfoCommand implements Runnable {
 		this.plugin = plugin;
 		this.sender = sender;
 		this.args = args;
+		this.api = CouponCodes.getCouponManager();
 	}
 	
 	@Override
 	public void run() {
 		try {
-			if (CouponCodes.getCouponManager().getSQL().getDatabaseOptions() instanceof MySQLOptions) {
-				api = new CouponManager(plugin, new SQL(plugin, plugin.getDatabaseOptions()));
-				api.getSQL().open();
-			} else {
-				api = CouponCodes.getCouponManager();
-			}
 			if (args.length == 2) {
 				Coupon c = api.getCoupon(args[1]);
 				if (c != null) {
@@ -115,7 +108,6 @@ public class QuedInfoCommand implements Runnable {
 				sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+sb2.toString());
 				sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Total Coupons: "+ChatColor.DARK_PURPLE+total);
 				sender.sendMessage(ChatColor.GOLD+"|-----------------------|");
-				if (api.getSQL().getDatabaseOptions() instanceof MySQLOptions) api.getSQL().close();
 				return;
 			}
 		} catch (SQLException e) {

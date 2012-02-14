@@ -42,6 +42,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CouponCodes extends JavaPlugin {
 	
+	private static CouponCodes instance;
 	private static CouponManager cm;
 	
 	private DatabaseOptions dataop;
@@ -64,6 +65,7 @@ public class CouponCodes extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
+		instance = this;
 		server = getServer();
 		config = new Config(this);
 		debug = config.getDebug();
@@ -79,7 +81,7 @@ public class CouponCodes extends JavaPlugin {
 		setUpdateInfo();
 		
 		if (!setupVault()) {
-			send("Vault support is disabled.");
+			send("Vault support is disabled. This option can be changed in the config.");
 			va = false;
 		} else {
 			send("Vault support is enabled.");
@@ -103,7 +105,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		// Timers!
 		if (usethread) {
-			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 100L, 100L);
+			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 200L, 200L);
 		}
 		
 		// This timer is required, so it can't be in (usethread)!
@@ -209,7 +211,7 @@ public class CouponCodes extends JavaPlugin {
 		// Remove command
 		else if (args[0].equalsIgnoreCase("remove")) {
 			if (has(sender, "cc.remove")) {
-				server.getScheduler().scheduleAsyncDelayedTask(this, new QuedRemoveCommand(this, sender, args));
+				server.getScheduler().scheduleAsyncDelayedTask(this, new QuedRemoveCommand(sender, args));
 				return true;
 			} else {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
@@ -393,6 +395,10 @@ public class CouponCodes extends JavaPlugin {
 	public void debug(String message) {
 		if (!debug) return;
 		System.out.println("[CouponCodes] [Debug] "+message);
+	}
+	
+	public static CouponCodes getInstance() {
+		return instance;
 	}
 	
 	public static CouponManager getCouponManager() {
