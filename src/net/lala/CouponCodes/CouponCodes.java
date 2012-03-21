@@ -11,13 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.lala.CouponCodes.api.CouponManager;
+import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.api.events.plugin.CouponCodesCommandEvent;
 import net.lala.CouponCodes.listeners.DebugListen;
 import net.lala.CouponCodes.listeners.PlayerListen;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Metrics;
-import net.lala.CouponCodes.runnable.CouponTimer;
+//import net.lala.CouponCodes.runnable.CouponTimer;
 import net.lala.CouponCodes.runnable.CustomDataSender;
 import net.lala.CouponCodes.runnable.qued.QuedAddCommand;
 import net.lala.CouponCodes.runnable.qued.QuedInfoCommand;
@@ -52,9 +53,9 @@ public class CouponCodes extends JavaPlugin {
 	private boolean debug = false;
 	private boolean usethread = true;
 	
-	private SQL sql;
 	private Metrics mt = null;
 	
+	public SQL sql;
 	public Server server;
 	public Economy econ;
 	public Permission perm;
@@ -105,7 +106,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		// Timers!
 		if (usethread) {
-			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 200L, 200L);
+//			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 200L, 200L);
 		}
 		
 		// This timer is required, so it can't be in (usethread)!
@@ -146,7 +147,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		try {
 			sql.open();
-			sql.createTable("CREATE TABLE IF NOT EXISTS couponcodes (name VARCHAR(24), ctype VARCHAR(10), usetimes INT(10), usedplayers TEXT(1024), ids VARCHAR(255), money INT(10), groupname VARCHAR(20), timeuse INT(100), xp INT(10))");
+			Coupon.createTables(sql);
 			cm = new CouponManager(this, sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -162,13 +163,17 @@ public class CouponCodes extends JavaPlugin {
 			RegisteredServiceProvider<Economy> ep = server.getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
 			RegisteredServiceProvider<Permission> pe = server.getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
 			if (ep == null)
+				getLogger().info("ep is null!");
+			if (pe == null)
+				getLogger().info("pe is null!");
+			if (ep == null || pe == null)
 				return false;
-			else if (pe == null)
-				return false;
-			else
+			else {
+				getLogger().info("ep and pe are good!");
 				econ = ep.getProvider();
 				perm = pe.getProvider();
 				return true;
+			}
 		} catch (NoClassDefFoundError e) {
 			return false;
 		}

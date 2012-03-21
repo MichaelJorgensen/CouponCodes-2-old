@@ -5,11 +5,17 @@ import java.util.Random;
 public class Misc {
 
 	private static Random random = new Random();
+	private static final String seed = "QWERTYUIPADFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm12346789";
 	
 	public static String generateName() {
-		String ref = "";
-		while (ref.length() < 5)
-			ref = ref+"qwertyuiopasdfghjklzxcvbnm1234567890".charAt(random.nextInt(36));
+		return generateName(5, "");
+	}
+
+	public static String generateName(int len, String prefix) {
+		random.setSeed(random.nextLong() + len);
+		String ref = prefix;
+		while (ref.length() < len)
+			ref = ref + seed.charAt(random.nextInt(seed.length()));
 		return ref;
 	}
 }

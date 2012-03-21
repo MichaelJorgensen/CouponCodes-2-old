@@ -1,5 +1,5 @@
 package net.lala.CouponCodes.runnable;
-
+/*
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -62,3 +62,4 @@ public class CouponTimer implements Runnable {
 		}
 	}
 }
+*/

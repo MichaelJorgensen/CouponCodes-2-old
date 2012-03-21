@@ -23,7 +23,8 @@ public class CustomDataSender implements Runnable {
 	
 	@Override
 	public void run() {
-		plugin.debug("Beginning Custom data sending");
+		return;
+/*		plugin.debug("Beginning Custom data sending");
 		mt.addCustomData(plugin, new Metrics.Plotter() {
 			
 			@Override
@@ -153,6 +154,6 @@ public class CustomDataSender implements Runnable {
 			e.printStackTrace();
 		}
 		
-		plugin.debug("End of custom data sending");
+		plugin.debug("End of custom data sending");*/
 	}
 }

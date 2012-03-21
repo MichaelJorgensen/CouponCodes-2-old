@@ -5,10 +5,7 @@ import java.util.HashMap;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
-import net.lala.CouponCodes.api.coupon.EconomyCoupon;
-import net.lala.CouponCodes.api.coupon.ItemCoupon;
-import net.lala.CouponCodes.api.coupon.RankCoupon;
-import net.lala.CouponCodes.api.coupon.XpCoupon;
+import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Misc;
 
@@ -35,20 +32,20 @@ public class QuedAddCommand implements Runnable {
 			if (args.length >= 4) {
 				try {
 					String name = args[2];
-					int usetimes = 1;
+					int active = 1;
+					int totaluses = 1;
 					int time = -1;
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
-					if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
-					if (args.length >= 6) time = Integer.parseInt(args[5]);
-					if (args.length > 6) {
+					if (args.length >= 5) active = Integer.parseInt(args[4]);
+					if (args.length >= 6) totaluses = Integer.parseInt(args[5]);
+					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
 						return;
 					}
 					
-					ItemCoupon ic = api.createNewItemCoupon(name, usetimes, time, plugin.convertStringToHash(args[3]), new HashMap<String, Boolean>());
-					
-					if (ic.addToDatabase()) {
+					if (api.addItemCoupon(name, args[3], active, totaluses, time)) {
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -74,21 +71,21 @@ public class QuedAddCommand implements Runnable {
 			if (args.length >= 4) {
 				try {
 					String name = args[2];
+					int active = 1;
 					int usetimes = 1;
 					int time = -1;
 					int money = Integer.parseInt(args[3]);
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
-					if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
-					if (args.length >= 6) time = Integer.parseInt(args[5]);
-					if (args.length > 6) {
+					if (args.length >= 5) active = Integer.parseInt(args[4]);
+					if (args.length >= 6) usetimes = Integer.parseInt(args[5]);
+					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
 						return;
 					}
 					
-					EconomyCoupon ec = api.createNewEconomyCoupon(name, usetimes, time, new HashMap<String, Boolean>(), money);
-					
-					if (ec.addToDatabase()) {
+					if(api.addEconomyCoupon(name, money, active, usetimes, time)) {
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -115,20 +112,21 @@ public class QuedAddCommand implements Runnable {
 				try {
 					String name = args[2];
 					String group = args[3];
+					int active = 1;
 					int usetimes = 1;
 					int time = -1;
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
-					if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
-					if (args.length >= 6) time = Integer.parseInt(args[5]);
-					if (args.length > 6) {
+					if (args.length >= 5) active = Integer.parseInt(args[4]);
+					if (args.length >= 6) usetimes = Integer.parseInt(args[5]);
+					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
 						return;
 					}
-					
-					RankCoupon rc = api.createNewRankCoupon(name, group, usetimes, time, new HashMap<String, Boolean>());
-					
-					if (rc.addToDatabase()) {
+
+					int rankid = api.getRankID(group);
+					if(api.addRankCoupon(name, rankid, active, usetimes, time)) {
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -155,20 +153,20 @@ public class QuedAddCommand implements Runnable {
 				try {
 					String name = args[2];
 					int xp = Integer.parseInt(args[3]);
+					int active = 1;
 					int usetimes = 1;
 					int time = -1;
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
-					if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
-					if (args.length >= 6) time = Integer.parseInt(args[5]);
-					if (args.length > 6) {
+					if (args.length >= 5) active = Integer.parseInt(args[4]);
+					if (args.length >= 6) usetimes = Integer.parseInt(args[5]);
+					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_XP.toString());
 						return;
 					}
 					
-					XpCoupon xc = api.createNewXpCoupon(name, xp, usetimes, time, new HashMap<String, Boolean>());
-					
-					if (xc.addToDatabase()) {
+					if(api.addXPCoupon(name, xp, active, usetimes, time)) {
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -188,6 +186,45 @@ public class QuedAddCommand implements Runnable {
 				sender.sendMessage(CommandUsage.C_ADD_XP.toString());
 				return;
 			}
+		} else if (args[1].equalsIgnoreCase("multi")) {
+			try {
+				String[] na = args[2].split(":");
+				String name = na[0];
+				int count = 1;
+				if(na.length == 2)
+					count = Integer.parseInt(na[1]);
+				String addcodes = args[3];
+				String[] codes = addcodes.split(":");
+				int usetimes = 1;
+				int time = -1;
+				
+				if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
+				if (args.length >= 6) time = Integer.parseInt(args[5]);
+				if (args.length > 6) {
+					sender.sendMessage(CommandUsage.C_ADD_XP.toString());
+					return;
+				}
+
+				for(int i = 0; i < count; i++) {
+					String codename = name;
+					if (count > 1)
+						codename = Misc.generateName(24, name);
+					if(api.addMultiCoupon(codename, codes, usetimes, time))
+						sender.sendMessage(ChatColor.GREEN+"Coupon " + ChatColor.GOLD + codename + ChatColor.GREEN + " has been added!");
+					else
+						sender.sendMessage(ChatColor.RED+"This coupon already exists!");
+				}
+				return;
+			} catch (NumberFormatException e) {
+				sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got a string. Please check your syntax.");
+				return;
+			} catch (SQLException e) {
+				sender.sendMessage(ChatColor.DARK_RED+"Error while interacting with the database. See console for more info.");
+				sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
+				e.printStackTrace();
+				return;
+			}
+			
 		} else {
 			plugin.helpAdd(sender);
 			return;

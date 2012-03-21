@@ -23,22 +23,22 @@ public class DebugListen implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onCouponAddToDatabase(CouponAddToDatabaseEvent event) {
-		plugin.debug("Coupon added to database. Name: "+event.getCoupon().getName());
+		plugin.debug("Coupon added to database. Name: " + event.getCoupon().getCode());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onCouponRemoveFromDatabase(CouponRemoveFromDatabaseEvent event) {
-		plugin.debug("Coupon removed from database. Name: "+event.getCoupon());
+		plugin.debug("Coupon removed from database. Name: " + event.getCoupon());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onCouponExpireEvent(CouponExpireEvent event) {
-		plugin.debug("Coupon expired. Name: "+event.getCoupon().getName());
+		plugin.debug("Coupon expired. Name: "+event.getCoupon().getCode());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onCouponTimeChangeEvent(CouponTimeChangeEvent event) {
-		plugin.debug("Coupon time changed. Name: "+event.getCoupon().getName()+" New time: "+event.getCoupon().getTime());
+		plugin.debug("Coupon time changed. Name: " + event.getCoupon().getCode()+" New time: "+event.getCoupon().getExpireTimestamp());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)

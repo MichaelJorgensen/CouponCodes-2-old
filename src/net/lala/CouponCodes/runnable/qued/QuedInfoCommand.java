@@ -7,10 +7,6 @@ import java.util.ArrayList;
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.api.coupon.Coupon;
-import net.lala.CouponCodes.api.coupon.EconomyCoupon;
-import net.lala.CouponCodes.api.coupon.ItemCoupon;
-import net.lala.CouponCodes.api.coupon.RankCoupon;
-import net.lala.CouponCodes.api.coupon.XpCoupon;
 import net.lala.CouponCodes.misc.Misc;
 
 import org.bukkit.ChatColor;
@@ -34,14 +30,14 @@ public class QuedInfoCommand implements Runnable {
 	public void run() {
 		try {
 			if (args.length == 2) {
-				Coupon c = api.getCoupon(args[1]);
+				Coupon c = api.findCoupon(args[1]);
 				if (c != null) {
 					sender.sendMessage(ChatColor.GOLD+"|----------------------|");
-					sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"Coupon "+ChatColor.YELLOW+c.getName()+ChatColor.DARK_RED+" info"+ChatColor.GOLD+"---|");
-					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Name: "+ChatColor.DARK_PURPLE+c.getName());
-					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Type: "+ChatColor.DARK_PURPLE+c.getType());
-					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Use times left: "+ChatColor.DARK_PURPLE+c.getUseTimes());
-					if (c.getTime() != -1)
+					sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"Coupon "+ChatColor.YELLOW+c.getCode()+ChatColor.DARK_RED+" info"+ChatColor.GOLD+"---|");
+					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Name: "+ChatColor.DARK_PURPLE+c.getCode());
+					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Type: "+ChatColor.DARK_PURPLE+c.getEffect());
+					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Use times left: "+ChatColor.DARK_PURPLE+c.getTotalUses());
+/*					if (c.getTime() != -1)
 						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: "+ChatColor.DARK_PURPLE+c.getTime()+ChatColor.YELLOW+" seconds");
 					else
 						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: "+ChatColor.DARK_PURPLE+"Unlimited");
@@ -57,7 +53,7 @@ public class QuedInfoCommand implements Runnable {
 					else if (c instanceof RankCoupon)
 						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Rank: "+ChatColor.DARK_PURPLE+((RankCoupon) c).getGroup());
 					else if (c instanceof XpCoupon)
-						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"XP: "+ChatColor.DARK_PURPLE+((XpCoupon) c).getXp());
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"XP: "+ChatColor.DARK_PURPLE+((XpCoupon) c).getXp());*/
 					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Totally random name: "+ChatColor.DARK_PURPLE+Misc.generateName());
 					sender.sendMessage(ChatColor.GOLD+"|----------------------|");
 					return;
@@ -68,7 +64,7 @@ public class QuedInfoCommand implements Runnable {
 			} else {
 				StringBuilder sb1 = new StringBuilder();
 				StringBuilder sb2 = new StringBuilder();
-				ArrayList<String> co = api.getCoupons();
+				ArrayList<String> co = null; //api.getCoupons();
 				int total = 0;
 				if (co.isEmpty() || co.equals(null)) {
 					sb1.append("None");
@@ -86,11 +82,11 @@ public class QuedInfoCommand implements Runnable {
 					DecimalFormat d = new DecimalFormat("##.##");
 					for (String name : co) {
 						sb1.append(name+", ");
-						Coupon coo = api.getBasicCoupon(name);
+/*						Coupon coo = api.getBasicCoupon(name);
 						if (coo instanceof ItemCoupon) it++;
 						if (coo instanceof EconomyCoupon) ec++;
 						if (coo instanceof RankCoupon) ra++;
-						if (coo instanceof XpCoupon) xp++;
+						if (coo instanceof XpCoupon) xp++;*/
 					}
 					sb1.deleteCharAt(sb1.length()-1);
 					sb1.deleteCharAt(sb1.length()-1);

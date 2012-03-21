@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
+import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.misc.CommandUsage;
 
 import org.bukkit.ChatColor;
@@ -27,21 +28,17 @@ public class QuedRemoveCommand implements Runnable {
 		if (args.length == 2) {
 			try {
 				if (args[1].equalsIgnoreCase("all")) {
-					int j = 0;
-					ArrayList<String> cs = api.getCoupons();
-					for (String i : cs) {
-						api.removeCouponFromDatabase(i);
-						j++;
-					}
-					sender.sendMessage(ChatColor.GREEN+"A total of "+ChatColor.GOLD+j+ChatColor.GREEN+" coupons have been removed.");
+					api.deleteAllCoupons();
+					sender.sendMessage(ChatColor.GREEN + "All coupons removed.");
 					return;
 				}
-				if (!api.couponExists(args[1])) {
-					sender.sendMessage(ChatColor.RED+"That coupon doesn't exist!");
+				Coupon c = api.findCoupon(args[1]);
+				if(c == null) {
+					sender.sendMessage(ChatColor.RED + "That coupon doesn't exist!");
 					return;
 				}
-				api.removeCouponFromDatabase(api.createNewItemCoupon(args[1], 0, -1, null, null));
-				sender.sendMessage(ChatColor.GREEN+"The coupon "+ChatColor.GOLD+args[1]+ChatColor.GREEN+" has been removed.");
+				api.deleteCoupon(c);
+				sender.sendMessage(ChatColor.GREEN+"The coupon " + ChatColor.GOLD + args[1] + ChatColor.GREEN + " has been removed.");
 				return;
 			} catch (SQLException e) {
 				sender.sendMessage(ChatColor.DARK_RED+"Error while removing coupon from the database. Please check the console for more info.");
