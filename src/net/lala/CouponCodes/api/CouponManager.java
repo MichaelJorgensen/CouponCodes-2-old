@@ -1,13 +1,10 @@
 package net.lala.CouponCodes.api;
 
-import java.sql.Connection;
-import java.util.Date;
-import java.sql.PreparedStatement;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -18,7 +15,6 @@ import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.sql.SQL;
-import net.lala.CouponCodes.sql.options.MySQLOptions;
 
 public class CouponManager {
 	
@@ -33,7 +29,7 @@ public class CouponManager {
 	}
 	
 	public int addCouponToDatabase(Coupon coupon) throws SQLException {
-		if(couponExists(coupon)) return 0;
+		if(Coupon.couponExists(sql, coupon)) return 0;
 		String q = "INSERT INTO codes (code, effect, value, totaluses, expire, active) VALUES ('" +
 				coupon.getCode() + "', " + coupon.getEffect() + ", " + coupon.getValue() + ", " + coupon.getTotalUses() + ", " +
 				coupon.getExpireTimestamp().getTime() + ", " + coupon.getActive() + ")";
@@ -47,30 +43,10 @@ public class CouponManager {
 	}
 	
 	public boolean removeCouponFromDatabase(Coupon coupon) throws SQLException {
-		if (!couponExists(coupon)) return false;
+		if (!Coupon.couponExists(sql, coupon)) return false;
 		sql.query("DELETE FROM codes WHERE id="+coupon.getID());
 		EventHandle.callCouponRemoveFromDatabaseEvent(coupon);
 		return true;
-	}
-	
-	public boolean couponExists(Coupon coupon) throws SQLException {
-		ResultSet rs = sql.query("SELECT COUNT(id) FROM codes WHERE id=" + coupon.getID());
-		rs.next();
-		int rc = rs.getInt(1);
-		return (rc > 0) ? true : false;
-	}
-	
-	public Coupon findCoupon(String code) throws SQLException {
-		Coupon c = null;
-		String q = "SELECT * FROM codes WHERE code='" + code + "'";
-		m_log.info("findCoupon: " + q);
-		ResultSet rs = sql.query(q);
-		while(rs.next()) {
-			c = new Coupon(rs);
-			String s = (c.getActive() == 1) ? "true" : "false";
-			m_log.info("cup: " + c.getID() + " act: " + s + " code: " + c.getCode());
-		}
-		return c;
 	}
 	
 	public void addUse(Player player, Coupon coupon) throws SQLException {
@@ -100,31 +76,6 @@ public class CouponManager {
 	
 	public SQL getSQL() {
 		return sql;
-	}
-	
-	public int getTimesUsed(Coupon coupon) throws SQLException {
-		ResultSet rs = sql.query("SELECT COUNT(id) FROM uses WHERE code_id=" + coupon.getID());
-		rs.next();
-		int count = rs.getInt(1);
-		m_log.info("getTimesUsed cid: " + coupon.getID() + " count: " + count);
-		return count;
-	}
-	
-	public Boolean alreadyUsed(String playername, Coupon coupon) throws SQLException {
-		ResultSet rs = sql.query("SELECT COUNT(uses.id) FROM uses JOIN users ON uses.user_id=users.id WHERE users.name='" + playername + "' AND uses.code_id='" + coupon.getID() + "'");
-		int rc = rs.getInt(1);
-		return (rc > 0) ? true : false;
-	}
-	
-	public Boolean isExpired(Coupon coupon) {
-		Timestamp cts = coupon.getExpireTimestamp();
-		long ctime = cts.getTime();
-		if(ctime == -1)
-			return false;
-		Date ndate = new Date();
-		long ntime = ndate.getTime();
-		m_log.info("ctime: " + ctime + " ntime: " + ntime);       
-		return (ctime <= ntime) ? true : false; 
 	}
 	
 	public void doEffect(Player player, Coupon coupon) {
@@ -226,7 +177,7 @@ public class CouponManager {
 		}
 	}
 	
-	public Boolean addItemCoupon(String code, String items, int active, int totaluses, long expire) throws SQLException {
+	public Boolean addItemCoupon(String code, HashMap<Integer, Integer> items, int active, int totaluses, long expire) throws SQLException {
 		Coupon c = new Coupon();
 		c.setCode(code);
 		c.setEffect(Coupon.ITEMS);
@@ -236,18 +187,10 @@ public class CouponManager {
 		c.setExpireTimestamp(ets);
 		c.addToDatabase();
 		int id = c.getID();
-		String[] itemarray = items.split(",");
-		for(String pairs : itemarray) {
-			String[] pairarray = pairs.split(":");
-			int item_id = Integer.parseInt(pairarray[0]);
-			int amount = Integer.parseInt(pairarray[1]);
-			addItem(id, item_id, amount);
+		for(Entry<Integer, Integer> pair : items.entrySet()) {
+			sql.query("INSERT INTO items (coupon_id, item_id, amount) VALUES (" + id + ", " + pair.getKey() + ", " + pair.getValue() + ")");
 		}
 		return true;
-	}
-	
-	private void addItem(int coupon_id, int item_id, int amount) throws SQLException {
-		sql.query("INSERT INTO items (coupon_id, item_id, amount) VALUES (" + coupon_id + ", " + item_id + ", " + amount + ")");
 	}
 	
 	public boolean addEconomyCoupon(String code, int amount, int active, int totaluses, long expire) throws SQLException {
@@ -296,33 +239,9 @@ public class CouponManager {
 		c.addToDatabase();
 		int id = c.getID();
 		for(String sc : subcodes) {
-			Coupon subc = findCoupon(sc);
+			Coupon subc = Coupon.findCoupon(sql, sc);
 			sql.query("INSERT INTO multi (trigger_code_id, effect_code_id) VALUES (" + id + ", " + subc.getID() + ")");
 		}
 		return true;
-	}
-	
-	public void deleteAllCoupons() throws SQLException {
-		sql.query("DELETE FROM codes");
-		sql.query("DELETE FROM users");
-		sql.query("DELETE FROM uses");
-		sql.query("DELETE FROM multi");
-		sql.query("DELETE FROM items");
-		sql.query("DELETE FROM ranks");
-	}
-	
-	public void deleteCoupon(Coupon coupon) throws SQLException {
-		// FIXME this should delete unused rows that it references in other tables 
-		sql.query("DELETE FROM codes WHERE id=" + coupon.getID());
-	}
-	
-	public ArrayList<Coupon> getAllCoupons() throws SQLException {
-		ArrayList<Coupon> alc = new ArrayList<Coupon>();
-		ResultSet rs = sql.query("SELECT * FROM codes WHERE active=1");
-		while(rs.next()) {
-			Coupon c = new Coupon(rs);
-			alc.add(c);
-		}
-		return alc;
 	}
 }

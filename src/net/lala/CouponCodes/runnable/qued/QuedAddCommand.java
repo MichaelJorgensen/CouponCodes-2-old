@@ -1,11 +1,11 @@
 package net.lala.CouponCodes.runnable.qued;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
-import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Misc;
 
@@ -44,8 +44,8 @@ public class QuedAddCommand implements Runnable {
 						sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
 						return;
 					}
-					
-					if (api.addItemCoupon(name, args[3], active, totaluses, time)) {
+					HashMap<Integer, Integer> aa = parseToItemMap(args[3]);
+					if(api.addItemCoupon(name, aa, active, totaluses, time)) {
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -60,6 +60,9 @@ public class QuedAddCommand implements Runnable {
 					sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 					e.printStackTrace();
 					return;
+				} catch(Exception e) {
+					String msg = e.getMessage();
+					sender.sendMessage(ChatColor.DARK_RED + "Your item string did not parse correctly. Error: " + msg);
 				}
 			} else {
 				sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
@@ -155,12 +158,33 @@ public class QuedAddCommand implements Runnable {
 					int xp = Integer.parseInt(args[3]);
 					int active = 1;
 					int usetimes = 1;
-					int time = -1;
+					long time = -1;
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
 					if (args.length >= 5) active = Integer.parseInt(args[4]);
 					if (args.length >= 6) usetimes = Integer.parseInt(args[5]);
-					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length >= 7) {
+						String expire = args[6]; 
+						if(expire.charAt(0) == '+') {
+							String val = expire.substring(1, expire.length());
+							String[] vals = val.split(":");
+							int amt = Integer.parseInt(vals[0]);
+							String unit = vals[1];
+							long now = (new Date()).getTime();
+							long exptime = -1;
+							if(unit.toLowerCase().contains("min") == true)
+								exptime = now + (amt * 1000 * 60);
+							else if(unit.toLowerCase().contains("hour") == true)
+								exptime = now + (amt * 1000 * 60 * 60);
+							else if(unit.toLowerCase().contains("day") == true)
+								exptime = now + (amt * 1000 * 60 * 60 * 24);
+							else if(unit.toLowerCase().contains("week") == true)
+								exptime = now + (amt * 1000 * 60 * 60 * 24 * 7);
+							time = exptime;
+						} else
+							time = Integer.parseInt(args[6]);
+					}
+					
 					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_XP.toString());
 						return;
@@ -229,5 +253,21 @@ public class QuedAddCommand implements Runnable {
 			plugin.helpAdd(sender);
 			return;
 		}
+	}
+	
+	public HashMap<Integer, Integer> parseToItemMap(String s) throws Exception {
+		HashMap<Integer, Integer> wm = new HashMap<Integer, Integer>();
+		String[] splits = s.split(",");
+		for(String str : splits) {
+			String[] strsplit = str.split(":");
+			int item_id = Integer.valueOf(strsplit[0]);
+			if(item_id < 256 || item_id > 384)
+				throw(new Exception("ID_RANGE"));
+			int amount = Integer.valueOf(strsplit[1]);
+			if(amount < 0 || amount > 64)
+				throw(new Exception("AMOUNT_RANGE"));
+			wm.put(item_id, amount);
+		}
+		return wm;
 	}
 }

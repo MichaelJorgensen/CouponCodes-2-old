@@ -3,6 +3,7 @@ package net.lala.CouponCodes.runnable.qued;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
@@ -30,18 +31,27 @@ public class QuedInfoCommand implements Runnable {
 	public void run() {
 		try {
 			if (args.length == 2) {
-				Coupon c = api.findCoupon(args[1]);
+				Coupon c = Coupon.findCoupon(api.getSQL(), args[1]);
 				if (c != null) {
 					sender.sendMessage(ChatColor.GOLD+"|----------------------|");
 					sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"Coupon "+ChatColor.YELLOW+c.getCode()+ChatColor.DARK_RED+" info"+ChatColor.GOLD+"---|");
 					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Name: "+ChatColor.DARK_PURPLE+c.getCode());
-					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Type: "+ChatColor.DARK_PURPLE+c.getEffect());
-					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Use times left: "+ChatColor.DARK_PURPLE+c.getTotalUses());
-/*					if (c.getTime() != -1)
-						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: "+ChatColor.DARK_PURPLE+c.getTime()+ChatColor.YELLOW+" seconds");
+					sender.sendMessage(ChatColor.GOLD+"|--" + ChatColor.YELLOW + "Type: " + ChatColor.DARK_PURPLE + Coupon.effectText(c.getEffect()));
+					if(c.getActive() > 0) {
+						sender.sendMessage(ChatColor.GOLD + "|--" + ChatColor.YELLOW + "Status: " + ChatColor.DARK_PURPLE + "Active");
+						sender.sendMessage(ChatColor.GOLD + "|--" + ChatColor.YELLOW + "Uses remaining: " + ChatColor.DARK_PURPLE + 
+								(c.getTotalUses() - Coupon.getTimesUsed(api.getSQL(), c)));
+					} else 
+						sender.sendMessage(ChatColor.GOLD + "|--" + ChatColor.YELLOW + "Status: " + ChatColor.DARK_PURPLE + "Inactive");
+					if (c.getExpireTimestamp().getTime() != -1) {
+						long now = (new Date()).getTime();
+						long diff = c.getExpireTimestamp().getTime() - now;
+						diff = diff / 1000;
+						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: " + ChatColor.DARK_PURPLE + diff + ChatColor.YELLOW + " seconds");
+					}
 					else
 						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: "+ChatColor.DARK_PURPLE+"Unlimited");
-					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Expired: "+ChatColor.DARK_PURPLE+c.isExpired());
+/*					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Expired: "+ChatColor.DARK_PURPLE+c.isExpired());
 					if (c.getUsedPlayers().isEmpty())
 						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Used players: "+ChatColor.DARK_PURPLE+"None");
 					else
@@ -64,7 +74,7 @@ public class QuedInfoCommand implements Runnable {
 			} else {
 				StringBuilder sb1 = new StringBuilder();
 				StringBuilder sb2 = new StringBuilder();
-				ArrayList<String> co = null; //api.getCoupons();
+				ArrayList<Coupon> co = Coupon.getAllCoupons(api.getSQL());
 				int total = 0;
 				if (co.isEmpty() || co.equals(null)) {
 					sb1.append("None");
@@ -75,27 +85,33 @@ public class QuedInfoCommand implements Runnable {
 					double ec = 0;
 					double ra = 0;
 					double xp = 0;
-					String it2 = null;
-					String ec2 = null;
-					String ra2 = null;
-					String xp2 = null;
-					DecimalFormat d = new DecimalFormat("##.##");
-					for (String name : co) {
-						sb1.append(name+", ");
-/*						Coupon coo = api.getBasicCoupon(name);
-						if (coo instanceof ItemCoupon) it++;
-						if (coo instanceof EconomyCoupon) ec++;
-						if (coo instanceof RankCoupon) ra++;
-						if (coo instanceof XpCoupon) xp++;*/
+					double mu = 0; 
+					for (Coupon c : co) {
+						sb1.append(c.getCode() + ", ");
+						switch(c.getEffect()) {
+						case Coupon.ECONOMY:
+							ec++; break;
+						case Coupon.ITEMS:
+							it++; break;
+						case Coupon.RANK:
+							ra++; break;
+						case Coupon.XP:
+							xp++; break;
+						case Coupon.MULTI:
+							mu++; break;
+						}
 					}
 					sb1.deleteCharAt(sb1.length()-1);
 					sb1.deleteCharAt(sb1.length()-1);
-					it2 = d.format(it/j*100);
-					ec2 = d.format(ec/j*100);
-					ra2 = d.format(ra/j*100);
-					xp2 = d.format(xp/j*100);
-					total = (int) (it+ec+ra+xp);
-					sb2.append("Out of those, "+it2+"% are item, "+ec2+"% are economy, "+ra2+"% are rank, and "+xp2+"% are XP coupons.");
+
+					DecimalFormat d = new DecimalFormat("##.##");
+					String it2 = d.format(it/j*100);
+					String ec2 = d.format(ec/j*100);
+					String ra2 = d.format(ra/j*100);
+					String xp2 = d.format(xp/j*100);
+					String mu2 = d.format(mu/j*100);
+					total = (int) (it + ec + ra + xp + mu);
+					sb2.append("Out of those, "+it2+"% are item, "+ec2+"% are economy, "+ra2+"% are rank, and "+xp2+"% are XP coupons, and " + mu2 + "% are Multi coupons.");
 				}
 				sender.sendMessage(ChatColor.GOLD+"|-----------------------|");
 				sender.sendMessage(ChatColor.GOLD+"|-"+ChatColor.DARK_RED+"Info on current coupons"+ChatColor.GOLD+"-|");

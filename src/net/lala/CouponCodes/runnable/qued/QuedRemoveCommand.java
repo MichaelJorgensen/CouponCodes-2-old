@@ -1,7 +1,6 @@
 package net.lala.CouponCodes.runnable.qued;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
@@ -28,16 +27,16 @@ public class QuedRemoveCommand implements Runnable {
 		if (args.length == 2) {
 			try {
 				if (args[1].equalsIgnoreCase("all")) {
-					api.deleteAllCoupons();
+					Coupon.deleteAllCoupons(api.getSQL());
 					sender.sendMessage(ChatColor.GREEN + "All coupons removed.");
 					return;
 				}
-				Coupon c = api.findCoupon(args[1]);
+				Coupon c = Coupon.findCoupon(api.getSQL(), args[1]);
 				if(c == null) {
 					sender.sendMessage(ChatColor.RED + "That coupon doesn't exist!");
 					return;
 				}
-				api.deleteCoupon(c);
+				Coupon.deleteCoupon(api.getSQL(), c);
 				sender.sendMessage(ChatColor.GREEN+"The coupon " + ChatColor.GOLD + args[1] + ChatColor.GREEN + " has been removed.");
 				return;
 			} catch (SQLException e) {

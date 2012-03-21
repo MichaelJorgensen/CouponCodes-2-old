@@ -244,7 +244,7 @@ public class CouponCodes extends JavaPlugin {
 		// List command
 		else if (args[0].equalsIgnoreCase("list")) {
 			if (has(sender, "cc.list")) {
-				server.getScheduler().scheduleAsyncDelayedTask(this, new QuedListCommand(sender));
+				server.getScheduler().scheduleAsyncDelayedTask(this, new QuedListCommand(this, sender, args));
 				return true;
 			} else {
 				sender.sendMessage(ChatColor.RED+"You do not have permission to use this command");
@@ -338,7 +338,7 @@ public class CouponCodes extends JavaPlugin {
 		}
 	}
 	
-	public HashMap<Integer, Integer> convertStringToHash(String args) {
+	public static HashMap<Integer, Integer> convertStringToHash(String args) {
 		HashMap<Integer, Integer> ids = new HashMap<Integer, Integer>();
 		String[] sp = args.split(",");
 		try {

@@ -5,16 +5,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 
 import net.lala.CouponCodes.CouponCodes;
-import net.lala.CouponCodes.api.events.coupon.CouponExpireEvent;
 import net.lala.CouponCodes.sql.SQL;
 
 public class Coupon {
@@ -58,18 +50,6 @@ public class Coupon {
 	public boolean removeFromDatabase() throws SQLException {
 		return CouponCodes.getCouponManager().removeCouponFromDatabase(this);
 	}
-	
-	public boolean isInDatabase() throws SQLException {
-		return CouponCodes.getCouponManager().couponExists(this);
-	}
-	
-/*	public void updateWithDatabase() throws SQLException {
-		CouponCodes.getCouponManager().updateCoupon(this);
-	}
-	
-	public void updateTimeWithDatabase() throws SQLException {
-		CouponCodes.getCouponManager().updateCouponTime(this);
-	}*/
 	
 	public int getID() { return m_id; }
 	
@@ -129,5 +109,85 @@ public class Coupon {
 		default:
 			return "";
 		}
+	}
+	
+	public static ArrayList<Coupon> getAllCoupons(SQL sql) throws SQLException {
+		return getAllCoupons(sql, true, true, null);
+	}
+	
+	public static ArrayList<Coupon> getAllCoupons(SQL sql, boolean showactive, boolean showinactive, String prefix) throws SQLException {
+		ArrayList<Coupon> alc = new ArrayList<Coupon>();
+		String s = "SELECT * FROM codes WHERE 1=1 ";
+		if(showactive == true && showinactive == false)
+			s += "AND active=1 ";
+		if(showactive == false && showinactive == true)
+			s += "AND active=0 ";
+		if(prefix != null)
+			s += "AND SUBSTR(code,1," + prefix.length() + ")='" + prefix + "'";
+		ResultSet rs = sql.query(s);
+		while(rs.next()) {
+			Coupon c = new Coupon(rs);
+			alc.add(c);
+		}
+		return alc;
+	}
+
+	public static void deleteAllCoupons(SQL sql) throws SQLException {
+		sql.query("DELETE FROM codes");
+		sql.query("DELETE FROM users");
+		sql.query("DELETE FROM uses");
+		sql.query("DELETE FROM multi");
+		sql.query("DELETE FROM items");
+		sql.query("DELETE FROM ranks");
+	}
+	
+	public static void deleteCoupon(SQL sql, Coupon coupon) throws SQLException {
+		// FIXME this should delete unused rows that it references in other tables 
+		sql.query("DELETE FROM codes WHERE id=" + coupon.getID());
+	}
+	
+	public static boolean isExpired(SQL sql, Coupon coupon) {
+		Timestamp cts = coupon.getExpireTimestamp();
+		long ctime = cts.getTime();
+		if(ctime == -1)
+			return false;
+		Date ndate = new Date();
+		long ntime = ndate.getTime();
+//		m_log.info("ctime: " + ctime + " ntime: " + ntime);       
+		return (ctime <= ntime) ? true : false; 
+	}
+	
+	public static boolean couponExists(SQL sql, Coupon coupon) throws SQLException {
+		ResultSet rs = sql.query("SELECT COUNT(id) FROM codes WHERE id=" + coupon.getID());
+		rs.next();
+		int rc = rs.getInt(1);
+		return (rc > 0) ? true : false;
+	}
+	
+	public static Coupon findCoupon(SQL sql, String code) throws SQLException {
+		Coupon c = null;
+		String q = "SELECT * FROM codes WHERE code='" + code + "'";
+//		m_log.info("findCoupon: " + q);
+		ResultSet rs = sql.query(q);
+		while(rs.next()) {
+			c = new Coupon(rs);
+//			String s = (c.getActive() == 1) ? "true" : "false";
+//			m_log.info("cup: " + c.getID() + " act: " + s + " code: " + c.getCode());
+		}
+		return c;
+	}
+	
+	public static int getTimesUsed(SQL sql, Coupon coupon) throws SQLException {
+		ResultSet rs = sql.query("SELECT COUNT(id) FROM uses WHERE code_id=" + coupon.getID());
+		rs.next();
+		int count = rs.getInt(1);
+//		m_log.info("getTimesUsed cid: " + coupon.getID() + " count: " + count);
+		return count;
+	}
+	
+	public static boolean alreadyUsed(SQL sql, String playername, Coupon coupon) throws SQLException {
+		ResultSet rs = sql.query("SELECT COUNT(uses.id) FROM uses JOIN users ON uses.user_id=users.id WHERE users.name='" + playername + "' AND uses.code_id='" + coupon.getID() + "'");
+		int rc = rs.getInt(1);
+		return (rc > 0) ? true : false;
 	}
 }
