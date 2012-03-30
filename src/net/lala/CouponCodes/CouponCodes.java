@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -293,15 +294,11 @@ public class CouponCodes extends JavaPlugin {
 	
 	private void help(CommandSender sender) {
 		sender.sendMessage(ChatColor.GOLD+"|-[] = required-"+ChatColor.DARK_RED+"CouponCodes Help"+ChatColor.GOLD+"-() = optional-|");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add item [name] [item1:amount,item2:amount,..] (usetimes) (time)");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add econ [name] [money] (usetimes) (time)");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add rank [name] [group] (usetimes) (time)");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"add xp [name] [xp] (usetimes) (time)");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"redeem [name]");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"remove [name]");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"list");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"info (name)");
-		sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"reload");
+		CommandUsage[] s = CommandUsage.values();
+		int l = s.length;
+		for(int i = 0; i < l; i++) {
+			sender.sendMessage(ChatColor.GOLD + "|--" + s[i].toString());
+		}
 	}
 	
 	public void helpAdd(CommandSender sender) {
@@ -309,6 +306,7 @@ public class CouponCodes extends JavaPlugin {
 		sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
 		sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
 		sender.sendMessage(CommandUsage.C_ADD_XP.toString());
+		sender.sendMessage(CommandUsage.C_ADD_MULTI.toString());
 	}
 	
 	public boolean checkForUpdate() {

@@ -28,6 +28,7 @@ public class QuedRemoveCommand implements Runnable {
 			try {
 				if (args[1].equalsIgnoreCase("all")) {
 					Coupon.deleteAllCoupons(api.getSQL());
+					api.getLogger().info(sender.getName() + " just removed ALL coupons.");
 					sender.sendMessage(ChatColor.GREEN + "All coupons removed.");
 					return;
 				}
@@ -37,6 +38,7 @@ public class QuedRemoveCommand implements Runnable {
 					return;
 				}
 				Coupon.deleteCoupon(api.getSQL(), c);
+				api.getLogger().info(sender.getName() + " just removed code: " + args[1]);
 				sender.sendMessage(ChatColor.GREEN+"The coupon " + ChatColor.GOLD + args[1] + ChatColor.GREEN + " has been removed.");
 				return;
 			} catch (SQLException e) {

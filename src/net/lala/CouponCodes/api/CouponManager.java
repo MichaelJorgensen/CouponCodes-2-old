@@ -1,5 +1,6 @@
 package net.lala.CouponCodes.api;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.sql.ResultSet;
@@ -8,11 +9,13 @@ import java.sql.Timestamp;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.coupon.Coupon;
+import net.lala.CouponCodes.api.coupon.Item;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.sql.SQL;
 
@@ -32,10 +35,9 @@ public class CouponManager {
 		if(Coupon.couponExists(sql, coupon)) return 0;
 		String q = "INSERT INTO codes (code, effect, value, totaluses, expire, active) VALUES ('" +
 				coupon.getCode() + "', " + coupon.getEffect() + ", " + coupon.getValue() + ", " + coupon.getTotalUses() + ", " +
-				coupon.getExpireTimestamp().getTime() + ", " + coupon.getActive() + ")";
-		m_log.info("addCouponToDatabase: " + q);
+				coupon.getExpireTimestamp() + ", " + coupon.getActive() + ")";
 		sql.query(q);
-		ResultSet rs = sql.query("SELECT MAX(id) FROM codes");
+		ResultSet rs = sql.query("SELECT LAST_INSERT_ID()");
 		rs.next();
 		int newid = rs.getInt(1);
 		EventHandle.callCouponAddToDatabaseEvent(coupon);
@@ -78,6 +80,10 @@ public class CouponManager {
 		return sql;
 	}
 	
+	public Logger getLogger() {
+		return m_log;
+	}
+	
 	public void doEffect(Player player, Coupon coupon) {
 		switch(coupon.getEffect()) {
 		case Coupon.ECONOMY:
@@ -103,7 +109,8 @@ public class CouponManager {
 			player.sendMessage(ChatColor.DARK_RED + "Vault support is currently disabled. You cannot redeem an economy coupon.");
 		else {
 			plugin.econ.depositPlayer(player.getName(), coupon.getValue());
-			player.sendMessage(ChatColor.GREEN + "Coupon " + ChatColor.GOLD + coupon.getCode() + ChatColor.GREEN + " has been redeemed, and the money added to your account!");
+			player.sendMessage(ChatColor.GREEN + "Coupon " + ChatColor.GOLD + coupon.getCode() + ChatColor.GREEN + " has been redeemed, and "
+						+ ChatColor.GOLD + coupon.getValue() + ChatColor.GREEN + " Crits have been added to your account.");
 		}
 	}
 	
@@ -147,19 +154,29 @@ public class CouponManager {
 	
 	public void doItems(Player player, Coupon coupon) {
 		try {
-			ResultSet rs = sql.query("SELECT item_id, amount FROM items WHERE coupon_id=" + coupon.getID());
+			ResultSet rs = sql.query("SELECT item_id, amount, damage, enchantment FROM items WHERE coupon_id=" + coupon.getID());
 			while(rs.next()) {
 				int iid = rs.getInt(1);
 				int iamount = rs.getInt(2);
-				ItemStack is = new ItemStack(iid, iamount);
+				short idamage = (short) rs.getInt(3);
+				int ienchantment = rs.getInt(4);
+				ItemStack is = null;
+				if(idamage == 0)
+					is = new ItemStack(iid, iamount);
+				else
+					is = new ItemStack(iid, iamount, idamage);
+				if(ienchantment > 0) {
+					Enchantment enc = Enchantment.getById(ienchantment);
+					is.addEnchantment(enc, 1);
+				}
 				if (player.getInventory().firstEmpty() == -1) {
 					player.getLocation().getWorld().dropItem(player.getLocation(), is);
 					player.sendMessage(ChatColor.RED + "Your inventory is full, so the items have been dropped below you.");
 				} else {
 					player.getInventory().addItem(is);
-					player.sendMessage(ChatColor.GREEN+"Coupon " + ChatColor.GOLD + coupon.getCode() + ChatColor.GREEN + " has been redeemed, and the items added to your inventory!");
 				}
 			}
+			player.sendMessage(ChatColor.GREEN+"Coupon " + ChatColor.GOLD + coupon.getCode() + ChatColor.GREEN + " has been redeemed, and the items added to your inventory!");
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -177,19 +194,18 @@ public class CouponManager {
 		}
 	}
 	
-	public Boolean addItemCoupon(String code, HashMap<Integer, Integer> items, int active, int totaluses, long expire) throws SQLException {
+	public Boolean addItemCoupon(String code, ArrayList<Item> items, int active, int totaluses, long expire) throws SQLException {
 		Coupon c = new Coupon();
 		c.setCode(code);
 		c.setEffect(Coupon.ITEMS);
 		c.setActive(active);
 		c.setUseTimes(totaluses);
-		Timestamp ets = new Timestamp(expire);
-		c.setExpireTimestamp(ets);
+		c.setExpireTimestamp(expire);
 		c.addToDatabase();
 		int id = c.getID();
-		for(Entry<Integer, Integer> pair : items.entrySet()) {
-			sql.query("INSERT INTO items (coupon_id, item_id, amount) VALUES (" + id + ", " + pair.getKey() + ", " + pair.getValue() + ")");
-		}
+		for(Item item : items)
+			sql.query("INSERT INTO items (coupon_id, item_id, amount, damage, enchantment) VALUES (" + id + ", " + item.id() + ", " + item.quantity() + 
+					 ", " + item.damage() + ", " + item.enchantment() + ")");
 		return true;
 	}
 	
@@ -200,8 +216,7 @@ public class CouponManager {
 		c.setValue(amount);
 		c.setActive(active);
 		c.setUseTimes(totaluses);
-		Timestamp ets = new Timestamp(expire);
-		c.setExpireTimestamp(ets);
+		c.setExpireTimestamp(expire);
 		return c.addToDatabase();
 	}
 	
@@ -212,8 +227,7 @@ public class CouponManager {
 		c.setValue(rankid);
 		c.setActive(active);
 		c.setUseTimes(totaluses);
-		Timestamp ets = new Timestamp(expire);
-		c.setExpireTimestamp(ets);
+		c.setExpireTimestamp(expire);
 		return c.addToDatabase();
 	}
 	
@@ -224,8 +238,7 @@ public class CouponManager {
 		c.setValue(amount);
 		c.setActive(active);
 		c.setUseTimes(totaluses);
-		Timestamp ets = new Timestamp(expire);
-		c.setExpireTimestamp(ets);
+		c.setExpireTimestamp(expire);
 		return c.addToDatabase();
 	}
 	
@@ -234,8 +247,7 @@ public class CouponManager {
 		c.setCode(code);
 		c.setEffect(Coupon.MULTI);
 		c.setUseTimes(totaluses);
-		Timestamp ets = new Timestamp(expire);
-		c.setExpireTimestamp(ets);
+		c.setExpireTimestamp(expire);
 		c.addToDatabase();
 		int id = c.getID();
 		for(String sc : subcodes) {

@@ -1,11 +1,13 @@
 package net.lala.CouponCodes.runnable.qued;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
+import net.lala.CouponCodes.api.coupon.Item;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Misc;
 
@@ -34,18 +36,20 @@ public class QuedAddCommand implements Runnable {
 					String name = args[2];
 					int active = 1;
 					int totaluses = 1;
-					int time = -1;
+					long time = 0;
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
 					if (args.length >= 5) active = Integer.parseInt(args[4]);
 					if (args.length >= 6) totaluses = Integer.parseInt(args[5]);
-					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length >= 7) time = parseExpire(args[6]);
 					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
 						return;
 					}
-					HashMap<Integer, Integer> aa = parseToItemMap(args[3]);
-					if(api.addItemCoupon(name, aa, active, totaluses, time)) {
+//					HashMap<Integer, Integer> aa = parseToItemMap(args[3]);
+					ArrayList<Item> items = Item.parseToItems(args[3]);
+					if(api.addItemCoupon(name, items, active, totaluses, time)) {
+						api.getLogger().info(sender.getName() + " just added an item code: " + name);
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -76,19 +80,20 @@ public class QuedAddCommand implements Runnable {
 					String name = args[2];
 					int active = 1;
 					int usetimes = 1;
-					int time = -1;
+					long time = 0;
 					int money = Integer.parseInt(args[3]);
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
 					if (args.length >= 5) active = Integer.parseInt(args[4]);
 					if (args.length >= 6) usetimes = Integer.parseInt(args[5]);
-					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length >= 7) time = parseExpire(args[6]);
 					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_ECON.toString());
 						return;
 					}
 					
 					if(api.addEconomyCoupon(name, money, active, usetimes, time)) {
+						api.getLogger().info(sender.getName() + " just added an econ code: " + name);
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -117,12 +122,12 @@ public class QuedAddCommand implements Runnable {
 					String group = args[3];
 					int active = 1;
 					int usetimes = 1;
-					int time = -1;
+					long time = 0;
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
 					if (args.length >= 5) active = Integer.parseInt(args[4]);
 					if (args.length >= 6) usetimes = Integer.parseInt(args[5]);
-					if (args.length >= 7) time = Integer.parseInt(args[6]);
+					if (args.length >= 7) time = parseExpire(args[6]);
 					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_RANK.toString());
 						return;
@@ -130,6 +135,7 @@ public class QuedAddCommand implements Runnable {
 
 					int rankid = api.getRankID(group);
 					if(api.addRankCoupon(name, rankid, active, usetimes, time)) {
+						api.getLogger().info(sender.getName() + " just added a rank code: " + name);
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -158,32 +164,12 @@ public class QuedAddCommand implements Runnable {
 					int xp = Integer.parseInt(args[3]);
 					int active = 1;
 					int usetimes = 1;
-					long time = -1;
+					long time = 0;
 					
 					if (name.equalsIgnoreCase("random")) name = Misc.generateName();
 					if (args.length >= 5) active = Integer.parseInt(args[4]);
 					if (args.length >= 6) usetimes = Integer.parseInt(args[5]);
-					if (args.length >= 7) {
-						String expire = args[6]; 
-						if(expire.charAt(0) == '+') {
-							String val = expire.substring(1, expire.length());
-							String[] vals = val.split(":");
-							int amt = Integer.parseInt(vals[0]);
-							String unit = vals[1];
-							long now = (new Date()).getTime();
-							long exptime = -1;
-							if(unit.toLowerCase().contains("min") == true)
-								exptime = now + (amt * 1000 * 60);
-							else if(unit.toLowerCase().contains("hour") == true)
-								exptime = now + (amt * 1000 * 60 * 60);
-							else if(unit.toLowerCase().contains("day") == true)
-								exptime = now + (amt * 1000 * 60 * 60 * 24);
-							else if(unit.toLowerCase().contains("week") == true)
-								exptime = now + (amt * 1000 * 60 * 60 * 24 * 7);
-							time = exptime;
-						} else
-							time = Integer.parseInt(args[6]);
-					}
+					if (args.length >= 7) time = parseExpire(args[6]);
 					
 					if (args.length > 7) {
 						sender.sendMessage(CommandUsage.C_ADD_XP.toString());
@@ -191,6 +177,7 @@ public class QuedAddCommand implements Runnable {
 					}
 					
 					if(api.addXPCoupon(name, xp, active, usetimes, time)) {
+						api.getLogger().info(sender.getName() + " just added an xp code: " + name);
 						sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
 						return;
 					} else {
@@ -211,6 +198,10 @@ public class QuedAddCommand implements Runnable {
 				return;
 			}
 		} else if (args[1].equalsIgnoreCase("multi")) {
+			if (args.length > 6 || args.length < 4) {
+				sender.sendMessage(CommandUsage.C_ADD_MULTI.toString());
+				return;
+			}
 			try {
 				String[] na = args[2].split(":");
 				String name = na[0];
@@ -220,22 +211,19 @@ public class QuedAddCommand implements Runnable {
 				String addcodes = args[3];
 				String[] codes = addcodes.split(":");
 				int usetimes = 1;
-				int time = -1;
+				long time = 0;
 				
 				if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
-				if (args.length >= 6) time = Integer.parseInt(args[5]);
-				if (args.length > 6) {
-					sender.sendMessage(CommandUsage.C_ADD_XP.toString());
-					return;
-				}
+				if (args.length >= 6) time = parseExpire(args[5]);
 
 				for(int i = 0; i < count; i++) {
 					String codename = name;
 					if (count > 1)
 						codename = Misc.generateName(24, name);
-					if(api.addMultiCoupon(codename, codes, usetimes, time))
+					if(api.addMultiCoupon(codename, codes, usetimes, time)) {
+						api.getLogger().info(sender.getName() + " just added a multi code: " + name);
 						sender.sendMessage(ChatColor.GREEN+"Coupon " + ChatColor.GOLD + codename + ChatColor.GREEN + " has been added!");
-					else
+					} else
 						sender.sendMessage(ChatColor.RED+"This coupon already exists!");
 				}
 				return;
@@ -255,13 +243,40 @@ public class QuedAddCommand implements Runnable {
 		}
 	}
 	
+	public long parseExpire(String expire) {
+		long time = 0;
+		try {
+			if(expire.charAt(0) == '+') {
+				String val = expire.substring(1, expire.length());
+				String[] vals = val.split(":");
+				int amt = Integer.parseInt(vals[0]);
+				String unit = vals[1];
+				long now = (new Date()).getTime();
+				long exptime = 0;
+				if(unit.toLowerCase().contains("min") == true)
+					exptime = now + (amt * 1000 * 60);
+				else if(unit.toLowerCase().contains("hour") == true)
+					exptime = now + (amt * 1000 * 60 * 60);
+				else if(unit.toLowerCase().contains("day") == true)
+					exptime = now + (amt * 1000 * 60 * 60 * 24);
+				else if(unit.toLowerCase().contains("week") == true)
+					exptime = now + (amt * 1000 * 60 * 60 * 24 * 7);
+				time = exptime;
+			} else
+				time = Integer.parseInt(args[6]);
+		} catch(NumberFormatException e) {
+			return 0;
+		}
+		return time;
+	}
+	
 	public HashMap<Integer, Integer> parseToItemMap(String s) throws Exception {
 		HashMap<Integer, Integer> wm = new HashMap<Integer, Integer>();
 		String[] splits = s.split(",");
 		for(String str : splits) {
 			String[] strsplit = str.split(":");
 			int item_id = Integer.valueOf(strsplit[0]);
-			if(item_id < 256 || item_id > 384)
+			if(item_id < 0 || item_id > 385)
 				throw(new Exception("ID_RANGE"));
 			int amount = Integer.valueOf(strsplit[1]);
 			if(amount < 0 || amount > 64)

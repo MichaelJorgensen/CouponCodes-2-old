@@ -50,6 +50,7 @@ public class QuedRedeemCommand implements Runnable {
 				
 				api.doEffect(player, coupon);
 				api.addUse(player, coupon);
+				api.getLogger().info(player.getName() + " just redeemed code: " + coupon.getCode());
 				return;
 			} catch (SQLException e) {
 				player.sendMessage(ChatColor.DARK_RED + "Error while trying to find " + ChatColor.GOLD + args[1] + ChatColor.DARK_RED + 

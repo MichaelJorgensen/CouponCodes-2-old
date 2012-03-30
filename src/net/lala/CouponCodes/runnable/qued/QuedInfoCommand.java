@@ -43,9 +43,9 @@ public class QuedInfoCommand implements Runnable {
 								(c.getTotalUses() - Coupon.getTimesUsed(api.getSQL(), c)));
 					} else 
 						sender.sendMessage(ChatColor.GOLD + "|--" + ChatColor.YELLOW + "Status: " + ChatColor.DARK_PURPLE + "Inactive");
-					if (c.getExpireTimestamp().getTime() != -1) {
+					if (c.getExpireTimestamp() != 0) {
 						long now = (new Date()).getTime();
-						long diff = c.getExpireTimestamp().getTime() - now;
+						long diff = c.getExpireTimestamp() - now;
 						diff = diff / 1000;
 						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: " + ChatColor.DARK_PURPLE + diff + ChatColor.YELLOW + " seconds");
 					}

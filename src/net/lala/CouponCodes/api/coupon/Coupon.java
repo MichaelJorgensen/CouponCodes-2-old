@@ -22,7 +22,7 @@ public class Coupon {
 	private int m_effect = 0; 
 	private int m_value = 0;
 	private int m_totaluses = 0;
-	private Timestamp m_ts = null;
+	private long m_ts = 0;
 	private int m_active = 1;
 
 	public Coupon() {
@@ -38,7 +38,7 @@ public class Coupon {
 		m_effect = rs.getInt("effect");
 		m_value = rs.getInt("value");
 		m_totaluses = rs.getInt("totaluses");
-		m_ts = rs.getTimestamp("expire");
+		m_ts = rs.getLong("expire");
 		m_active = rs.getInt("active");
 	}
 	
@@ -71,9 +71,9 @@ public class Coupon {
 	
 	public void setUseTimes(int usetimes) { m_totaluses = usetimes; }
 	
-	public Timestamp getExpireTimestamp() { return m_ts; }
+	public long getExpireTimestamp() { return m_ts; }
 	
-	public void setExpireTimestamp(Timestamp time) { m_ts = time; }
+	public void setExpireTimestamp(long time) { m_ts = time; }
 	
 	public int getActive() { return m_active; }
 	
@@ -81,12 +81,12 @@ public class Coupon {
 	
 	public static Boolean createTables(SQL sql) {
 		try {
-			sql.createTable("CREATE TABLE IF NOT EXISTS codes (id INTEGER PRIMARY KEY AUTOINCREMENT, code VARCHAR(24), effect INT, value INT, totaluses INT, expire TIMESTAMP, active INT)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(16))");
-			sql.createTable("CREATE TABLE IF NOT EXISTS uses (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INT, code_id INT, ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS multi (id INTEGER PRIMARY KEY AUTOINCREMENT, trigger_code_id INT, effect_code_id INT)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTOINCREMENT, coupon_id INT, item_id INT, amount INT)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS ranks (id INTEGER PRIMARY KEY AUTOINCREMENT, name VARCHAR(16))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS codes (id INTEGER PRIMARY KEY AUTO_INCREMENT, code VARCHAR(24), effect INT, value INT, totaluses INT, expire BIGINT, active INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS uses (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INT, code_id INT, ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS multi (id INTEGER PRIMARY KEY AUTO_INCREMENT, trigger_code_id INT, effect_code_id INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTO_INCREMENT, coupon_id INT, item_id INT, amount INT, damage INT, enchantment INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS ranks (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
 		} catch(Exception e) {
 			e.printStackTrace();
 			return false;
@@ -147,9 +147,8 @@ public class Coupon {
 	}
 	
 	public static boolean isExpired(SQL sql, Coupon coupon) {
-		Timestamp cts = coupon.getExpireTimestamp();
-		long ctime = cts.getTime();
-		if(ctime == -1)
+		long ctime = coupon.getExpireTimestamp();
+		if(ctime == 0)
 			return false;
 		Date ndate = new Date();
 		long ntime = ndate.getTime();
@@ -181,12 +180,12 @@ public class Coupon {
 		ResultSet rs = sql.query("SELECT COUNT(id) FROM uses WHERE code_id=" + coupon.getID());
 		rs.next();
 		int count = rs.getInt(1);
-//		m_log.info("getTimesUsed cid: " + coupon.getID() + " count: " + count);
 		return count;
 	}
 	
 	public static boolean alreadyUsed(SQL sql, String playername, Coupon coupon) throws SQLException {
-		ResultSet rs = sql.query("SELECT COUNT(uses.id) FROM uses JOIN users ON uses.user_id=users.id WHERE users.name='" + playername + "' AND uses.code_id='" + coupon.getID() + "'");
+		ResultSet rs = sql.query("SELECT COUNT(uses.id) FROM uses JOIN users ON uses.user_id=users.id WHERE users.name='" + playername + "' AND uses.code_id=" + coupon.getID() + "");
+		rs.next();
 		int rc = rs.getInt(1);
 		return (rc > 0) ? true : false;
 	}
