@@ -41,6 +41,13 @@ Talk: /c
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +90:days  
+#### Warp
+	/c add warp [coupon code] [x] [y] [z] (active) (total uses) (expire)
+[coupon code] = string used to redeem this coupon.  no spaces.  
+[x/y/z] = coordinates to teleport player to.  if any don't parse as numbers, they will be replaced with the players current respective coordinate. ex: 'X 256 X' to drop someone from the sky.   
+(active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
+(total uses) = default 1 use.  
+(expiration) = period coupon is good for.  example: +90:days  
 #### Multi
 	/c add multi [coupon code(:count)] [subcoupon1(:subcoupon2...)] (total uses) (expire)
 [coupon code] = string used to redeem this coupon.  no spaces.  
