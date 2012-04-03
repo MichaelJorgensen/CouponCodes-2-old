@@ -7,6 +7,7 @@ public enum CommandUsage {
 	C_ADD_ECON	(ChatColor.YELLOW+"/c add econ [name] [money] (active) (usetimes) (expire)"),
 	C_ADD_RANK	(ChatColor.YELLOW+"/c add rank [name] [group] (active) (usetimes) (expire)"),
 	C_ADD_XP	(ChatColor.YELLOW+"/c add xp [name] [xp] (active) (usetimes) (expire)"),
+	C_ADD_WARP	(ChatColor.YELLOW+"/c add warp [x] [y] [z] (active) (usetimes) (expire)"),
 	C_ADD_MULTI	(ChatColor.YELLOW+"/c add multi [name(:count)] [subcoupon1(:subcoupon2...)] (usetimes) (expire)"),
 	C_REDEEM	(ChatColor.YELLOW+"/c redeem [name]"),
 	C_REMOVE	(ChatColor.YELLOW+"/c remove [name/all]"),

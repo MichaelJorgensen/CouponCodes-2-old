@@ -31,21 +31,21 @@ public class QuedInfoCommand implements Runnable {
 	public void run() {
 		try {
 			if (args.length == 2) {
-				Coupon c = Coupon.findCoupon(api.getSQL(), args[1]);
+				Coupon c = Coupon.findCoupon(args[1]);
 				if (c != null) {
 					sender.sendMessage(ChatColor.GOLD+"|----------------------|");
 					sender.sendMessage(ChatColor.GOLD+"|---"+ChatColor.DARK_RED+"Coupon "+ChatColor.YELLOW+c.getCode()+ChatColor.DARK_RED+" info"+ChatColor.GOLD+"---|");
 					sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Name: "+ChatColor.DARK_PURPLE+c.getCode());
-					sender.sendMessage(ChatColor.GOLD+"|--" + ChatColor.YELLOW + "Type: " + ChatColor.DARK_PURPLE + Coupon.effectText(c.getEffect()));
+					sender.sendMessage(ChatColor.GOLD+"|--" + ChatColor.YELLOW + "Type: " + ChatColor.DARK_PURPLE + c.effectText());
 					if(c.getActive() > 0) {
 						sender.sendMessage(ChatColor.GOLD + "|--" + ChatColor.YELLOW + "Status: " + ChatColor.DARK_PURPLE + "Active");
 						sender.sendMessage(ChatColor.GOLD + "|--" + ChatColor.YELLOW + "Uses remaining: " + ChatColor.DARK_PURPLE + 
 								(c.getTotalUses() - Coupon.getTimesUsed(api.getSQL(), c)));
 					} else 
 						sender.sendMessage(ChatColor.GOLD + "|--" + ChatColor.YELLOW + "Status: " + ChatColor.DARK_PURPLE + "Inactive");
-					if (c.getExpireTimestamp() != 0) {
+					if (c.getExpire() != 0) {
 						long now = (new Date()).getTime();
-						long diff = c.getExpireTimestamp() - now;
+						long diff = c.getExpire() - now;
 						diff = diff / 1000;
 						sender.sendMessage(ChatColor.GOLD+"|--"+ChatColor.YELLOW+"Time left: " + ChatColor.DARK_PURPLE + diff + ChatColor.YELLOW + " seconds");
 					}

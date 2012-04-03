@@ -1,14 +1,16 @@
 # Coupon Codes for Minecraft  
-## Basic Coupon commands:
+[Commands](#commands)
+[Installing](#install)
+## Basic Coupon commands:<a name='commands'>
 Console: coupon    
 Talk: /c  
 [] = required  
 () = optional  
-## Redeeming:
+### Redeeming:
 	/c redeem [coupon code]  
 [coupon code] = code to redeem.  this is the command most players care about.    
-## Adding:
-### Items  
+### Adding:
+#### Items  
 	/c add item [coupon code] [item code:amount(:damage(:enchantment))] (active) (total uses) (expiration)
 [coupon code] = string used to redeem this coupon.  no spaces.  
 [item code] = id of a block or item from [Minecraft Wiki](http://www.minecraftwiki.net/wiki/Data_values)  
@@ -18,43 +20,45 @@ Talk: /c
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +1:hour  
-### XP
+#### XP
 	/c add xp [coupon code] [xp] (active) (total uses) (expiration)
 [coupon code] = string used to redeem this coupon.  no spaces.  
 [xp] = amount of xp to reward.  
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +60:min  
-### Rank
+#### Rank
 	/c add rank [coupon code] [rank] (active) (total uses) (expiration)
 [coupon code] = string used to redeem this coupon.  no spaces.  
 [xp] = amount of xp to reward.  
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +30:seconds  
-### Economy
+#### Economy
 	/c add econ [coupon code] [money] (active) (total uses) (expiration)
 [coupon code] = string used to redeem this coupon.  no spaces.  
 [money] = amount of money to reward.  
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +90:days  
-### Multi
+#### Multi
 	/c add multi [coupon code(:count)] [subcoupon1(:subcoupon2...)] (total uses) (expire)
 [coupon code] = string used to redeem this coupon.  no spaces.  
 (count) = use [coupon code] as a prefix, and generate (count) unique codes.  
 [subcoupon1(:subcoupon2...)] = semicolon seperated list of coupons that you want this "multi" coupon to apply.   
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +3600:sec    
-## Deleting:
+### Deleting:
 	/c remove [coupon code/all]
 [coupon code] = code of the coupon to remove.  
 [all] = delete everything.  BOOM.  
-## Listing:
+### Listing:
 	/c list (all/inactive/prefix)
 (all) = show all coupons, instead of just active ones  
 (inactive) = show only inactive coupons  
 (prefix) = show all coupons begining with the (prefix)  
-## Information:
+### Information:
 	/c info (coupon code)
 (coupon code) = show information the specific coupon, instead of general info  
+## Installation<a name='install'>
+Under development

@@ -38,7 +38,7 @@ public class DebugListen implements Listener {
 	
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onCouponTimeChangeEvent(CouponTimeChangeEvent event) {
-		plugin.debug("Coupon time changed. Name: " + event.getCoupon().getCode()+" New time: "+event.getCoupon().getExpireTimestamp());
+		plugin.debug("Coupon time changed. Name: " + event.getCoupon().getCode()+" New time: "+event.getCoupon().getExpire());
 	}
 	
 	@EventHandler(priority = EventPriority.MONITOR)

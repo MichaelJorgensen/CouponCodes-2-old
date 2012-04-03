@@ -27,7 +27,7 @@ public class QuedRedeemCommand implements Runnable {
 	public void run() {
 		if (args.length == 2) {
 			try {
-				Coupon coupon = Coupon.findCoupon(api.getSQL(), args[1]);
+				Coupon coupon = Coupon.findCoupon(args[1]);
 				if (coupon == null || coupon.getActive() == 0) {
 					player.sendMessage(ChatColor.RED+"That coupon doesn't exist!");
 					return;
@@ -48,7 +48,7 @@ public class QuedRedeemCommand implements Runnable {
 					return;
 				}
 				
-				api.doEffect(player, coupon);
+				coupon.doEffect(player);
 				api.addUse(player, coupon);
 				api.getLogger().info(player.getName() + " just redeemed code: " + coupon.getCode());
 				return;

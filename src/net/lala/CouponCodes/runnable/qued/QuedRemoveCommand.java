@@ -32,7 +32,7 @@ public class QuedRemoveCommand implements Runnable {
 					sender.sendMessage(ChatColor.GREEN + "All coupons removed.");
 					return;
 				}
-				Coupon c = Coupon.findCoupon(api.getSQL(), args[1]);
+				Coupon c = Coupon.findCoupon(args[1]);
 				if(c == null) {
 					sender.sendMessage(ChatColor.RED + "That coupon doesn't exist!");
 					return;
