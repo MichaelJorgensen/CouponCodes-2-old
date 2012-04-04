@@ -90,8 +90,7 @@ public class CouponCodes extends JavaPlugin {
 			send("Vault support is enabled.");
 			va = true;
 		}
-		
-		if (!version.equals(newversion) && !version.contains("TEST"))
+		if (version.compareTo(newversion) < 0 && !version.contains("TEST"))
 			send("New update is available for CouponCodes! Current version: "+version+" New version: "+newversion);
 		
 		// This is for this plugin's own events!
@@ -171,7 +170,6 @@ public class CouponCodes extends JavaPlugin {
 			if (ep == null || pe == null)
 				return false;
 			else {
-				getLogger().info("ep and pe are good!");
 				econ = ep.getProvider();
 				perm = pe.getProvider();
 				return true;
