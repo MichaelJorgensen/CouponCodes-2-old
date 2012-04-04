@@ -52,17 +52,18 @@ Talk: /c
 	/c add bad [coupon code] [effect] (active) (total uses) (expire)
 [coupon code] = string used to redeem this coupon.  no spaces.  
 [effect]
--	burn = set player on fire
--	explode = player explodes like TNT
--	chicken = spawns player some chickens
--	lightning = hits the player with lightning
--	poison = poisons the player
--	drop = teleport the player high up into the sky
+- burn = set player on fire
+- explode = player explodes like TNT
+- chicken = spawns player some chickens
+- lightning = hits the player with lightning
+- poison = poisons the player
+- drop = teleport the player high up into the sky
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +90:days  
 #### Multi
-	/c add multi [coupon code(:count)] [subcoupon1(:subcoupon2...)] (total uses) (expire)
+	/c add multi [(group-)coupon code(:count)] [subcoupon1(:subcoupon2...)] (total uses) (expire)
+(group) = puts the multicoupon in a group.  only 1 coupon can be redeemed per user per group. 
 [coupon code] = string used to redeem this coupon.  no spaces.  
 (count) = use [coupon code] as a prefix, and generate (count) unique codes.  
 [subcoupon1(:subcoupon2...)] = semicolon seperated list of coupons that you want this "multi" coupon to apply.   
