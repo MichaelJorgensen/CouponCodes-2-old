@@ -1,3 +1,7 @@
+---
+title: Coupon Codes 2.1.0
+---
+
 # Coupon Codes for Minecraft  
 [Commands](#commands)
 [Installing](#install)
@@ -47,7 +51,7 @@ Talk: /c
 [x/y/z] = coordinates to teleport player to.  if any don't parse as numbers, they will be replaced with the players current respective coordinate. ex: 'X 256 X' to drop someone from the sky.   
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
-(expiration) = period coupon is good for.  example: +90:days  
+(expiration) = period coupon is good for.  example: +15:minutes  
 #### Bad
 	/c add bad [coupon code] [effect] (active) (total uses) (expire)
 [coupon code] = string used to redeem this coupon.  no spaces.  
@@ -60,7 +64,7 @@ Talk: /c
 * drop = teleport the player high up into the sky  
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
-(expiration) = period coupon is good for.  example: +90:days  
+(expiration) = period coupon is good for.  example: +1:days
 #### Multi
 	/c add multi [(group-)coupon code(:count)] [subcoupon1(:subcoupon2...)] (total uses) (expire)
 (group) = puts the multicoupon in a group.  only 1 coupon can be redeemed per user per group. 
