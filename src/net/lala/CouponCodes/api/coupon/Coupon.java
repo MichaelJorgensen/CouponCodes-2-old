@@ -14,6 +14,7 @@ import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.api.events.EventHandle;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.sql.SQL;
+import net.lala.CouponCodes.sql.options.MySQLOptions;
 
 abstract public class Coupon {
 	
@@ -75,7 +76,11 @@ abstract public class Coupon {
 				getCode() + "', " + getEffect() + ", " + getValue() + ", " + getTotalUses() + ", " +
 				getExpire() + ", " + getActive() + ")";
 		sql.query(q);
-		ResultSet rs = sql.query("SELECT LAST_INSERT_ID()");
+		ResultSet rs;
+		if(sql.getDatabaseOptions() instanceof MySQLOptions)
+			rs = sql.query("SELECT LAST_INSERT_ID()");
+		else
+			rs = sql.query("SELECT LAST_INSERT_ROWID()");
 		rs.next();
 		int newid = rs.getInt(1);
 		EventHandle.callCouponAddToDatabaseEvent(this);
@@ -140,15 +145,15 @@ abstract public class Coupon {
 	
 	public static Boolean createTables(SQL sql) {
 		try {
-			sql.createTable("CREATE TABLE IF NOT EXISTS codes (id INTEGER PRIMARY KEY AUTO_INCREMENT, code VARCHAR(24), effect INT, value INT, totaluses INT, expire BIGINT, active INT)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
-			sql.createTable("CREATE TABLE IF NOT EXISTS uses (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INT, code_id INT, ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS multi (id INTEGER PRIMARY KEY AUTO_INCREMENT, trigger_code_id INT, effect_code_id INT, multigroup_id INT)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTO_INCREMENT, code_id INT, item_id INT, amount INT, damage INT, enchantment INT)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS ranks (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
-			sql.createTable("CREATE TABLE IF NOT EXISTS warp (id INTEGER PRIMARY KEY AUTO_INCREMENT, x DOUBLE, y DOUBLE, z DOUBLE)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS attempt (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INT, code VARCHAR(24), ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS multigroup (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS codes (id INTEGER PRIMARY KEY, code VARCHAR(24), effect INT, value INT, totaluses INT, expire BIGINT, active INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name VARCHAR(16))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS uses (id INTEGER PRIMARY KEY, user_id INT, code_id INT, ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS multi (id INTEGER PRIMARY KEY, trigger_code_id INT, effect_code_id INT, multigroup_id INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY, code_id INT, item_id INT, amount INT, damage INT, enchantment INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS ranks (id INTEGER PRIMARY KEY, name VARCHAR(16))");
+			sql.createTable("CREATE TABLE IF NOT EXISTS warp (id INTEGER PRIMARY KEY, x DOUBLE, y DOUBLE, z DOUBLE)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS attempt (id INTEGER PRIMARY KEY, user_id INT, code VARCHAR(24), ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS multigroup (id INTEGER PRIMARY KEY, name VARCHAR(16))");
 		} catch(Exception e) {
 			e.printStackTrace();
 			return false;
