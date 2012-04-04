@@ -25,7 +25,19 @@ public class CouponManager {
 	
 	public void addUse(Player player, Coupon coupon) throws SQLException {
 		int playerid = getUserID(player.getName());
-		sql.query("INSERT INTO uses (user_id, code_id) VALUES (" + playerid + ", " + coupon.getID() + ")");
+		String s = "INSERT INTO uses (user_id, code_id) VALUES (?, ?)";
+		PreparedStatement ps = sql.getConnection().prepareStatement(s);
+		ps.setInt(1, playerid);
+		ps.setInt(2, coupon.getID());
+	}
+	
+	public void addAttempt(Player player, String code) throws SQLException {
+		int playerid = getUserID(player.getName());
+		String s ="INSERT INTO attempt (user_id, code) VALUES (?, ?)";
+		PreparedStatement ps = sql.getConnection().prepareStatement(s);
+		ps.setInt(1, playerid);
+		ps.setString(2, code);
+		ps.executeUpdate();
 	}
 	
 	public int getUserID(String username) throws SQLException {
@@ -71,7 +83,6 @@ public class CouponManager {
 			else
 				ps.setDouble(3, z);
 			int rc = ps.executeUpdate();
-//			sql.query("INSERT INTO warp (x, y, z) VALUES (" + x + ", " + y + ", " + "z" + ")");
 		} else
 			return rs.getInt("id");
 		rs = sql.query(s);

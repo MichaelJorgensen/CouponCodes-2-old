@@ -37,7 +37,7 @@ public class Item {
 	
 	static public ArrayList<Item> findItems(SQL sql, String code) {
 		ArrayList<Item> ret = new ArrayList<Item>();
-		String q = "SELECT items.* FROM items JOIN codes ON items.coupon_id=codes.id WHERE code='" + code + "'";
+		String q = "SELECT items.* FROM items JOIN codes ON items.code_id=codes.id WHERE code='" + code + "'";
 		try {
 			ResultSet rs = sql.query(q);
 			while(rs.next()) {

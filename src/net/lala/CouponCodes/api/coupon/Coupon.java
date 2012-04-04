@@ -87,7 +87,7 @@ abstract public class Coupon {
 	abstract public void dbRemove();
 	
 	static public void parseAddArgs(CouponManager api, CommandSender sender, String[] args) {
-		if(args.length > 2) {
+		if(args.length > 1) {
 			String e = args[1];
 			if(e.equalsIgnoreCase("econ"))
 				EconomyCoupon.parseAddArgs(api, sender, args);
@@ -144,10 +144,10 @@ abstract public class Coupon {
 			sql.createTable("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
 			sql.createTable("CREATE TABLE IF NOT EXISTS uses (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INT, code_id INT, ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 			sql.createTable("CREATE TABLE IF NOT EXISTS multi (id INTEGER PRIMARY KEY AUTO_INCREMENT, trigger_code_id INT, effect_code_id INT, multigroup_id INT)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTO_INCREMENT, coupon_id INT, item_id INT, amount INT, damage INT, enchantment INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTO_INCREMENT, code_id INT, item_id INT, amount INT, damage INT, enchantment INT)");
 			sql.createTable("CREATE TABLE IF NOT EXISTS ranks (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
 			sql.createTable("CREATE TABLE IF NOT EXISTS warp (id INTEGER PRIMARY KEY AUTO_INCREMENT, x DOUBLE, y DOUBLE, z DOUBLE)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS attempt (id INTEGER PRIMARY KEY AUTO_INCREMENT, users_id INT, code VARCHAR(24), ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS attempt (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INT, code VARCHAR(24), ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
 			sql.createTable("CREATE TABLE IF NOT EXISTS multigroup (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
 		} catch(Exception e) {
 			e.printStackTrace();

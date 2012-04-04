@@ -17,7 +17,7 @@ public enum CommandUsage {
 	C_INFO		(ChatColor.YELLOW+"/c info (name)"),
 	C_RELOAD	(ChatColor.YELLOW+"/c reload");
 	
-	private String usage;
+	private final String usage;
 	
 	private CommandUsage(String usage) {
 		this.usage = usage;

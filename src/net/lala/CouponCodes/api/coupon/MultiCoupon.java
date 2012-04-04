@@ -97,7 +97,7 @@ public class MultiCoupon extends Coupon {
 
 	static public void parseAddArgs(CouponManager api, CommandSender sender, String[] args) {
 		if (args.length > 6 || args.length < 4) {
-			sender.sendMessage(CommandUsage.C_ADD_MULTI.toString());
+			sender.sendMessage(CommandUsage.C_ADD_MULTI.getUsage());
 			return;
 		}
 		try {
@@ -123,8 +123,8 @@ public class MultiCoupon extends Coupon {
 			int usetimes = 1;
 			long time = 0;
 			
-			if (args.length >= 5) usetimes = Integer.parseInt(args[4]);
-			if (args.length >= 6) time = parseExpire(args[5]);
+			if (args.length > 4) usetimes = Integer.parseInt(args[4]);
+			if (args.length > 5) time = parseExpire(args[5]);
 
 			for(int i = 0; i < count; i++) {
 				String codename = name;

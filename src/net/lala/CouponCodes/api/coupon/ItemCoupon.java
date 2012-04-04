@@ -21,7 +21,7 @@ public class ItemCoupon extends Coupon {
 	public ItemCoupon(ResultSet rs) throws SQLException {
 		super(rs);
 		m_items = new ArrayList<Item>();
-		ResultSet irs = m_sql.query("SELECT item_id, amount, damage, enchantment FROM items WHERE coupon_id=" + getID());
+		ResultSet irs = m_sql.query("SELECT item_id, amount, damage, enchantment FROM items WHERE code_id=" + getID());
 		while(irs.next()) {
 			int iid = irs.getInt("item_id");
 			int iamount = irs.getInt("amount");
@@ -71,7 +71,7 @@ public class ItemCoupon extends Coupon {
 	public int dbAdd() throws SQLException {
 		int newid = super.dbAdd();
 		for(Item item : m_items)
-			m_sql.query("INSERT INTO items (coupon_id, item_id, amount, damage, enchantment) VALUES (" + newid + ", " + item.id() + ", " + item.amount() + 
+			m_sql.query("INSERT INTO items (code_id, item_id, amount, damage, enchantment) VALUES (" + newid + ", " + item.id() + ", " + item.amount() + 
 					 ", " + item.damage() + ", " + item.enchantment() + ")");
 		return newid; 
 	}
