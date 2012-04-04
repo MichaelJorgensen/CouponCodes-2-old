@@ -91,9 +91,9 @@ public class ItemCoupon extends Coupon {
 	static public void parseAddArgs(CouponManager api, CommandSender sender, String[] args) {
 		if (args.length >= 4) {
 			try {
-				String name = args[2];
-				if(name.equalsIgnoreCase("random"))
-					name = Misc.generateName();
+				String code = args[2];
+				if(code.equalsIgnoreCase("random"))
+					code = Misc.generateName();
 
 				ArrayList<Item> items = Item.parseToItems(args[3]);
 
@@ -107,10 +107,10 @@ public class ItemCoupon extends Coupon {
 					sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
 					throw new Exception("Too many parameters");
 				}
-				ItemCoupon ic = new ItemCoupon(name, items, active, totaluses, expire);
+				ItemCoupon ic = new ItemCoupon(code, items, active, totaluses, expire);
 				if(ic.dbAdd() > 0) {
-					ic.m_plugin.getLogger().info(sender.getName() + " just added an item code: " + name);
-					sender.sendMessage(ChatColor.GREEN+"Coupon "+ChatColor.GOLD+name+ChatColor.GREEN+" has been added!");
+					ic.m_plugin.getLogger().info(sender.getName() + " just added an item code: " + code);
+					sender.sendMessage(ChatColor.GREEN + "ItemCoupon " + ChatColor.GOLD + code + ChatColor.GREEN + " has been added!");
 					return;
 				} else {
 					sender.sendMessage(ChatColor.RED+"This coupon already exists!");

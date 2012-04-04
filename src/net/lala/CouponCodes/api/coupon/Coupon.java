@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.api.events.EventHandle;
+import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.sql.SQL;
 
 abstract public class Coupon {
@@ -22,6 +23,7 @@ abstract public class Coupon {
 	public static final int XP		= 4;
 	public static final int MULTI	= 5;
 	public static final int WARP	= 6;
+	public static final int BAD		= 7;
 	
 	protected CouponCodes m_plugin;
 	protected SQL m_sql;
@@ -99,7 +101,10 @@ abstract public class Coupon {
 				MultiCoupon.parseAddArgs(api, sender, args);
 			if(e.equalsIgnoreCase("warp"))
 				WarpCoupon.parseAddArgs(api, sender, args);
-		}
+			if(e.equalsIgnoreCase("bad"))
+				BadCoupon.parseAddArgs(api, sender, args);
+		} else
+			CommandUsage.sendHelp(sender);
 	}
 
 	static public Coupon loadFrom(ResultSet rs) throws SQLException {
@@ -118,6 +123,8 @@ abstract public class Coupon {
 			c = (Coupon) new ItemCoupon(rs); break;
 		case WARP:
 			c = (Coupon) new WarpCoupon(rs); break;
+		case BAD:
+			c = (Coupon) new BadCoupon(rs); break;
 		}
 
 		return c;
@@ -136,11 +143,12 @@ abstract public class Coupon {
 			sql.createTable("CREATE TABLE IF NOT EXISTS codes (id INTEGER PRIMARY KEY AUTO_INCREMENT, code VARCHAR(24), effect INT, value INT, totaluses INT, expire BIGINT, active INT)");
 			sql.createTable("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
 			sql.createTable("CREATE TABLE IF NOT EXISTS uses (id INTEGER PRIMARY KEY AUTO_INCREMENT, user_id INT, code_id INT, ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
-			sql.createTable("CREATE TABLE IF NOT EXISTS multi (id INTEGER PRIMARY KEY AUTO_INCREMENT, trigger_code_id INT, effect_code_id INT)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS multi (id INTEGER PRIMARY KEY AUTO_INCREMENT, trigger_code_id INT, effect_code_id INT, multigroup_id INT)");
 			sql.createTable("CREATE TABLE IF NOT EXISTS items (id INTEGER PRIMARY KEY AUTO_INCREMENT, coupon_id INT, item_id INT, amount INT, damage INT, enchantment INT)");
 			sql.createTable("CREATE TABLE IF NOT EXISTS ranks (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
 			sql.createTable("CREATE TABLE IF NOT EXISTS warp (id INTEGER PRIMARY KEY AUTO_INCREMENT, x DOUBLE, y DOUBLE, z DOUBLE)");
 			sql.createTable("CREATE TABLE IF NOT EXISTS attempt (id INTEGER PRIMARY KEY AUTO_INCREMENT, users_id INT, code VARCHAR(24), ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP)");
+			sql.createTable("CREATE TABLE IF NOT EXISTS multigroup (id INTEGER PRIMARY KEY AUTO_INCREMENT, name VARCHAR(16))");
 		} catch(Exception e) {
 			e.printStackTrace();
 			return false;
@@ -148,8 +156,32 @@ abstract public class Coupon {
 		return true;
 	}
 
+	public static int getCount(SQL sql) throws SQLException {
+		return getCount(sql, 0);
+	}
+	public static int getCount(SQL sql, int effect) throws SQLException {
+		int i = 0;
+		String q = "SELECT COUNT(*) FROM codes";
+		q += (effect > 0) ? " WHERE effect=" + effect : "";
+		ResultSet rs = sql.query(q);
+		if(rs.next())
+			i = rs.getInt(1);
+		return i;
+	}
+	
 	public static ArrayList<Coupon> getAllCoupons(SQL sql) throws SQLException {
 		return getAllCoupons(sql, true, true, null);
+	}
+	
+	public static ArrayList<Coupon> getAllCoupons(SQL sql, int effect) throws SQLException {
+		ArrayList<Coupon> alc = new ArrayList<Coupon>();
+		String s = "SELECT * FROM codes WHERE effect=" + effect;
+		ResultSet rs = sql.query(s);
+		while(rs.next()) {
+			Coupon c = Coupon.loadFrom(rs);
+			alc.add(c);
+		}
+		return alc;
 	}
 	
 	public static ArrayList<Coupon> getAllCoupons(SQL sql, boolean showactive, boolean showinactive, String prefix) throws SQLException {
@@ -206,7 +238,7 @@ abstract public class Coupon {
 		String q = "SELECT * FROM codes WHERE code='" + code + "'";
 		try {
 			ResultSet rs = sql.query(q);
-			while(rs.next()) {
+			if(rs.next()) {
 				c = Coupon.loadFrom(rs);
 			}
 		} catch(SQLException e) {
@@ -221,7 +253,7 @@ abstract public class Coupon {
 		String q = "SELECT * FROM codes WHERE id=" + id;
 		try {
 			ResultSet rs = sql.query(q);
-			while(rs.next()) {
+			if(rs.next()) {
 				c = Coupon.loadFrom(rs);
 			}
 		} catch(SQLException e) {
@@ -237,11 +269,11 @@ abstract public class Coupon {
 		return count;
 	}
 	
-	static public boolean alreadyUsed(SQL sql, String playername, Coupon coupon) throws SQLException {
-		ResultSet rs = sql.query("SELECT COUNT(uses.id) FROM uses JOIN users ON uses.user_id=users.id WHERE users.name='" + playername + "' AND uses.code_id=" + coupon.getID() + "");
+	public boolean alreadyUsed(SQL sql, String playername) throws SQLException {
+		ResultSet rs = sql.query("SELECT COUNT(uses.id) FROM uses JOIN users ON uses.user_id=users.id WHERE users.name='" + playername + "' AND uses.code_id=" + getID());
 		rs.next();
 		int rc = rs.getInt(1);
-		if(coupon.getTotalUses() == 0)
+		if(getTotalUses() == 0)
 			return false;
 		return (rc > 0) ? true : false;
 	}

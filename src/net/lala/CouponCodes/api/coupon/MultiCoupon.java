@@ -1,12 +1,15 @@
 package net.lala.CouponCodes.api.coupon;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Misc;
+import net.lala.CouponCodes.sql.SQL;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -15,14 +18,16 @@ import org.bukkit.entity.Player;
 public class MultiCoupon extends Coupon {
 
 	private ArrayList<Coupon> m_codes;
+	private int m_multigroup;
 	
-	public MultiCoupon(String codename, ArrayList<Coupon> codes, int totaluses, long expire) {
-		this(0, codename, codes, totaluses, expire);
+	public MultiCoupon(String codename, ArrayList<Coupon> codes, int totaluses, long expire, int multigroup) {
+		this(0, codename, codes, totaluses, expire, multigroup);
 	}
 
-	public MultiCoupon(int id, String codename, ArrayList<Coupon> codes, int totaluses, long expire) {
+	public MultiCoupon(int id, String codename, ArrayList<Coupon> codes, int totaluses, long expire, int multigroup) {
 		super(id, codename, Coupon.MULTI, 0, 1, totaluses, expire);
 		m_codes = codes;
+		m_multigroup = multigroup;
 	}
 
 	public MultiCoupon(ResultSet rs) throws SQLException {
@@ -32,6 +37,11 @@ public class MultiCoupon extends Coupon {
 		while(srs.next()) {
 			m_codes.add(Coupon.loadFrom(srs));
 		}
+		srs = m_sql.query("SELECT DISTINCT(mg.id) as id FROM multi m JOIN multigroup mg ON m.multigroup_id=mg.id JOIN codes c ON c.id=m.trigger_code_id WHERE c.id=" + getID());
+		if(srs.next())
+			m_multigroup = srs.getInt("id");
+		else
+			m_multigroup = 0;
 	}
 	
 	@Override
@@ -42,9 +52,25 @@ public class MultiCoupon extends Coupon {
 	@Override
 	public void doEffect(Player player) {
 		for(Coupon code : m_codes) {
-//			Coupon coupon = Coupon.findCoupon(code);
 			code.doEffect(player);
 		}
+	}
+
+	@Override
+	public boolean alreadyUsed(SQL sql, String playername) throws SQLException {
+		if(super.alreadyUsed(sql, playername))
+			return true;
+		if(m_multigroup == 0 || getTotalUses() == 0)
+			return false;
+		String q = "SELECT c.id FROM uses u JOIN codes c ON u.code_id=c.id JOIN multi m ON c.id=m.trigger_code_id JOIN multigroup mg ON m.multigroup_id=mg.id WHERE mg.id=? GROUP BY c.id";
+		PreparedStatement ps = sql.getConnection().prepareStatement(q);
+		ps.setInt(1, m_multigroup);
+		ResultSet rs = ps.executeQuery();
+		if(rs.next()) {
+			int rc = rs.getInt("id");
+			return (rc > 0) ? true : false;
+		}
+		return false;
 	}
 
 	@Override
@@ -52,7 +78,7 @@ public class MultiCoupon extends Coupon {
 		int newid = super.dbAdd();
 		for(Coupon code : m_codes) {
 //			Coupon i = Coupon.findCoupon(code);
-			m_sql.query("INSERT INTO multi (trigger_code_id, effect_code_id) VALUES (" + newid + ", " + code.getID() + ")");
+			m_sql.query("INSERT INTO multi (trigger_code_id, effect_code_id, multigroup_id) VALUES (" + newid + ", " + code.getID() + ", " + m_multigroup + ")");
 		}
 		return newid;
 	}
@@ -75,8 +101,15 @@ public class MultiCoupon extends Coupon {
 			return;
 		}
 		try {
+			String name = null;
+			int group = 0;
 			String[] na = args[2].split(":");
-			String name = na[0];
+			String[] nga = na[0].split("-");
+			if(nga.length == 2) {
+				group = api.getGroupID(nga[0]);
+				name = nga[1];
+			} else
+				name = na[0];
 			int count = 1;
 			if(na.length == 2)
 				count = Integer.parseInt(na[1]);
@@ -96,12 +129,14 @@ public class MultiCoupon extends Coupon {
 			for(int i = 0; i < count; i++) {
 				String codename = name;
 				if (count > 1)
-					codename = Misc.generateName(24, name);
+					codename = Misc.generateName(12, name);
 				
-				MultiCoupon mc = new MultiCoupon(codename, ca, usetimes, time);
+				MultiCoupon mc = new MultiCoupon(codename, ca, usetimes, time, group);
 				if(mc.dbAdd() > 0) {
-					mc.m_plugin.getLogger().info(sender.getName() + " just added a multi code: " + name);
-					sender.sendMessage(ChatColor.GREEN+"Coupon " + ChatColor.GOLD + codename + ChatColor.GREEN + " has been added!");
+					String msg = sender.getName() + " just added a multi code: " + mc.getCode();
+					msg += (group > 0) ? " to group: " + nga[0] : "";
+					mc.m_plugin.getLogger().info(msg);
+					sender.sendMessage(ChatColor.GREEN+"Coupon " + ChatColor.GOLD + mc.getCode() + ChatColor.GREEN + " has been added!");
 				} else
 					sender.sendMessage(ChatColor.RED+"This coupon already exists!");
 			}
@@ -114,10 +149,8 @@ public class MultiCoupon extends Coupon {
 			sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 			e.printStackTrace();
 			return;
-		}/* catch (Exception e) {
-			sender.sendMessage(e.getMessage());
-			e.printStackTrace();
-		}*/
+		}
 	}
-
+	
+	
 }

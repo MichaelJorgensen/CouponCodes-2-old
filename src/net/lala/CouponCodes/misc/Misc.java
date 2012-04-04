@@ -5,7 +5,7 @@ import java.util.Random;
 public class Misc {
 
 	private static Random random = new Random();
-	private static final String seed = "QWERTYUIPADFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm12346789";
+	private static final String seed = "QWERTYUPADFGHJKLZXCVBNMqwertyuopasdfghjkzxcvbnm2346789";
 	
 	public static String generateName() {
 		return generateName(5, "");

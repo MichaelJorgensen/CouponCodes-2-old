@@ -120,7 +120,7 @@ public class WarpCoupon extends Coupon {
 				WarpCoupon rc = new WarpCoupon(code, warp_id, active, totaluses, expire);
 				if(rc.dbAdd() > 0) {
 					api.getLogger().info(sender.getName() + " just added a warp code: " + code);
-					sender.sendMessage(ChatColor.GREEN+"Coupon " + ChatColor.GOLD + code + ChatColor.GREEN+" has been added!");
+					sender.sendMessage(ChatColor.GREEN + "WarpCoupon " + ChatColor.GOLD + code + ChatColor.GREEN+" has been added!");
 					return;
 				} else {
 					sender.sendMessage(ChatColor.RED+"This coupon already exists!");

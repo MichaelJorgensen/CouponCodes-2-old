@@ -38,7 +38,7 @@ public class QuedRedeemCommand implements Runnable {
 					return;
 				}
 				
-				if(Coupon.alreadyUsed(api.getSQL(), player.getName(), coupon)) {
+				if(coupon.alreadyUsed(api.getSQL(), player.getName())) {
 					player.sendMessage(ChatColor.RED+"You have already used this coupon");
 					return;
 				}

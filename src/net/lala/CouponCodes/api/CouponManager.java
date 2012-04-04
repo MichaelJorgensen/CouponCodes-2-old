@@ -79,6 +79,16 @@ public class CouponManager {
 		return rs.getInt("id");
 	}
 	
+	public int getGroupID(String group) throws SQLException {
+		ResultSet rs = sql.query("SELECT id FROM multigroup WHERE name='" + group + "'");
+		if(!rs.next()) {
+			sql.query("INSERT INTO multigroup (name) VALUES ('" + group + "')");
+			rs = sql.query("SELECT id FROM multigroup WHERE name='" + group + "'");
+			rs.next();
+		}
+		return rs.getInt(1);
+	}
+	
 	public SQL getSQL() {
 		return sql;
 	}

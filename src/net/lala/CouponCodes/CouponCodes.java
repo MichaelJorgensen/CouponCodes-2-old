@@ -20,6 +20,7 @@ import net.lala.CouponCodes.listeners.PlayerListen;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Metrics;
 //import net.lala.CouponCodes.runnable.CouponTimer;
+import net.lala.CouponCodes.runnable.CouponTimer;
 import net.lala.CouponCodes.runnable.CustomDataSender;
 import net.lala.CouponCodes.runnable.qued.QuedAddCommand;
 import net.lala.CouponCodes.runnable.qued.QuedInfoCommand;
@@ -107,7 +108,7 @@ public class CouponCodes extends JavaPlugin {
 		
 		// Timers!
 		if (usethread) {
-//			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 200L, 200L);
+			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new CouponTimer(), 200L, 200L);
 		}
 		
 		// This timer is required, so it can't be in (usethread)!
@@ -293,12 +294,7 @@ public class CouponCodes extends JavaPlugin {
 	}
 	
 	private void help(CommandSender sender) {
-		sender.sendMessage(ChatColor.GOLD+"|-[] = required-"+ChatColor.DARK_RED+"CouponCodes Help"+ChatColor.GOLD+"-() = optional-|");
-		CommandUsage[] s = CommandUsage.values();
-		int l = s.length;
-		for(int i = 0; i < l; i++) {
-			sender.sendMessage(ChatColor.GOLD + "|--" + s[i].toString());
-		}
+		CommandUsage.sendHelp(sender);
 	}
 	
 	public void helpAdd(CommandSender sender) {
