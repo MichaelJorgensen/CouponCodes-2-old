@@ -51,13 +51,13 @@ Talk: /c
 #### Bad
 	/c add bad [coupon code] [effect] (active) (total uses) (expire)
 [coupon code] = string used to redeem this coupon.  no spaces.  
-[effect]
-* burn = set player on fire
-* explode = player explodes like TNT
-* chicken = spawns player some chickens
-* lightning = hits the player with lightning
-* poison = poisons the player
-* drop = teleport the player high up into the sky
+[effect]  
+* burn = set player on fire  
+* explode = player explodes like TNT  
+* chicken = spawns player some chickens  
+* lightning = hits the player with lightning  
+* poison = poisons the player  
+* drop = teleport the player high up into the sky  
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +90:days  
