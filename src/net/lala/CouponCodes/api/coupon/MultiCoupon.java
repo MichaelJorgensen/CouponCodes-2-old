@@ -117,7 +117,11 @@ public class MultiCoupon extends Coupon {
 			String[] codes = addcodes.split(":");
 			ArrayList<Coupon> ca = new ArrayList<Coupon>();
 			for(String code : codes) {
-				Coupon c = Coupon.findCoupon(code); 
+				Coupon c = Coupon.findCoupon(code);
+				if(c == null) {
+					String emsg = ChatColor.RED + "Subcoupon: " + code + ChatColor.DARK_RED + " not found.";
+					throw new Exception(emsg);
+				}
 				ca.add(c);
 			}
 			int usetimes = 1;
@@ -148,6 +152,9 @@ public class MultiCoupon extends Coupon {
 			sender.sendMessage(ChatColor.DARK_RED+"Error while interacting with the database. See console for more info.");
 			sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 			e.printStackTrace();
+			return;
+		} catch (Exception e) {
+			sender.sendMessage(e.getMessage());
 			return;
 		}
 	}
