@@ -29,6 +29,7 @@ public class CouponManager {
 		PreparedStatement ps = sql.getConnection().prepareStatement(s);
 		ps.setInt(1, playerid);
 		ps.setInt(2, coupon.getID());
+		ps.executeUpdate();
 	}
 	
 	public void addAttempt(Player player, String code) throws SQLException {
