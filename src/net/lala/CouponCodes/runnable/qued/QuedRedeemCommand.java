@@ -35,44 +35,45 @@ public class QuedRedeemCommand implements Runnable {
 					return;
 				}
 				
+				String eff = coupon.effectText();
 				if (coupon.getActive() == 0) {
 					player.sendMessage(ChatColor.RED + "That coupon doesn't exist!");
-					api.getLogger().info(player.getName() + " failed to redeem inactive code: " + args[1]);
+					api.getLogger().info(player.getName() + " failed to redeem inactive " + eff + " code: " + args[1]);
 					api.addAttempt(player, args[1]);
 					return;
 				}
 				
 				if (Coupon.isExpired(api.getSQL(), coupon)) {
 					player.sendMessage(ChatColor.RED + "That coupon is expired!");
-					api.getLogger().info(player.getName() + " failed to redeem expired code: " + args[1]);
+					api.getLogger().info(player.getName() + " failed to redeem expired " + eff + " code: " + args[1]);
 					api.addAttempt(player, args[1]);
 					return;
 				}
 				
-				if (Coupon.getTimesUsed(api.getSQL(), coupon) > coupon.getTotalUses()) {
+				if (Coupon.getTimesUsed(api.getSQL(), coupon) > coupon.getTotalUses() && coupon.getTotalUses() > 0) {
 					player.sendMessage(ChatColor.RED + "This coupon has been used up!");
-					api.getLogger().info(player.getName() + " failed to redeem used up code: " + args[1]);
+					api.getLogger().info(player.getName() + " failed to redeem used up " + eff + " code: " + args[1]);
 					api.addAttempt(player, args[1]);
 					return;
 				}
 				
 				if(coupon.alreadyUsed(api.getSQL(), player.getName())) {
 					player.sendMessage(ChatColor.RED + "You have already used this coupon");
-					api.getLogger().info(player.getName() + " failed to redeem already used code: " + args[1]);
+					api.getLogger().info(player.getName() + " failed to redeem already used " + eff + " code: " + args[1]);
 					api.addAttempt(player, args[1]);
 					return;
 				}
 				
 				if (Coupon.isExpired(api.getSQL(), coupon)) {
 					player.sendMessage(ChatColor.RED + "This coupon has expired!");
-					api.getLogger().info(player.getName() + " failed to redeem expired code: " + args[1]);
+					api.getLogger().info(player.getName() + " failed to redeem expired " + eff + " code: " + args[1]);
 					api.addAttempt(player, args[1]);
 					return;
 				}
 				
 				coupon.doEffect(player);
 				api.addUse(player, coupon);
-				api.getLogger().info(player.getName() + " redeemed code: " + coupon.getCode());
+				api.getLogger().info(player.getName() + " redeemed " + eff + " code: " + coupon.getCode());
 				return;
 			} catch (SQLException e) {
 				player.sendMessage(ChatColor.DARK_RED + "Error while trying to find " + ChatColor.GOLD + args[1] + ChatColor.DARK_RED + 
