@@ -174,7 +174,7 @@ public class BadCoupon extends Coupon {
 		case CHICKEN:
 			return ChatColor.GREEN + "You win: " + ChatColor.GOLD + "chickens!";
 		case LIGHTNING:
-			return ChatColor.GREEN + "The fury of " + ChatColor.GOLD + "Might Zeus" + ChatColor.GREEN + " upon you!";
+			return ChatColor.GREEN + "The fury of " + ChatColor.GOLD + "Mighty Zeus" + ChatColor.GREEN + " crashes upon you!";
 		case POISON:
 			return ChatColor.GREEN + "Just relax and let the " + ChatColor.DARK_RED + "poison" + ChatColor.GREEN + " do its work...";
 		case DROP:
