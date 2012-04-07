@@ -62,9 +62,11 @@ public class MultiCoupon extends Coupon {
 			return true;
 		if(m_multigroup == 0 || getTotalUses() == 0)
 			return false;
-		String q = "SELECT c.id FROM uses u JOIN codes c ON u.code_id=c.id JOIN multi m ON c.id=m.trigger_code_id JOIN multigroup mg ON m.multigroup_id=mg.id WHERE mg.id=? GROUP BY c.id";
+		String q = "SELECT c.id FROM uses u JOIN codes c ON u.code_id=c.id JOIN multi m ON c.id=m.trigger_code_id JOIN multigroup mg ON m.multigroup_id=mg.id WHERE mg.id=? AND u.user_id=? GROUP BY c.id";
 		PreparedStatement ps = sql.getConnection().prepareStatement(q);
 		ps.setInt(1, m_multigroup);
+		int userid = CouponCodes.getCouponManager().getUserID(playername);
+		ps.setInt(2, userid);
 		ResultSet rs = ps.executeQuery();
 		if(rs.next()) {
 			int rc = rs.getInt("id");
