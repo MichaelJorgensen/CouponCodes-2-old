@@ -101,7 +101,7 @@ public class ItemCoupon extends Coupon {
 				if (args.length >= 7) expire = parseExpire(args[6]);
 				if (args.length > 7) {
 					sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
-					throw new Exception("Too many parameters");
+					throw new IllegalArgumentException("Too many parameters");
 				}
 				ItemCoupon ic = new ItemCoupon(code, items, active, totaluses, expire);
 				if(ic.dbAdd() > 0) {
@@ -117,7 +117,7 @@ public class ItemCoupon extends Coupon {
 				sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
 				e.printStackTrace();
 				return;
-			} catch(Exception e) {
+			} catch(IllegalArgumentException e) {
 				String msg = e.getMessage();
 				sender.sendMessage(ChatColor.DARK_RED + "Item string parse FAIL. Error: " + msg);
 			}

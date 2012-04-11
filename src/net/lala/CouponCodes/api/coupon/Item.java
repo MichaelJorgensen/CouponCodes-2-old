@@ -73,7 +73,7 @@ public class Item {
 		return ret;
 	}
 	
-	static public ArrayList<Item> parseToItems(CommandSender sender, String str) {
+	static public ArrayList<Item> parseToItems(CommandSender sender, String str) throws IllegalArgumentException {
 		ArrayList<Item> ret = new ArrayList<Item>();
 		String[] items = new String[1];
 		if(str.indexOf(',') != -1)
@@ -92,51 +92,51 @@ public class Item {
 				try {
 					enc = Integer.parseInt(args[3]);
 				} catch(NumberFormatException e) {
-					String msg = ChatColor.RED + args[3] + ChatColor.GREEN + " is not a number (" + str + ")";
+					String msg = ChatColor.RED + "Enchantment" + ChatColor.GREEN + " is not a number (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 			case 3:
 				try {
-					dam = (short) Integer.parseInt(args[2]);
+					dam = Short.parseShort(args[2]);
 				} catch(NumberFormatException e) {
-					String msg = ChatColor.RED + args[2] + ChatColor.GREEN + " is not a number (" + str + ")";
+					String msg = ChatColor.RED + "Damage" + ChatColor.GREEN + " is not a number (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				if(dam < 0) {
-					String msg = ChatColor.RED + args[2] + ChatColor.GREEN + " can not be less than 0 (" + str + ")";
+					String msg = ChatColor.RED + "Damage" + ChatColor.GREEN + " can not be less than 0 (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				if(dam > 32767) {
-					String msg = ChatColor.RED + args[2] + ChatColor.GREEN + " must be less than 32767 (" + str + ")";
+					String msg = ChatColor.RED + "Damage" + ChatColor.GREEN + " must be less than 32767 (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 			case 2:
 				try {
 					qua = Integer.parseInt(args[1]);
 				} catch(NumberFormatException e) {
-					String msg = ChatColor.RED + args[1] + ChatColor.GREEN + " is not a number (" + str + ")";
+					String msg = ChatColor.RED + "Quantity" + ChatColor.GREEN + " is not a number (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				if(qua < 1) {
-					String msg = ChatColor.RED + args[1] + ChatColor.GREEN + " must be greater than 0 (" + str + ")";
+					String msg = ChatColor.RED + "Quantity" + ChatColor.GREEN + " has to be greater than 0 (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				if(qua > 64) {
-					String msg = ChatColor.RED + args[1] + ChatColor.GREEN + " must be less than 64 (" + str + ")";
+					String msg = ChatColor.RED + "Quantity" + ChatColor.GREEN + " should be less than 64 (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				try {
 					bid = Integer.parseInt(args[0]);
 				} catch(NumberFormatException e) {
-					String msg = ChatColor.RED + args[0] + ChatColor.GREEN + " is not a number (" + str + ")";
+					String msg = ChatColor.RED + "Item Code" + ChatColor.GREEN + " is not a number (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				if(bid < 1) {
-					String msg = ChatColor.RED + args[0] + ChatColor.GREEN + " must be greater than 0 (" + str + ")";
+					String msg = ChatColor.RED + "Item Code" + ChatColor.GREEN + " must be greater than 0 (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				if(bid > 386) {
-					String msg = ChatColor.RED + args[0] + ChatColor.GREEN + " must be less than 386 (" + str + ")";
+					String msg = ChatColor.RED + "Item Code" + ChatColor.GREEN + " must be less than 386 (" + str + ")";
 					throw new IllegalArgumentException(msg);
 				}
 				break;
@@ -146,9 +146,9 @@ public class Item {
 			if(enc > 0) {
 				ItemStack test = new ItemStack(bid, qua);
 				Enchantment teste = Enchantment.getById(enc);
-				if(!teste.canEnchantItem(test)) {
+				if(teste == null || !teste.canEnchantItem(test)) {
 					String msg = "Item #" + bid + " cannot accept enchatment #" + enc;
-					throw(new IllegalArgumentException(msg));
+					throw new IllegalArgumentException(msg);
 				}
 			}
 			ret.add(new Item(bid, qua, dam, enc));
