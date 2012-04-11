@@ -23,7 +23,7 @@ Talk: /c
 #### XP
 	/c add xp [coupon code] [xp] (active) (total uses) (expiration)
 [coupon code] = string used to redeem this coupon.  no spaces.  
-[xp] = amount of xp to reward.  
+[xp] = Experience level to reward.  
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +60:min  
