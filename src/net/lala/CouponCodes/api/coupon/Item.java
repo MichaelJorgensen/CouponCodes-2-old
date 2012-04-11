@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.sql.SQL;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 public class Item {
@@ -27,6 +30,17 @@ public class Item {
 			stack = new ItemStack(this.id(), this.amount());
 		else
 			stack = new ItemStack(this.id(), this.amount(), this.damage());
+
+		if(enchantment() > 0) {
+			Enchantment enc = Enchantment.getById(enchantment());
+			try {
+				stack.addEnchantment(enc, 1);
+			} catch(IllegalArgumentException e) {
+				String msg = "Failed to add enchantment #" + enchantment() + " to item #" + id();
+				CouponCodes.getCouponManager().getLogger().info(msg);
+			}
+		}
+		
 		return stack;
 	}
 
@@ -59,37 +73,85 @@ public class Item {
 		return ret;
 	}
 	
-	static public ArrayList<Item> parseToItems(String str) {
+	static public ArrayList<Item> parseToItems(CommandSender sender, String str) {
 		ArrayList<Item> ret = new ArrayList<Item>();
-		try {
-			String[] items = new String[1];
-			if(str.indexOf(',') != -1)
-				items = str.split(",");
-			else
-				items[0] = str;
-			for(String item : items) {
-				String[] args = item.split(":");
-				int bid = 0;
-				int qua = 0;
-				short dam = 0;
-				int enc = 0;
-				int argc = args.length;
-				switch(argc) {
-				case 4:
+		String[] items = new String[1];
+		if(str.indexOf(',') != -1)
+			items = str.split(",");
+		else
+			items[0] = str;
+		for(String item : items) {
+			int bid = 0;
+			int qua = 0;
+			short dam = 0;
+			int enc = 0;
+			String[] args = item.split(":");
+			int argc = args.length;
+			switch(argc) {
+			case 4:
+				try {
 					enc = Integer.parseInt(args[3]);
-				case 3:
-					dam = (short) Integer.parseInt(args[2]);
-				case 2:
-					qua = Integer.parseInt(args[1]);
-					bid = Integer.parseInt(args[0]);
-					break;
-				default:
-					throw(new Exception());
+				} catch(NumberFormatException e) {
+					String msg = ChatColor.RED + args[3] + ChatColor.GREEN + " is not a number (" + str + ")";
+					throw new IllegalArgumentException(msg);
 				}
-				ret.add(new Item(bid, qua, dam, enc));
+			case 3:
+				try {
+					dam = (short) Integer.parseInt(args[2]);
+				} catch(NumberFormatException e) {
+					String msg = ChatColor.RED + args[2] + ChatColor.GREEN + " is not a number (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				if(dam < 0) {
+					String msg = ChatColor.RED + args[2] + ChatColor.GREEN + " can not be less than 0 (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				if(dam > 32767) {
+					String msg = ChatColor.RED + args[2] + ChatColor.GREEN + " must be less than 32767 (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+			case 2:
+				try {
+					qua = Integer.parseInt(args[1]);
+				} catch(NumberFormatException e) {
+					String msg = ChatColor.RED + args[1] + ChatColor.GREEN + " is not a number (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				if(qua < 1) {
+					String msg = ChatColor.RED + args[1] + ChatColor.GREEN + " must be greater than 0 (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				if(qua > 64) {
+					String msg = ChatColor.RED + args[1] + ChatColor.GREEN + " must be less than 64 (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				try {
+					bid = Integer.parseInt(args[0]);
+				} catch(NumberFormatException e) {
+					String msg = ChatColor.RED + args[0] + ChatColor.GREEN + " is not a number (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				if(bid < 1) {
+					String msg = ChatColor.RED + args[0] + ChatColor.GREEN + " must be greater than 0 (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				if(bid > 386) {
+					String msg = ChatColor.RED + args[0] + ChatColor.GREEN + " must be less than 386 (" + str + ")";
+					throw new IllegalArgumentException(msg);
+				}
+				break;
+			default:
+				throw(new IllegalArgumentException("Items must have between 2 and 4 parameters. ID:Quantity(:Damage:Enchantment)"));
 			}
-		} catch(Exception e) {
-			
+			if(enc > 0) {
+				ItemStack test = new ItemStack(bid, qua);
+				Enchantment teste = Enchantment.getById(enc);
+				if(!teste.canEnchantItem(test)) {
+					String msg = "Item #" + bid + " cannot accept enchatment #" + enc;
+					throw(new IllegalArgumentException(msg));
+				}
+			}
+			ret.add(new Item(bid, qua, dam, enc));
 		}
 		return ret;
 	}

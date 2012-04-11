@@ -1,11 +1,7 @@
----
-title: Coupon Codes 2.1.0
----
-
 # Coupon Codes for Minecraft  
 [Commands](#commands)
 [Installing](#install)
-## Basic Coupon commands:<a name='commands'>
+## Basic Coupon commands:<a id='commands' />
 Console: coupon    
 Talk: /c  
 [] = required  
@@ -56,12 +52,14 @@ Talk: /c
 	/c add bad [coupon code] [effect] (active) (total uses) (expire)
 [coupon code] = string used to redeem this coupon.  no spaces.  
 [effect]  
-* burn = set player on fire  
-* explode = player explodes like TNT  
-* chicken = spawns player some chickens  
-* lightning = hits the player with lightning  
-* poison = poisons the player  
-* drop = teleport the player high up into the sky  
+<ul><li>burn = set player on fire</li>
+<li>explode = player explodes like TNT</li>
+<li>chicken = spawns player some chickens</li>
+<li>lightning = hits the player with lightning</li>
+<li>poison = poisons the player</li>
+<li>drop = teleport the player high up into the sky</li>
+<li>kick = kicks the plays</li>
+<li>ban = bans the player</li></ul>
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +1:days
@@ -70,7 +68,7 @@ Talk: /c
 (group) = puts the multicoupon in a group.  only 1 coupon can be redeemed per user per group. 
 [coupon code] = string used to redeem this coupon.  no spaces.  
 (count) = use [coupon code] as a prefix, and generate (count) unique codes.  
-[subcoupon1(:subcoupon2...)] = semicolon seperated list of coupons that you want this "multi" coupon to apply.   
+[subcoupon1(:subcoupon2...)] = semicolon separated list of coupons that you want this "multi" coupon to apply.   
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +3600:sec    
 ### Deleting:
@@ -81,7 +79,7 @@ Talk: /c
 	/c list (all/inactive/prefix)
 (all) = show all coupons, instead of just active ones  
 (inactive) = show only inactive coupons  
-(prefix) = show all coupons begining with the (prefix)  
+(prefix) = show all coupons beginning with the (prefix)  
 ### Information:
 	/c info (coupon code)
 (coupon code) = show information the specific coupon, instead of general info  

@@ -7,10 +7,12 @@ import net.lala.CouponCodes.api.CouponManager;
 import net.lala.CouponCodes.misc.CommandUsage;
 import net.lala.CouponCodes.misc.Misc;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.defaults.BanCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffectType;
 
@@ -22,6 +24,8 @@ public class BadCoupon extends Coupon {
 	static final int LIGHTNING = 4;
 	static final int POISON = 5;
 	static final int DROP = 6;
+	static final int KICK = 7;
+	static final int BAN = 8;
 	
 	public BadCoupon(String code, int value, int active, int totaluses, long expire) {
 		this(0, code, value, active, totaluses, expire);
@@ -89,6 +93,13 @@ public class BadCoupon extends Coupon {
 			w = player.getWorld();
 			pl = player.getLocation();
 			player.teleport(new Location(w, pl.getX(), 1024, pl.getZ()));
+			return;
+		case KICK:
+			player.kickPlayer(badMessage(KICK));
+			return;
+		case BAN:
+			Bukkit.getOfflinePlayer(player.getName()).setBanned(true);
+			player.kickPlayer(badMessage(BAN));
 			return;
 		}
 	}
@@ -161,6 +172,10 @@ public class BadCoupon extends Coupon {
 			return POISON;
 		if(bad.equalsIgnoreCase("drop"))
 			return DROP;
+		if(bad.equalsIgnoreCase("kick"))
+			return KICK;
+		if(bad.equalsIgnoreCase("ban"))
+			return BAN;
 		return CHICKEN;
 	}
 	
@@ -179,6 +194,10 @@ public class BadCoupon extends Coupon {
 			return ChatColor.GREEN + "Just relax and let the " + ChatColor.DARK_RED + "poison" + ChatColor.GREEN + " do its work...";
 		case DROP:
 			return ChatColor.GREEN + "Its not the fall that gets you, its the " + ChatColor.RED + "SUDDEN STOP" + ChatColor.GREEN + " at the end.";
+		case KICK:
+			return ChatColor.RED + "Redeeming random coupon codes can have ill effects.";
+		case BAN:
+			return ChatColor.RED + "Appeal the The Mighty BANHAMMER® at appeals@bestminecraftserverever.com.";
 		}
 	}
 }

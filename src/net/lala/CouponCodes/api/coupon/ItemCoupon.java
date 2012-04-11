@@ -50,10 +50,6 @@ public class ItemCoupon extends Coupon {
 		try {
 			for(Item item : m_items) {
 				ItemStack is = item.getItemStack();
-				if(item.enchantment() > 0) {
-					Enchantment enc = Enchantment.getById(item.enchantment());
-					is.addEnchantment(enc, 1);
-				}
 				if (player.getInventory().firstEmpty() == -1) {
 					player.getLocation().getWorld().dropItem(player.getLocation(), is);
 					player.sendMessage(ChatColor.RED + "Your inventory is full, so the items have been dropped below you.");
@@ -95,7 +91,7 @@ public class ItemCoupon extends Coupon {
 				if(code.equalsIgnoreCase("random"))
 					code = Misc.generateName();
 
-				ArrayList<Item> items = Item.parseToItems(args[3]);
+				ArrayList<Item> items = Item.parseToItems(sender, args[3]);
 
 				int active = 1;
 				int totaluses = 1;
@@ -116,9 +112,6 @@ public class ItemCoupon extends Coupon {
 					sender.sendMessage(ChatColor.RED+"This coupon already exists!");
 					return;
 				}
-			} catch (NumberFormatException e) {
-				sender.sendMessage(ChatColor.DARK_RED+"Expected a number, but got a string. Please check your syntax.");
-				return;
 			} catch (SQLException e) {
 				sender.sendMessage(ChatColor.DARK_RED+"Error while interacting with the database. See console for more info.");
 				sender.sendMessage(ChatColor.DARK_RED+"If this error persists, please report it.");
@@ -126,7 +119,7 @@ public class ItemCoupon extends Coupon {
 				return;
 			} catch(Exception e) {
 				String msg = e.getMessage();
-				sender.sendMessage(ChatColor.DARK_RED + "Your item string did not parse correctly. Error: " + msg);
+				sender.sendMessage(ChatColor.DARK_RED + "Item string parse FAIL. Error: " + msg);
 			}
 		} else {
 			sender.sendMessage(CommandUsage.C_ADD_ITEM.toString());
