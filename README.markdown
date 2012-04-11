@@ -65,7 +65,7 @@ Talk: /c
 (expiration) = period coupon is good for.  example: +1:days
 #### Multi
 	/c add multi [(group-)coupon code(:count)] [subcoupon1(:subcoupon2...)] (total uses) (expire)
-(group) = puts the multicoupon in a group.  only 1 coupon can be redeemed per user per group. 
+(group) = puts the multicoupon in a group.  only 1 coupon can be redeemed per user per group.  
 [coupon code] = string used to redeem this coupon.  no spaces.  
 (count) = use [coupon code] as a prefix, and generate (count) unique codes.  
 [subcoupon1(:subcoupon2...)] = semicolon separated list of coupons that you want this "multi" coupon to apply.   
