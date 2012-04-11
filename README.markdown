@@ -30,7 +30,7 @@ Talk: /c
 #### Rank
 	/c add rank [coupon code] [rank] (active) (total uses) (expiration)
 [coupon code] = string used to redeem this coupon.  no spaces.  
-[xp] = amount of xp to reward.  
+[rank] = title to grant the player.  
 (active) = default 1 for active, 0 for inactive.  inactive coupons can not be redeemed, except by a "multi" coupon.  
 (total uses) = default 1 use.  
 (expiration) = period coupon is good for.  example: +30:seconds  
