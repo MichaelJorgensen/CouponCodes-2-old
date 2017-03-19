@@ -1,5 +1,7 @@
 package net.lala.CouponCodes.api.events.coupon;
 
+import net.lala.CouponCodes.api.coupon.Coupon;
+
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -9,13 +11,13 @@ public class CouponRemoveFromDatabaseEvent extends Event {
 
 	private static final HandlerList h = new HandlerList();
 	
-	private String coupon;
+	private Coupon coupon;
 	
-	public CouponRemoveFromDatabaseEvent(String coupon) {
+	public CouponRemoveFromDatabaseEvent(Coupon coupon) {
 		this.coupon = coupon;
 	}
 	
-	public String getCoupon() {
+	public Coupon getCoupon() {
 		return coupon;
 	}
 	

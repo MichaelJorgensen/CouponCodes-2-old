@@ -5,7 +5,9 @@ import java.sql.SQLException;
 
 import net.lala.CouponCodes.CouponCodes;
 import net.lala.CouponCodes.api.CouponManager;
+import net.lala.CouponCodes.api.coupon.Coupon;
 import net.lala.CouponCodes.misc.Metrics;
+import net.lala.CouponCodes.sql.SQL;
 import net.lala.CouponCodes.sql.options.MySQLOptions;
 import net.lala.CouponCodes.sql.options.SQLiteOptions;
 
@@ -14,11 +16,13 @@ public class CustomDataSender implements Runnable {
 	private CouponCodes plugin;
 	private Metrics mt;
 	private CouponManager cm;
+	private SQL m_sql;
 	
 	public CustomDataSender(CouponCodes plugin, Metrics mt) {
 		this.plugin = plugin;
 		this.mt = mt;
 		this.cm = CouponCodes.getCouponManager();
+		m_sql = cm.getSQL();
 	}
 	
 	@Override
@@ -29,7 +33,7 @@ public class CustomDataSender implements Runnable {
 			@Override
 			public int getValue() {
 				try {
-					return cm.getCoupons().size();
+					return Coupon.getCount(m_sql);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -47,7 +51,7 @@ public class CustomDataSender implements Runnable {
 			@Override
 			public int getValue() {
 				try {
-					return cm.getAmountOf("Item");
+					return Coupon.getCount(m_sql, Coupon.ITEMS);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -65,7 +69,7 @@ public class CustomDataSender implements Runnable {
 			@Override
 			public int getValue() {
 				try {
-					return cm.getAmountOf("Economy");
+					return Coupon.getCount(m_sql, Coupon.ECONOMY);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -83,7 +87,7 @@ public class CustomDataSender implements Runnable {
 			@Override
 			public int getValue() {
 				try {
-					return cm.getAmountOf("Rank");
+					return Coupon.getCount(m_sql, Coupon.RANK);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -101,7 +105,7 @@ public class CustomDataSender implements Runnable {
 			@Override
 			public int getValue() {
 				try {
-					return cm.getAmountOf("Xp");
+					return Coupon.getCount(m_sql, Coupon.XP);
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -111,6 +115,60 @@ public class CustomDataSender implements Runnable {
 			@Override
 			public String getColumnName() {
 				return "Xp Coupons";
+			}
+		});
+		
+		mt.addCustomData(plugin, new Metrics.Plotter() {
+			
+			@Override
+			public int getValue() {
+				try {
+					return Coupon.getCount(m_sql, Coupon.MULTI);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				return 0;
+			}
+			
+			@Override
+			public String getColumnName() {
+				return "Multi Coupons";
+			}
+		});
+		
+		mt.addCustomData(plugin, new Metrics.Plotter() {
+			
+			@Override
+			public int getValue() {
+				try {
+					return Coupon.getCount(m_sql, Coupon.WARP);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				return 0;
+			}
+			
+			@Override
+			public String getColumnName() {
+				return "Warp Coupons";
+			}
+		});
+		
+		mt.addCustomData(plugin, new Metrics.Plotter() {
+			
+			@Override
+			public int getValue() {
+				try {
+					return Coupon.getCount(m_sql, Coupon.BAD);
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				return 0;
+			}
+			
+			@Override
+			public String getColumnName() {
+				return "Bad Coupons";
 			}
 		});
 		

@@ -33,7 +33,7 @@ public class CouponTimer implements Runnable {
 	
 	@Override
 	public void run() {
-		try {
+/*		try {
 			cl = cm.getCoupons();
 			if (cl == null) return;
 			
@@ -59,6 +59,6 @@ public class CouponTimer implements Runnable {
 			e.printStackTrace();
 		} catch (Exception e) {
 			
-		}
+		}*/
 	}
 }
